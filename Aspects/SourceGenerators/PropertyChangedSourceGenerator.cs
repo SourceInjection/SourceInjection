@@ -49,7 +49,7 @@ namespace Aspects.SourceGenerators
             }
         }
 
-        private static string GenerateClass(string classDec, IReadOnlyList<IFieldSymbol> fields)
+        private static string GenerateClass(string typeDec, IReadOnlyList<IFieldSymbol> fields)
         {
             var type = fields[0].ContainingType;
 
@@ -60,9 +60,9 @@ namespace Aspects.SourceGenerators
 
             sb.AppendLine($"namespace {type.ContainingNamespace.ToDisplayString()}");
             sb.AppendLine("{");
-
             sb.Append('\t');
-            sb.AppendLine(classDec);
+
+            sb.AppendLine(typeDec);
             sb.AppendLine("\t{");
 
             if (!type.GetMembers().Any(sy => sy.Name == "PropertyChanged"))
