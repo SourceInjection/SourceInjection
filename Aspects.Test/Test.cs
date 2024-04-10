@@ -5,14 +5,16 @@ using System.ComponentModel;
 namespace Aspects.Test
 {
     [Serializable]
-    public partial class Test<K> where K : struct, IEquatable<K>
+    [Browsable(false)]     
+    public partial class Test<K> : INotifyPropertyChanged where K : struct, IEquatable<K>
     {
-        [NotifyPropertyChanged]
+        [NotifyPropertyChanged(SetterVisibility.Protected)]
         private int _field;
 
-        [NotifyPropertyChanged]
-        private Herbert<K, string> _otherField;
+        [NotifyPropertyChanged(equalityCheck: true)]
+        private Herbert<K, string>? _otherField;
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        [NotifyPropertyChanged(equalityCheck: true)]
+        private int _anotherField;
     }
 }
