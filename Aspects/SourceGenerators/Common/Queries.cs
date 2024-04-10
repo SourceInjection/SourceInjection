@@ -8,12 +8,13 @@ namespace Aspects.SourceGenerators.Common
 {
     internal static class Queries
     {
-        public static IEnumerable<IFieldSymbol> GetFieldsWithAttribute(GeneratorSyntaxContext context, TypeDeclarationSyntax node, string attributeFullName)
+        public static IEnumerable<IFieldSymbol> GetFieldsWithAttribute(
+            GeneratorSyntaxContext context, TypeDeclarationSyntax node, string attributeFullName)
         {
             return node.ChildNodes()
                 .OfType<FieldDeclarationSyntax>()
-                .Where(fieldDec => fieldDec.AttributeLists.Any())
-                .SelectMany(fieldDec => fieldDec.Declaration.Variables.Select(v => context.SemanticModel.GetDeclaredSymbol(v) as IFieldSymbol))
+                .Where(field => field.AttributeLists.Any())
+                .SelectMany(field => field.Declaration.Variables.Select(v => context.SemanticModel.GetDeclaredSymbol(v) as IFieldSymbol))
                 .Where(field => field != null && field.GetAttributes().Any(fs => fs.AttributeClass.ToDisplayString() == attributeFullName));
         }
 
