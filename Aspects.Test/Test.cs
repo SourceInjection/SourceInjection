@@ -1,5 +1,4 @@
-﻿
-using Aspects.Attributes;
+﻿using Aspects.Attributes;
 using System.ComponentModel;
 
 namespace Aspects.Test

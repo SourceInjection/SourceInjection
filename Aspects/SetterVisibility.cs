@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Aspects.Attributes
+namespace Aspects
 {
     public enum SetterVisibility
     {
@@ -16,7 +16,7 @@ namespace Aspects.Attributes
     {
         public static string ToDisplayString(this SetterVisibility visibility)
         {
-            switch(visibility)
+            switch (visibility)
             {
                 case SetterVisibility.Public: return "public";
                 case SetterVisibility.Internal: return "internal";
