@@ -24,7 +24,8 @@ namespace Aspects.SourceGenerators.Base
                 foreach (var typeInfo in SyntaxReceiver.IdentifiedTypes)
                 {
                     var src = GeneratePartialType(typeInfo);
-                    context.AddSource($"{typeInfo.Symbol.Name}_{Name}.g.cs", SourceText.From(src, Encoding.UTF8));
+                    context.AddSource($"{typeInfo.Symbol.ContainingNamespace.ToDisplayString()}." +
+                        $"{typeInfo.Name.Replace('<', '[').Replace('>', ']')}-{Name}.g.cs", SourceText.From(src, Encoding.UTF8));
                 }
             }
         }
