@@ -2,26 +2,27 @@
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Generic;
+using TypeInfo = Aspects.SourceGenerators.Common.TypeInfo;
 
 namespace Aspects.SourceGenerators.SyntaxReceivers
 {
     internal class TypeSyntaxReceiver : ISyntaxContextReceiver
     {
-        private readonly Predicate<Common.TypeInfo> _predicate;
-        private readonly List<Common.TypeInfo> _identifiedContexts = new List<Common.TypeInfo>(256);
+        private readonly Predicate<TypeInfo> _predicate;
+        private readonly List<TypeInfo> _identifiedContexts = new List<TypeInfo>(256);
 
-        public TypeSyntaxReceiver(Predicate<Common.TypeInfo> predicate)
+        public TypeSyntaxReceiver(Predicate<TypeInfo> predicate)
         {
             _predicate = predicate;
         }
 
-        public IReadOnlyList<Common.TypeInfo> IdentifiedTypes => _identifiedContexts;
+        public IReadOnlyList<TypeInfo> IdentifiedTypes => _identifiedContexts;
 
         public void OnVisitSyntaxNode(GeneratorSyntaxContext context)
         {
             if(context.Node is TypeDeclarationSyntax node && context.SemanticModel.GetDeclaredSymbol(node) is INamedTypeSymbol symbol)
             {
-                var typeInfo = new Data.TypeInfo(node, symbol);
+                var typeInfo = new TypeInfo(node, symbol);
                 if(_predicate(typeInfo))
                     _identifiedContexts.Add(typeInfo);
             }

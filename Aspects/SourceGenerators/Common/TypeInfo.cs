@@ -12,7 +12,8 @@ namespace Aspects.SourceGenerators.Common
         {
             SyntaxNode = syntaxNode;
             Symbol = typeSymbol;
-            Declaration = TypeDeclaration(syntaxNode);
+            Declaration = Common.Declaration.GetText(syntaxNode);
+            Name = Common.Declaration.GetName(syntaxNode);
         }
 
         public TypeDeclarationSyntax SyntaxNode { get; }
@@ -21,35 +22,14 @@ namespace Aspects.SourceGenerators.Common
 
         public string Declaration { get; }
 
+        public string Name { get; }
+
         public IEnumerable<ISymbol> Members => Symbol.GetMembers();
 
         public IEnumerable<ISymbol> MembersWith<T>() where T : Attribute
         {
             var name = typeof(T).FullName;
             return Members.Where(m => m.GetAttributes().Any(a => a.AttributeClass.ToDisplayString() == name));
-        }
-
-        private static string TypeDeclaration(TypeDeclarationSyntax node)
-        {
-            var nodeText = node.GetText().ToString();
-
-            int nameStart = 0;
-            if (node.AttributeLists.Any())
-                nameStart = node.AttributeLists.Sum(al => al.GetText().Length);
-
-            int nameLength;
-            if (node.TypeParameterList is null)
-                nameLength = nodeText.IndexOf(node.Identifier.Text) + node.Identifier.Text.Length;
-            else
-                nameLength = nodeText.IndexOf('>') + 1;
-            nameLength -= nameStart;
-
-            return nodeText.Substring(nameStart, nameLength).Trim();
-        }
-
-        public override int GetHashCode()
-        {
-            return HashCodeCom
         }
     }
 }
