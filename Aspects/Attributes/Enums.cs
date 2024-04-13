@@ -1,7 +1,9 @@
 ﻿using System;
 
-namespace Aspects
+namespace Aspects.Attributes
 {
+    public enum DataMemberKind { All, Field, Property }
+
     public enum SetterVisibility
     {
         Public,
