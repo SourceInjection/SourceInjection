@@ -13,28 +13,23 @@ namespace Aspects.SourceGenerators
     {
         private protected override string Name => "ToString";
 
-        private protected override ToStringAttribute ConvertToAttribute(AttributeData attributeData)
-        {
-            return ToStringAttribute.FromAttributeData(attributeData);
-        }
-
         private protected override string ClassBody(TypeInfo typeInfo)
         {
             var sb = new StringBuilder();
             sb.AppendLine($"public override string ToString()");
             sb.AppendLine("{");
 
-            sb.Append($"\treturn $\"({{nameof({typeInfo.Name})}})");
+            sb.Append($"\treturn $\"({typeInfo.Name})");
 
-            var symbols = GetSymbols(typeInfo).Where(sy => sy.DeclaredAccessibility == Accessibility.Public);
+            var symbols = GetSymbols(typeInfo);
             if (symbols.Any())
             {
                 sb.Append("{{");
                 var first = symbols.First().Name;
-                sb.Append($"{Property.Name(first)}: {{{first}}}");
+                sb.Append($"{first}: {{{first}}}");
 
                 foreach (var name in symbols.Skip(1).Select(s => s.Name))
-                    sb.Append($", {Property.Name(name)}: {{{name}}}");
+                    sb.Append($", {name}: {{{name}}}");
                 sb.Append("}}");
             }
             sb.AppendLine("\";");

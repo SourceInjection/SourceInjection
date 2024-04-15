@@ -9,7 +9,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Aspects\Aspects.csproj" OutputItemType="Analyzer"/>
+    <ProjectReference Include="..\Aspects\Aspects.csproj" OutputItemType="Analyzer" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Mvvm\" />
   </ItemGroup>
 
 </Project>

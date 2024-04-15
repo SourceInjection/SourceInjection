@@ -5,23 +5,20 @@ using Aspects.SourceGenerators.SyntaxReceivers;
 using Microsoft.CodeAnalysis;
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using TypeInfo = Aspects.SourceGenerators.Common.TypeInfo;
 
 namespace Aspects.SourceGenerators.Base
 {
     public abstract class BasicMethodOverrideSourceGeneratorBase<TTypeAttribute, TExcludeAttribute> : TypeSourceGeneratorBase 
-        where TTypeAttribute : BaseOverrideMethodAttribute 
+        where TTypeAttribute : BasicOverrideMethodAttribute 
         where TExcludeAttribute : Attribute
     {
         private static readonly string s_attributeName = typeof(TTypeAttribute).FullName;
         private static readonly string s_excludeName = typeof(TExcludeAttribute).FullName;
 
         private protected override TypeSyntaxReceiver SyntaxReceiver { get; }
-            = new TypeSyntaxReceiver(Types.With<HashCodeAttribute>());
-
-        protected private abstract TTypeAttribute ConvertToAttribute(AttributeData attributeData);
+            = new TypeSyntaxReceiver(Types.With<TTypeAttribute>());
 
         private protected override string Dependencies(TypeInfo typeInfo)
         {
@@ -48,27 +45,21 @@ namespace Aspects.SourceGenerators.Base
             throw new NotImplementedException();
         }
 
-        private static IEnumerable<ISymbol> GetDataMembers(TypeInfo typeInfo, TTypeAttribute attribute)
+        private static IEnumerable<ISymbol> GetDataMembers(TypeInfo typeInfo, BasicOverrideMethodAttribute attribute)
         {
-            IEnumerable<ISymbol> fields = GetFields(typeInfo, attribute).ToArray();
-
-            var excludedPropNames = fields
-                .Select(f => Property.Name(f.Name))
-                .ToImmutableHashSet();
-
-            var properties = GetProperties(typeInfo, attribute)
-                .Where(p => !excludedPropNames.Contains(p.Name));
-
+            IEnumerable<ISymbol> fields = GetFields(typeInfo, attribute);
+            var properties = GetProperties(typeInfo, attribute).ToArray();
+            fields = fields.Where(f => !Array.Exists(properties, p => p.Name == Property.Name(f.Name))).ToArray();
             return fields.Concat(properties);
         }
 
-        protected private TTypeAttribute GetAttribute(TypeInfo typeInfo)
+        protected private BasicOverrideMethodAttribute GetAttribute(TypeInfo typeInfo)
         {
-            return ConvertToAttribute(typeInfo.Symbol.GetAttributes()
+            return BasicOverrideMethodAttribute.FromAttributeData(typeInfo.Symbol.GetAttributes()
                 .First(a => a.AttributeClass.ToDisplayString() == s_attributeName));
         }
 
-        private static IEnumerable<IPropertySymbol> GetProperties(TypeInfo typeInfo, TTypeAttribute attribute)
+        private static IEnumerable<IPropertySymbol> GetProperties(TypeInfo typeInfo, BasicOverrideMethodAttribute attribute)
         {
             return typeInfo.Members
                 .OfType<IPropertySymbol>()
@@ -83,7 +74,7 @@ namespace Aspects.SourceGenerators.Base
                 && !property.GetMethod.IsStatic;
         }
 
-        private static IEnumerable<IFieldSymbol> GetFields(TypeInfo typeInfo, TTypeAttribute attribute)
+        private static IEnumerable<IFieldSymbol> GetFields(TypeInfo typeInfo, BasicOverrideMethodAttribute attribute)
         {
             return typeInfo.Members
                 .OfType<IFieldSymbol>()

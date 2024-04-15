@@ -21,7 +21,7 @@ namespace Aspects.SourceGenerators.Common
             nodeText = nodeText.Substring(0, nodeText.IndexOf('{'));
             nodeText = RemoveAttributes(nodeText).Trim();
 
-            if (node.AttributeLists.Any())
+            if (nodeText.Contains('>'))
                 return nodeText.Substring(0, nodeText.IndexOf('>') + 1);
             return nodeText.Substring(0, nodeText.IndexOf(node.Identifier.Text) + node.Identifier.Text.Length);
         }

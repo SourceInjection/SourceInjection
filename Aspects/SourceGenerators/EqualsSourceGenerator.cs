@@ -16,10 +16,6 @@ namespace Aspects.SourceGenerators
 
         private protected override string Name => "Equals";
 
-        private protected override EqualsAttribute ConvertToAttribute(AttributeData attributeData)
-        {
-            return EqualsAttribute.FromAttributeData(attributeData);
-        }
 
         private protected override string ClassBody(TypeInfo typeInfo)
         {

@@ -12,11 +12,6 @@ namespace Aspects.SourceGenerators
     {
         private protected override string Name => "HashCode";
 
-        private protected override HashCodeAttribute ConvertToAttribute(AttributeData attributeData)
-        {
-            return HashCodeAttribute.FromAttributeData(attributeData);
-        }
-
         private protected override string ClassBody(TypeInfo typeInfo)
         {
             var sb = new StringBuilder();
