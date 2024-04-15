@@ -2,7 +2,15 @@
 
 namespace Aspects.Attributes
 {
-    public enum DataMemberKind { All, Field, Property }
+    public enum DataMemberKind 
+    { 
+        All,
+        Public,
+        Properties,
+        Fields,
+        PublicProperties,
+        PublicFields,
+    }
 
     public enum SetterVisibility
     {

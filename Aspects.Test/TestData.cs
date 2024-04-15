@@ -4,7 +4,7 @@ namespace Aspects.Test
 {
     [HashCode]
     [Equals]
-    [ToString]
+    [ToString(DataMemberKind.Public, nameof(Value), nameof(Int))]
     internal partial class TestData<T>
     {
         private const int constInt = 3;
@@ -14,7 +14,6 @@ namespace Aspects.Test
 
         [HashCodeExclude]
         [EqualsExclude]
-        [ToStringExclude]
         public int NotRelevant => constInt;
 
         public string Value { get; set; }

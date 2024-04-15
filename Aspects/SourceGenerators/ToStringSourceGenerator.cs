@@ -26,7 +26,7 @@ namespace Aspects.SourceGenerators
 
             sb.Append($"\treturn $\"({{nameof({typeInfo.Name})}})");
 
-            var symbols = GetSymbols(typeInfo);
+            var symbols = GetSymbols(typeInfo).Where(sy => sy.DeclaredAccessibility == Accessibility.Public);
             if (symbols.Any())
             {
                 sb.Append("{{");
