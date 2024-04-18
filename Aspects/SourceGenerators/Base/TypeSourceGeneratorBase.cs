@@ -1,5 +1,6 @@
-﻿using Aspects.SourceGenerators.SyntaxReceivers;
+﻿using Aspects.SyntaxReceivers;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Text;
 using System.Text;
 using TypeInfo = Aspects.SourceGenerators.Common.TypeInfo;
 
@@ -10,7 +11,6 @@ namespace Aspects.SourceGenerators.Base
         protected private abstract string Name { get; }
 
         protected private abstract TypeSyntaxReceiver SyntaxReceiver { get; }
-
 
         public void Initialize(GeneratorInitializationContext context)
         {
@@ -25,7 +25,7 @@ namespace Aspects.SourceGenerators.Base
                 {
                     var src = GeneratePartialType(typeInfo);
                     context.AddSource($"{typeInfo.Symbol.ContainingNamespace.ToDisplayString()}." +
-                        $"{typeInfo.Name.Replace('<', '[').Replace('>', ']')}-{Name}.g.cs", src);
+                        $"{typeInfo.Name.Replace('<', '[').Replace('>', ']')}-{Name}.g.cs", SourceText.From(src, Encoding.UTF8));
                 }
             }
         }

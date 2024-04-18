@@ -1,7 +1,7 @@
 ﻿using Aspects.Attributes;
 using Aspects.SourceGenerators.Base;
 using Aspects.SourceGenerators.Common;
-using Aspects.SourceGenerators.SyntaxReceivers;
+using Aspects.SyntaxReceivers;
 using Microsoft.CodeAnalysis;
 using System.Linq;
 using System.Text;
@@ -27,15 +27,14 @@ namespace Aspects.SourceGenerators
         {
             var sb = new StringBuilder();
 
-            if (!typeInfo.Members.Any(sy => sy.Name == "PropertyChanged"))
+            if (!typeInfo.Members(true).Any(sy => sy.Name == "PropertyChanged"))
             {
                 sb.AppendLine("public event PropertyChangedEventHandler PropertyChanged;");
                 sb.AppendLine();
             }
 
             var attributedFields = typeInfo
-                .MembersWith<NotifyPropertyChangedAttribute>()
-                .OfType<IFieldSymbol>()
+                .FieldsWith<NotifyPropertyChangedAttribute>()
                 .ToArray();
 
             sb.Append(PropertyCode(attributedFields[0]));
@@ -90,7 +89,7 @@ namespace Aspects.SourceGenerators
                 .First(a => a.AttributeClass.ToDisplayString() == attName);
 
             var attribute = NotifyPropertyChangedAttribute.FromAttributeData(attData);
-            if (attribute.Visibility == SetterVisibility.Public)
+            if (attribute.Visibility == Attributes.Accessibility.Public)
                 sb.AppendLine("\tset");
             else
                 sb.AppendLine($"\t{attribute.Visibility.ToDisplayString()} set");

@@ -1,7 +1,7 @@
 ﻿using Aspects.Attributes;
 using Aspects.Attributes.Base;
 using Aspects.SourceGenerators.Common;
-using Aspects.SourceGenerators.SyntaxReceivers;
+using Aspects.Util;
 using Microsoft.CodeAnalysis;
 using System;
 using System.Collections.Generic;
@@ -10,76 +10,90 @@ using TypeInfo = Aspects.SourceGenerators.Common.TypeInfo;
 
 namespace Aspects.SourceGenerators.Base
 {
-    public abstract class BasicMethodOverrideSourceGeneratorBase<TTypeAttribute, TExcludeAttribute> : TypeSourceGeneratorBase 
-        where TTypeAttribute : BasicOverrideMethodAttribute 
-        where TExcludeAttribute : Attribute
+    public abstract class BasicMethodOverrideSourceGeneratorBase : TypeSourceGeneratorBase 
     {
-        private static readonly string s_attributeName = typeof(TTypeAttribute).FullName;
-        private static readonly string s_excludeName = typeof(TExcludeAttribute).FullName;
+        protected abstract ISet<string> TypeAttributes { get; }
 
-        private protected override TypeSyntaxReceiver SyntaxReceiver { get; }
-            = new TypeSyntaxReceiver(Types.With<TTypeAttribute>());
+        protected abstract ISet<string> ExcludeAttributes { get; }
 
         private protected override string Dependencies(TypeInfo typeInfo)
         {
             return string.Empty;
         }
 
-        protected private IEnumerable<ISymbol> GetSymbols(TypeInfo typeInfo)
+        protected private IEnumerable<ISymbol> GetDeclaredSymbols(TypeInfo typeInfo)
+        {
+            return GetSymbols(typeInfo, typeInfo.Members());
+        }
+
+        protected private IEnumerable<ISymbol> GetAllSymbols(TypeInfo typeInfo)
+        {
+            return GetSymbols(typeInfo, typeInfo.Members(true));
+        }
+
+        private IEnumerable<ISymbol> GetSymbols(TypeInfo typeInfo, IEnumerable<ISymbol> members)
         {
             var attribute = GetAttribute(typeInfo);
 
-            if (attribute.DataMemberKind == DataMemberKind.Properties)
-                return GetProperties(typeInfo, attribute);
-            else if (attribute.DataMemberKind == DataMemberKind.Fields)
-                return GetFields(typeInfo, attribute);
-            else if (attribute.DataMemberKind == DataMemberKind.All)
-                return GetDataMembers(typeInfo, attribute);
-            else if (attribute.DataMemberKind == DataMemberKind.PublicProperties)
-                return GetProperties(typeInfo, attribute).Where(p => p.DeclaredAccessibility == Accessibility.Public);
-            else if (attribute.DataMemberKind == DataMemberKind.PublicFields)
-                return GetFields(typeInfo, attribute).Where(f => f.DeclaredAccessibility == Accessibility.Public);
-            else if (attribute.DataMemberKind == DataMemberKind.Public)
-                return GetDataMembers(typeInfo, attribute).Where(sy => sy.DeclaredAccessibility == Accessibility.Public);
+            if (attribute != null)
+            {
+                if (attribute.DataMemberKind == DataMemberKind.Property)
+                    return GetProperties(members);
+                else if (attribute.DataMemberKind == DataMemberKind.Field)
+                    return GetFields(members);
+                else if (attribute.DataMemberKind == DataMemberKind.DataMember)
+                    return GetDataMembers(members);
+                throw new NotImplementedException();
+            }
 
-            throw new NotImplementedException();
-        }
-
-        private static IEnumerable<ISymbol> GetDataMembers(TypeInfo typeInfo, BasicOverrideMethodAttribute attribute)
-        {
-            IEnumerable<ISymbol> fields = GetFields(typeInfo, attribute);
-            var properties = GetProperties(typeInfo, attribute).ToArray();
-            fields = fields.Where(f => !Array.Exists(properties, p => p.Name == Property.Name(f.Name))).ToArray();
-            return fields.Concat(properties);
+            return members
+                .Where(m => m is IFieldSymbol || m is IPropertySymbol p && PropertyIsValid(p))
+                .Where(m => MemberHasTypeAttribute(m));
         }
 
         protected private BasicOverrideMethodAttribute GetAttribute(TypeInfo typeInfo)
         {
             return BasicOverrideMethodAttribute.FromAttributeData(typeInfo.Symbol.GetAttributes()
-                .First(a => a.AttributeClass.ToDisplayString() == s_attributeName));
+                .First(a => TypeAttributes.Contains(a.AttributeClass.ToDisplayString())));
         }
 
-        private static IEnumerable<IPropertySymbol> GetProperties(TypeInfo typeInfo, BasicOverrideMethodAttribute attribute)
+        private bool MemberHasTypeAttribute(ISymbol m)
         {
-            return typeInfo.Members
-                .OfType<IPropertySymbol>()
-                .Where(p => !attribute.ExcludedMembers.Contains(p.Name) && GetterIsValid(p) 
-                    && !p.GetAttributes().Any(a => a.AttributeClass.ToDisplayString() == s_excludeName));
+            var attributeNames = m.GetAttributes()
+                .Select(a => a.AttributeClass.ToDisplayString());
+
+            return attributeNames.Any(a => TypeAttributes.Contains(a))
+                && !attributeNames.Any(a => ExcludeAttributes.Contains(a));
         }
 
-        private static bool GetterIsValid(IPropertySymbol property)
+        private IEnumerable<ISymbol> GetDataMembers(IEnumerable<ISymbol> members)
         {
-            return !property.IsStatic
+            IEnumerable<ISymbol> fields = GetFields(members);
+            var properties = GetProperties(members).ToArray();
+            fields = fields.Where(f => !Array.Exists(properties, p => p.Name == Property.Name(f.Name))).ToArray();
+            return fields.Concat(properties);
+        }
+
+        private IEnumerable<IPropertySymbol> GetProperties(IEnumerable<ISymbol> members)
+        {
+            return members.OfType<IPropertySymbol>()
+                .Where(p => PropertyIsValid(p) && !p.HasAnyAttribute(ExcludeAttributes));
+        }
+
+        private static bool PropertyIsValid(IPropertySymbol property)
+        {
+            return !property.IsOverride
+                && !property.IsImplicitlyDeclared
+                && !property.IsStatic
                 && property.GetMethod != null
                 && !property.GetMethod.IsStatic;
         }
 
-        private static IEnumerable<IFieldSymbol> GetFields(TypeInfo typeInfo, BasicOverrideMethodAttribute attribute)
+        private IEnumerable<IFieldSymbol> GetFields(IEnumerable<ISymbol> members)
         {
-            return typeInfo.Members
+            return members
                 .OfType<IFieldSymbol>()
-                .Where(f => !attribute.ExcludedMembers.Contains(f.Name) && !f.IsImplicitlyDeclared && !f.IsConst && !f.IsStatic
-                    && !f.GetAttributes().Any(a => a.AttributeClass.ToDisplayString() == s_excludeName));
+                .Where(f => !f.IsImplicitlyDeclared && !f.IsConst && !f.IsStatic && !f.HasAnyAttribute(ExcludeAttributes));
         } 
     }
 }

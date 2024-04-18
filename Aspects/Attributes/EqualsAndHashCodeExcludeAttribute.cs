@@ -3,6 +3,6 @@
 namespace Aspects.Attributes
 {
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, Inherited = true, AllowMultiple = false)]
-    public class EqualsExcludeAttribute : Attribute
+    public class EqualsAndHashCodeExcludeAttribute : Attribute
     { }
 }

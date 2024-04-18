@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using TypeInfo = Aspects.SourceGenerators.Common.TypeInfo;
 
-namespace Aspects.SourceGenerators.SyntaxReceivers
+namespace Aspects.SyntaxReceivers
 {
     internal class TypeSyntaxReceiver : ISyntaxContextReceiver
     {
@@ -20,10 +20,10 @@ namespace Aspects.SourceGenerators.SyntaxReceivers
 
         public void OnVisitSyntaxNode(GeneratorSyntaxContext context)
         {
-            if(context.Node is TypeDeclarationSyntax node && context.SemanticModel.GetDeclaredSymbol(node) is INamedTypeSymbol symbol)
+            if (context.Node is TypeDeclarationSyntax node && context.SemanticModel.GetDeclaredSymbol(node) is INamedTypeSymbol symbol)
             {
                 var typeInfo = new TypeInfo(node, symbol);
-                if(_predicate(typeInfo))
+                if (_predicate(typeInfo))
                     _identifiedContexts.Add(typeInfo);
             }
         }

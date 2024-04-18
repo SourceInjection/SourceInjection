@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Aspects.Util;
+using System;
 using System.Linq;
 
 namespace Aspects.SourceGenerators.Common
@@ -7,16 +8,22 @@ namespace Aspects.SourceGenerators.Common
     {
         public static Predicate<TypeInfo> With<T>() where T : Attribute
         {
-            var name = typeof(T).FullName;
-            return (TypeInfo type) => 
-                type.Symbol.GetAttributes().Any(a => a.AttributeClass.ToDisplayString() == name);
+            return WithAttribute(typeof(T).FullName);
+        }
+
+        public static Predicate<TypeInfo> WithAttribute(string attributeFullname)
+        {
+            return (TypeInfo type) => type.Symbol.HasAttribute(attributeFullname);
         }
 
         public static Predicate<TypeInfo> WithMembersWith<T>() where T : Attribute
         {
-            var name = typeof(T).FullName;
-            return (TypeInfo type) =>
-                type.Symbol.GetMembers().SelectMany(m => m.GetAttributes()).Any(a => a.AttributeClass.ToDisplayString() == name);
+            return WithMembersWithAttribute(typeof(T).FullName);
+        }
+
+        public static Predicate<TypeInfo> WithMembersWithAttribute(string attributeFullname)
+        {
+            return (TypeInfo type) => type.Symbol.GetMembers().Any(m => m.HasAttribute(attributeFullname));
         }
     }
 }

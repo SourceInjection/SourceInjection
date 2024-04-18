@@ -1,17 +1,31 @@
 ﻿using Aspects.Attributes;
 using Aspects.SourceGenerators.Base;
-using Aspects.SourceGenerators.Common;
 using Microsoft.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using TypeInfo = Aspects.SourceGenerators.Common.TypeInfo;
+using Accessibility = Microsoft.CodeAnalysis.Accessibility;
+using System.Collections.Generic;
+using Aspects.SourceGenerators.Common;
+using Aspects.SyntaxReceivers;
+using Aspects.Util;
 
 namespace Aspects.SourceGenerators
 {
     [Generator]
-    internal class ToStringSourceGenerator : BasicMethodOverrideSourceGeneratorBase<ToStringAttribute, ToStringExcludeAttribute>
+    internal class ToStringSourceGenerator : BasicMethodOverrideSourceGeneratorBase
     {
         private protected override string Name => "ToString";
+
+        protected override ISet<string> TypeAttributes { get; } 
+            = new HashSet<string>() { typeof(ToStringAttribute).FullName };
+
+        protected override ISet<string> ExcludeAttributes { get; } 
+            = new HashSet<string>() { typeof(ToStringExcludeAttribute).FullName };
+
+        private protected override TypeSyntaxReceiver SyntaxReceiver { get; } = new TypeSyntaxReceiver(
+                Types.With<ToStringAttribute>()
+            .Or(Types.WithMembersWith<ToStringAttribute>()));
 
         private protected override string ClassBody(TypeInfo typeInfo)
         {
@@ -21,7 +35,9 @@ namespace Aspects.SourceGenerators
 
             sb.Append($"\treturn $\"({typeInfo.Name})");
 
-            var symbols = GetSymbols(typeInfo);
+            var symbols = GetAllSymbols(typeInfo)
+                .Where(sy => IsPublicProperty(sy) || IsPublicField(sy));
+
             if (symbols.Any())
             {
                 sb.Append("{{");
@@ -36,6 +52,21 @@ namespace Aspects.SourceGenerators
             sb.Append('}');
 
             return sb.ToString();
+        }
+
+        public static bool IsPublicProperty(ISymbol symbol)
+        {
+            return symbol is IPropertySymbol property
+                && property.DeclaredAccessibility == Accessibility.Public
+                && property.GetMethod != null
+                && (property.GetMethod.DeclaredAccessibility == Accessibility.NotApplicable 
+                    || property.GetMethod.DeclaredAccessibility == Accessibility.Public);
+        }
+
+        public static bool IsPublicField(ISymbol symbol)
+        {
+            return symbol is IFieldSymbol field
+                && field.DeclaredAccessibility == Accessibility.Public;
         }
     }
 }

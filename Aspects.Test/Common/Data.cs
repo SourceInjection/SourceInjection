@@ -4,9 +4,8 @@
 namespace Aspects.Test.Common
 {
     [ToString]
-    [HashCode]
-    [Equals]
-    public partial class Data
+    [EqualsAndHashCode]
+    public partial class Data : DataBase
     {
         private int _int;
 
@@ -14,5 +13,13 @@ namespace Aspects.Test.Common
 
         public object? Object { get; }
 
+        public override string Name { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+    }
+
+    [ToString]
+    [EqualsAndHashCode]
+    public abstract partial class DataBase
+    {
+        public abstract string Name { get; set; }
     }
 }

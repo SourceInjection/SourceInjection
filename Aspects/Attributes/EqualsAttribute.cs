@@ -1,14 +1,14 @@
 ﻿using Aspects.Attributes.Base;
-using Microsoft.CodeAnalysis;
 using System;
 
 namespace Aspects.Attributes
 {
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, Inherited = false, AllowMultiple = false)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Field | AttributeTargets.Property, 
+        Inherited = false, AllowMultiple = false)]
     public class EqualsAttribute : BasicOverrideMethodAttribute
     {
-        public EqualsAttribute(DataMemberKind dataMemberKind = DataMemberKind.All, params string[] excludedMembers) 
-            : base(dataMemberKind, excludedMembers)
+        public EqualsAttribute(DataMemberKind dataMemberKind = DataMemberKind.DataMember) 
+            : base(dataMemberKind)
         { }
     }
 }
