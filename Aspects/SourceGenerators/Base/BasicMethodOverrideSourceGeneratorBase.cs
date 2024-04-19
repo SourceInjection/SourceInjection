@@ -80,9 +80,9 @@ namespace Aspects.SourceGenerators.Base
                 .Where(p => PropertyIsValid(p) && !p.HasAnyAttribute(ExcludeAttributes));
         }
 
-        private static bool PropertyIsValid(IPropertySymbol property)
+        private bool PropertyIsValid(IPropertySymbol property)
         {
-            return !property.IsOverride
+            return (!property.IsOverride || property.HasAnyAttribute(TypeAttributes))
                 && !property.IsImplicitlyDeclared
                 && !property.IsStatic
                 && property.GetMethod != null
