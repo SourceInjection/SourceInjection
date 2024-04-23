@@ -1,11 +1,7 @@
-﻿using Aspects.Attributes;
+﻿using Aspects.Attributes.Interfaces;
 using Aspects.SourceGenerators.Base;
-using Aspects.SourceGenerators.Common;
-using Aspects.SyntaxReceivers;
-using Aspects.Util;
 using Microsoft.CodeAnalysis;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using TypeInfo = Aspects.SourceGenerators.Common.TypeInfo;
@@ -13,24 +9,12 @@ using TypeInfo = Aspects.SourceGenerators.Common.TypeInfo;
 namespace Aspects.SourceGenerators
 {
     [Generator]
-    internal class EqualsSourceGenerator : BasicMethodOverrideSourceGeneratorBase
+    internal class EqualsSourceGenerator : BasicMethodOverrideSourceGeneratorBase<IEqualsAttribute, IEqualsExcludeAttribute>
     {
         private const string arg = "obj";
         private const string other = "other";
 
         private protected override string Name => "Equals";
-
-        protected override ISet<string> TypeAttributes { get; } 
-            = new HashSet<string>() { typeof(EqualsAndHashCodeAttribute).FullName, typeof(EqualsAttribute).FullName };
-
-        protected override ISet<string> ExcludeAttributes { get; }
-            = new HashSet<string>() { typeof(EqualsAndHashCodeExcludeAttribute).FullName, typeof(EqualsExcludeAttribute).FullName };
-
-        private protected override TypeSyntaxReceiver SyntaxReceiver { get; } = new TypeSyntaxReceiver(
-                Types.With<EqualsAttribute>()
-            .Or(Types.With<EqualsAndHashCodeAttribute>())
-            .Or(Types.WithMembersWith<EqualsAttribute>())
-            .Or(Types.WithMembersWith<EqualsAndHashCodeAttribute>()));
 
         private protected override string ClassBody(TypeInfo typeInfo)
         {
@@ -63,13 +47,9 @@ namespace Aspects.SourceGenerators
 
         private bool ShouldIncludeBase(TypeInfo typeInfo)
         {
-            var inheritance = typeInfo.Inheritance();
-            if (inheritance.Any(sy => sy.HasAnyAttribute(TypeAttributes)))
-                return true;
-
-            var baseMembers = inheritance.SelectMany(cl => cl.GetMembers());
-            return baseMembers.Any(m => m is IMethodSymbol method && MethodIsEqualsOverride(method))
-                || baseMembers.Any(m => m.HasAnyAttribute(TypeAttributes));
+            return typeInfo.Inheritance()
+                .SelectMany(cl => cl.GetMembers())
+                .Any(m => m is IMethodSymbol method && MethodIsEqualsOverride(method));
         }
 
         private bool MethodIsEqualsOverride(IMethodSymbol method)
@@ -85,18 +65,17 @@ namespace Aspects.SourceGenerators
             var memberName = symbol.Name;
 
             if (symbol is IFieldSymbol field)
-            {
-                if (field.Type.IsReferenceType)
-                    return $"{memberName}?.Equals({other}.{memberName}) is true";
-                return $"{memberName}.Equals({other}.{memberName})";
-            }
+                return Comparison(field.Type, memberName);
             else if (symbol is IPropertySymbol property)
-            {
-                if (property.Type.IsReferenceType)
-                    return $"{memberName}?.Equals({other}.{memberName}) is true";
-                return $"{memberName}.Equals({other}.{memberName})";
-            }
+                return Comparison(property.Type, memberName);
             else throw new NotImplementedException();
+        }
+
+        protected static string Comparison(ITypeSymbol type, string memberName)
+        {
+            if (type.IsReferenceType)
+                return $"{memberName}?.Equals({other}.{memberName}) is true";
+            return $"{memberName}.Equals({other}.{memberName})";
         }
     }
 }

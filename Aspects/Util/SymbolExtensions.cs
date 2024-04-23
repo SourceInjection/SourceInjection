@@ -6,19 +6,26 @@ namespace Aspects.Util
 {
     internal static class SymbolExtensions
     {
-        public static bool HasAttribute(this ISymbol symbol, string fullName)
+        public static bool HasAttributeOfType<T>(this ISymbol symbol)
         {
-            return symbol.GetAttributes().Any(a => a.AttributeClass.ToDisplayString() == fullName);
+            return symbol.GetAttributesOfType<T>().Any();
         }
 
-        public static bool HasAnyAttribute(this ISymbol symbol, ISet<string> attributeFullNames)
+        public static IEnumerable<AttributeData> GetAttributesOfType<T>(this ISymbol symbol)
         {
-            return symbol.GetAttributes().Any(a => attributeFullNames.Contains(a.AttributeClass.ToDisplayString()));
+            var name = typeof(T).FullName;
+            return symbol.GetAttributes().Where(a =>
+                a.AttributeClass.Inheritance().Any(ac => ac.ToDisplayString() == name)
+                || a.AttributeClass.AllInterfaces.Any(i => i.ToDisplayString() == name));
         }
 
-        public static bool HasAnyAttribute(this ISymbol symbol, IEnumerable<string> attributeFullNames)
+        public static IEnumerable<INamedTypeSymbol> Inheritance(this INamedTypeSymbol symbol)
         {
-            return symbol.GetAttributes().Any(a => attributeFullNames.Contains(a.AttributeClass.ToDisplayString()));
+            while(symbol != null)
+            {
+                yield return symbol;
+                symbol = symbol.BaseType;
+            }
         }
     }
 }

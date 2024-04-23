@@ -40,15 +40,6 @@ namespace Aspects.SourceGenerators.Common
                 yield return stack.Pop();
         }
 
-        public bool Has<T>(bool includeInherited) where T : Attribute
-        {
-            var name = typeof(T).FullName;
-            if (!includeInherited)
-                return Symbol.HasAttribute(name);
-
-            return Inheritance(true).Any(sy => sy.HasAttribute(name));
-        }
-
         public IEnumerable<ISymbol> Members(bool includeInherited = false)
         {
             if (!includeInherited)
@@ -72,25 +63,24 @@ namespace Aspects.SourceGenerators.Common
             return Members(includeInherited).OfType<IPropertySymbol>();
         }
 
-        public IEnumerable<ISymbol> MembersWith<T>(bool includeInherited = false) where T : Attribute
+        public IEnumerable<ISymbol> MembersWithAttributeOfType<T>(bool includeInherited = false)
         {
-            var name = typeof(T).FullName;
-            return Members(includeInherited).Where(m => m.HasAttribute(name));
+            return Members(includeInherited).Where(m => m.HasAttributeOfType<T>());
         }
 
-        public IEnumerable<IFieldSymbol> FieldsWith<T>(bool includeInherited = false) where T : Attribute
+        public IEnumerable<IFieldSymbol> FieldsWithAttributeOfType<T>(bool includeInherited = false)
         {
-            return MembersWith<T>(includeInherited).OfType<IFieldSymbol>();
+            return MembersWithAttributeOfType<T>(includeInherited).OfType<IFieldSymbol>();
         }
 
-        public IEnumerable<IPropertySymbol> PropertiesWith<T>(bool includeInherited = false) where T : Attribute
+        public IEnumerable<IPropertySymbol> PropertiesWithAttributeOfType<T>(bool includeInherited = false)
         {
-            return MembersWith<T>(includeInherited).OfType<IPropertySymbol>();
+            return MembersWithAttributeOfType<T>(includeInherited).OfType<IPropertySymbol>();
         }
 
-        public IEnumerable<IMethodSymbol> MethodsWith<T>(bool includeInherited = false) where T : Attribute
+        public IEnumerable<IMethodSymbol> MethodsWithAttributeOfType<T>(bool includeInherited = false)
         {
-            return MembersWith<T>(includeInherited).OfType<IMethodSymbol>();
+            return MembersWithAttributeOfType<T>(includeInherited).OfType<IMethodSymbol>();
         }
     }
 }

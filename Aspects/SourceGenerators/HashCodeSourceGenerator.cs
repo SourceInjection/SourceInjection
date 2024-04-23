@@ -1,10 +1,6 @@
-﻿using Aspects.Attributes;
+﻿using Aspects.Attributes.Interfaces;
 using Aspects.SourceGenerators.Base;
-using Aspects.SourceGenerators.Common;
-using Aspects.SyntaxReceivers;
-using Aspects.Util;
 using Microsoft.CodeAnalysis;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using TypeInfo = Aspects.SourceGenerators.Common.TypeInfo;
@@ -12,21 +8,9 @@ using TypeInfo = Aspects.SourceGenerators.Common.TypeInfo;
 namespace Aspects.SourceGenerators
 {
     [Generator]
-    public class HashCodeSourceGenerator : BasicMethodOverrideSourceGeneratorBase
+    public class HashCodeSourceGenerator : BasicMethodOverrideSourceGeneratorBase<IHashCodeAttribute, IHashCodeExcludeAttribute>
     {
         private protected override string Name => "HashCode";
-
-        protected override ISet<string> TypeAttributes { get; }
-            = new HashSet<string>() { typeof(EqualsAndHashCodeAttribute).FullName, typeof(HashCodeAttribute).FullName };
-
-        protected override ISet<string> ExcludeAttributes { get; }
-            = new HashSet<string>() { typeof(EqualsAndHashCodeExcludeAttribute).FullName, typeof(HashCodeExcludeAttribute).FullName };
-
-        private protected override TypeSyntaxReceiver SyntaxReceiver { get; } = new TypeSyntaxReceiver(
-                Types.With<HashCodeAttribute>()
-            .Or(Types.With<EqualsAndHashCodeAttribute>())
-            .Or(Types.WithMembersWith<HashCodeAttribute>())
-            .Or(Types.WithMembersWith<EqualsAndHashCodeAttribute>()));
 
         private protected override string ClassBody(TypeInfo typeInfo)
         {
@@ -64,13 +48,9 @@ namespace Aspects.SourceGenerators
 
         private bool ShouldIncludeBase(TypeInfo typeInfo)
         {
-            var inheritance = typeInfo.Inheritance();
-            if (inheritance.Any(sy => sy.HasAnyAttribute(TypeAttributes)))
-                return true;
-
-            var baseMembers = inheritance.SelectMany(cl => cl.GetMembers());
-            return baseMembers.Any(m => m is IMethodSymbol method && MethodIsHashCodeOverride(method))
-                || baseMembers.Any(m => m.HasAnyAttribute(TypeAttributes));
+            return typeInfo.Inheritance()
+                .SelectMany(cl => cl.GetMembers())
+                .Any(m => m is IMethodSymbol method && MethodIsHashCodeOverride(method));
         }
 
         private bool MethodIsHashCodeOverride(IMethodSymbol method)

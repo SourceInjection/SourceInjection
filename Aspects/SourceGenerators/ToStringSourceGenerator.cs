@@ -1,31 +1,17 @@
-﻿using Aspects.Attributes;
-using Aspects.SourceGenerators.Base;
+﻿using Aspects.SourceGenerators.Base;
 using Microsoft.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using TypeInfo = Aspects.SourceGenerators.Common.TypeInfo;
 using Accessibility = Microsoft.CodeAnalysis.Accessibility;
-using System.Collections.Generic;
-using Aspects.SourceGenerators.Common;
-using Aspects.SyntaxReceivers;
-using Aspects.Util;
+using Aspects.Attributes.Interfaces;
 
 namespace Aspects.SourceGenerators
 {
     [Generator]
-    internal class ToStringSourceGenerator : BasicMethodOverrideSourceGeneratorBase
+    internal class ToStringSourceGenerator : BasicMethodOverrideSourceGeneratorBase<IToStringAttribute, IToStringExcludeAttribute>
     {
         private protected override string Name => "ToString";
-
-        protected override ISet<string> TypeAttributes { get; } 
-            = new HashSet<string>() { typeof(ToStringAttribute).FullName };
-
-        protected override ISet<string> ExcludeAttributes { get; } 
-            = new HashSet<string>() { typeof(ToStringExcludeAttribute).FullName };
-
-        private protected override TypeSyntaxReceiver SyntaxReceiver { get; } = new TypeSyntaxReceiver(
-                Types.With<ToStringAttribute>()
-            .Or(Types.WithMembersWith<ToStringAttribute>()));
 
         private protected override string ClassBody(TypeInfo typeInfo)
         {

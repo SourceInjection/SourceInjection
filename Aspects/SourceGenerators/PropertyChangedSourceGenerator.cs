@@ -15,7 +15,7 @@ namespace Aspects.SourceGenerators
         private protected override string Name { get; } = "PropertyChanged";
 
         private protected override TypeSyntaxReceiver SyntaxReceiver { get; }
-            = new TypeSyntaxReceiver(Types.WithMembersWith<NotifyPropertyChangedAttribute>());
+            = new TypeSyntaxReceiver(Types.WithMembersWithAttributeOfType<NotifyPropertyChangedAttribute>());
 
 
         private protected override string Dependencies(TypeInfo typeInfo)
@@ -34,7 +34,7 @@ namespace Aspects.SourceGenerators
             }
 
             var attributedFields = typeInfo
-                .FieldsWith<NotifyPropertyChangedAttribute>()
+                .FieldsWithAttributeOfType<NotifyPropertyChangedAttribute>()
                 .ToArray();
 
             sb.Append(PropertyCode(attributedFields[0]));

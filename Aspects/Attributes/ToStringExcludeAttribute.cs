@@ -1,8 +1,9 @@
-﻿using System;
+﻿using Aspects.Attributes.Interfaces;
+using System;
 
 namespace Aspects.Attributes
 {
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, Inherited = true, AllowMultiple = false)]
-    public class ToStringExcludeAttribute : Attribute
+    public class ToStringExcludeAttribute : Attribute, IToStringExcludeAttribute
     { }
 }
