@@ -10,12 +10,12 @@ namespace Aspects.SourceGenerators
     [Generator]
     public class HashCodeSourceGenerator : BasicMethodOverrideSourceGeneratorBase<IHashCodeAttribute, IHashCodeExcludeAttribute>
     {
-        private protected override string Name => "HashCode";
+        private protected override string Name => "GetHashCode";
 
         private protected override string ClassBody(TypeInfo typeInfo)
         {
             var sb = new StringBuilder();
-            sb.AppendLine($"public override int GetHashCode()");
+            sb.AppendLine($"public override int {Name}()");
             sb.AppendLine("{");
 
             sb.Append("\treturn HashCode.Combine(");
@@ -25,7 +25,7 @@ namespace Aspects.SourceGenerators
             if (ShouldIncludeBase(typeInfo))
             {
                 sb.AppendLine();
-                sb.Append($"\t\tbase.GetHashCode()");
+                sb.Append($"\t\tbase.{Name}()");
                 if(symbols.Any())
                     sb.Append(',');
             }
@@ -55,7 +55,7 @@ namespace Aspects.SourceGenerators
 
         private bool MethodIsHashCodeOverride(IMethodSymbol method)
         {
-            return method.Name == "GetHashCode"
+            return method.Name == Name
                 && method.IsOverride
                 && method.Parameters.Length == 0;
         }

@@ -5,17 +5,6 @@ namespace Aspects.Util
 {
     internal static class EnumerableExtensions
     {
-        public static int CombinedHashCode(this IEnumerable col)
-        {
-            int hash = 0;
-            const int prime = 31;
-
-            foreach (var value in col)
-                hash = unchecked(hash * prime + value?.GetHashCode() ?? 0);
-
-            return hash;
-        }
-
         public static int DeepCombinedHashCode(this IEnumerable col)
         {
             var hash = 0;
@@ -32,24 +21,6 @@ namespace Aspects.Util
                 hash = unchecked(hash * prime + value);
             }
             return hash;
-        }
-
-        public static bool SequenceEqual(this IEnumerable col, IEnumerable other)
-        {
-            var colIt = col.GetEnumerator();
-            var otherIt = other.GetEnumerator();
-
-            while (colIt.MoveNext())
-            {
-                if (!otherIt.MoveNext() ||
-                    !(colIt.Current is null && otherIt.Current is null
-                    || colIt.Current?.Equals(otherIt.Current) is true))
-                {
-                    return DisposedReturn(false, colIt, otherIt);
-                }
-            }
-
-            return DisposedReturn(true, colIt, otherIt);
         }
 
         public static bool DeepSequenceEqual(this IEnumerable col, IEnumerable other)

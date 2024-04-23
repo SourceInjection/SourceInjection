@@ -1,4 +1,5 @@
 ﻿using Aspects.Attributes;
+using System.Collections;
 
 
 namespace Aspects.Test.Common
@@ -11,6 +12,10 @@ namespace Aspects.Test.Common
         public int Int => _int;
 
         public object? Object { get; }
+
+        public List<List<string>> Strings2d { get; set; }
+
+        public IList List { get; set; }
 
         public override string Name { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
     }

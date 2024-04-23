@@ -16,7 +16,7 @@ namespace Aspects.SourceGenerators
         private protected override string ClassBody(TypeInfo typeInfo)
         {
             var sb = new StringBuilder();
-            sb.AppendLine($"public override string ToString()");
+            sb.AppendLine($"public override string {Name}()");
             sb.AppendLine("{");
 
             sb.Append($"\treturn $\"({typeInfo.Name})");

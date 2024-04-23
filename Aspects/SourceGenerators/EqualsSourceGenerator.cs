@@ -1,7 +1,9 @@
 ﻿using Aspects.Attributes.Interfaces;
 using Aspects.SourceGenerators.Base;
+using Aspects.Util;
 using Microsoft.CodeAnalysis;
 using System;
+using System.Collections;
 using System.Linq;
 using System.Text;
 using TypeInfo = Aspects.SourceGenerators.Common.TypeInfo;
@@ -20,17 +22,24 @@ namespace Aspects.SourceGenerators
         {
             var sb = new StringBuilder();
             sb.AppendLine("#nullable enable");
-            sb.AppendLine($"public override bool Equals(object? {arg})");
+            sb.AppendLine($"public override bool {Name}(object? {arg})");
             sb.AppendLine("{");
 
-            sb.Append($"\treturn {arg} is {typeInfo.Name}");
+            sb.Append($"\treturn");
+            if (typeInfo.Symbol.IsReferenceType)
+                sb.Append($" {arg} == this ||");
+
+            sb.Append($" {arg} is {typeInfo.Name}");
 
             var symbols = GetDeclaredSymbols(typeInfo);
             if (symbols.Any())
                 sb.Append($" {other}");
-            
-            if(ShouldIncludeBase(typeInfo))
-                sb.Append($" && base.Equals({arg})");
+
+            if (ShouldIncludeBase(typeInfo))
+            {
+                sb.AppendLine();
+                sb.Append($"\t\t&& base.{Name}({arg})");
+            }
 
             foreach (var symbol in symbols)
             {
@@ -47,20 +56,12 @@ namespace Aspects.SourceGenerators
 
         private bool ShouldIncludeBase(TypeInfo typeInfo)
         {
-            return typeInfo.Inheritance()
-                .SelectMany(cl => cl.GetMembers())
-                .Any(m => m is IMethodSymbol method && MethodIsEqualsOverride(method));
+            return typeInfo.Symbol.HasAttributeOfType<IEqualsAttribute>()
+                || typeInfo.Symbol.OverridesEquals()
+                || typeInfo.Inheritance().SelectMany(cl => cl.GetMembers()).Any(m => m.HasAttributeOfType<IEqualsAttribute>());
         }
 
-        private bool MethodIsEqualsOverride(IMethodSymbol method)
-        {
-            return method.Name == "Equals"
-                && method.IsOverride
-                && method.Parameters.Length == 1
-                && (method.Parameters[0].Type.ToDisplayString() == "object" || method.Parameters[0].Type.ToDisplayString() == "object?");
-        }
-
-        private static string MemberEquals(ISymbol symbol)
+        private string MemberEquals(ISymbol symbol)
         {
             var memberName = symbol.Name;
 
@@ -71,11 +72,18 @@ namespace Aspects.SourceGenerators
             else throw new NotImplementedException();
         }
 
-        protected static string Comparison(ITypeSymbol type, string memberName)
+        private string Comparison(ITypeSymbol type, string memberName)
         {
             if (type.IsReferenceType)
-                return $"{memberName}?.Equals({other}.{memberName}) is true";
-            return $"{memberName}.Equals({other}.{memberName})";
+            {
+                if (type.IsEnumerable() && !type.OverridesEquals())
+                {
+                    var method = $"{typeof(Enumerable).FullName}.{nameof(Enumerable.SequenceEquals)}";
+                    return $"{method}({memberName}, {other}.{memberName})";
+                }
+                return $"{memberName}?.{Name}({other}.{memberName}) is true";
+            }
+            return $"{memberName}.{Name}({other}.{memberName})";
         }
     }
 }

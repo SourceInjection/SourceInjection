@@ -1,6 +1,4 @@
-﻿using Aspects.Util;
-using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 
 namespace Aspects.Comparers
@@ -9,19 +7,12 @@ namespace Aspects.Comparers
     {
         public bool Equals(IEnumerable x, IEnumerable y)
         {
-            if (x is null)
-                throw new ArgumentNullException(nameof(x));
-            if(y is null)
-                throw new ArgumentNullException(nameof(y));
-
-            return x.DeepSequenceEqual(y);
+            return Enumerable.SequenceEquals(x, y);
         }
 
         public int GetHashCode(IEnumerable obj)
         {
-            if(obj is null)
-                throw new ArgumentNullException(nameof(obj));
-            return obj.DeepCombinedHashCode();
+            return Enumerable.CombinedHashCode(obj);
         }
     }
 }

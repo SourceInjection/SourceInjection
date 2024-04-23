@@ -1,5 +1,4 @@
 ﻿using Aspects.Util;
-using System;
 using System.Collections;
 
 namespace Aspects
@@ -9,33 +8,17 @@ namespace Aspects
         public static int CombinedHashCode(this IEnumerable en)
         {
             if (en is null)
-                throw new ArgumentNullException(nameof(en));
-            return EnumerableExtensions.CombinedHashCode(en);
-        }
-
-        public static int DeepCombinedHashCode(this IEnumerable en)
-        {
-            if(en is null)
-                throw new ArgumentNullException(nameof(en));
+                return 0;
             return EnumerableExtensions.DeepCombinedHashCode(en);
         }
 
         public static bool SequenceEquals(this IEnumerable a, IEnumerable b)
         {
-            if (a is null)
-                throw new ArgumentNullException(nameof(a));
-            if (b is null)
-                throw new ArgumentNullException(nameof(b));
-            return EnumerableExtensions.SequenceEqual(a, b);
-        }
-
-        public static bool DeepSequenceEquals(this IEnumerable a, IEnumerable b)
-        {
-            if (a is null)
-                throw new ArgumentNullException(nameof(a));
-            if (b is null)
-                throw new ArgumentNullException(nameof(b));
-            return EnumerableExtensions.DeepSequenceEqual(a, b);
+            if (a is null && b is null)
+                return true;
+            if (!(a is null) && !(b is null))
+                return EnumerableExtensions.DeepSequenceEqual(a, b);
+            return false;
         }
     }
 }

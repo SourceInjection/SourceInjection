@@ -59,7 +59,7 @@ namespace Aspects.SourceGenerators.Base
 
             if(typeInfo.Symbol.GetAttributesOfType<TAttribute>()
                 .FirstOrDefault()?.ConstructorArguments
-                .FirstOrDefault(arg => arg.Type.ToDisplayString() == kindTypeName) 
+                .SingleOrDefault(arg => arg.Type.ToDisplayString() == kindTypeName) 
 
                 is TypedConstant typedConstant && typedConstant.Value != null)
             {
