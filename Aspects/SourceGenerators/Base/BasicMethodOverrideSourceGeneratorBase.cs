@@ -42,7 +42,7 @@ namespace Aspects.SourceGenerators.Base
                 else if (dataMemberKind == DataMemberKind.Field)
                     return GetFields(members);
                 else if (dataMemberKind == DataMemberKind.DataMember)
-                    return GetDataMembers(members);
+                    return GetDataMembers(typeInfo, members);
                 throw new NotImplementedException();
             }
 
@@ -74,11 +74,14 @@ namespace Aspects.SourceGenerators.Base
             return false;
         }
 
-        private IEnumerable<ISymbol> GetDataMembers(IEnumerable<ISymbol> members)
+        private IEnumerable<ISymbol> GetDataMembers(TypeInfo typeInfo, IEnumerable<ISymbol> members)
         {
             IEnumerable<ISymbol> fields = GetFields(members);
+
             var properties = GetProperties(members).ToArray();
-            fields = fields.Where(f => !Array.Exists(properties, p => p.Name == Property.Name(f.Name))).ToArray();
+            var mappedFields = SourceCode.GetLinkedFields(typeInfo);
+
+            fields = fields.Where(f => !mappedFields.Contains(f.Name)).ToArray();
             return fields.Concat(properties);
         }
 
@@ -92,13 +95,12 @@ namespace Aspects.SourceGenerators.Base
         private IEnumerable<IPropertySymbol> GetProperties(IEnumerable<ISymbol> members)
         {
             return members.OfType<IPropertySymbol>()
-                .Where(p => PropertyIsValid(p) && !p.HasAttributeOfType<TExcludeAttribute>());
+                .Where(p => PropertyIsValid(p) && (!p.IsOverride || p.HasAttributeOfType<TAttribute>()) && !p.HasAttributeOfType<TExcludeAttribute>());
         }
 
         private bool PropertyIsValid(IPropertySymbol property)
         {
-            return (!property.IsOverride || property.HasAttributeOfType<TAttribute>())
-                && !property.IsImplicitlyDeclared
+            return !property.IsImplicitlyDeclared
                 && !property.IsStatic
                 && property.GetMethod != null
                 && !property.GetMethod.IsStatic;

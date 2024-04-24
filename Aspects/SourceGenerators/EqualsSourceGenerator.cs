@@ -94,7 +94,7 @@ namespace Aspects.SourceGenerators
             if (type.IsReferenceType)
             {
                 if (type.IsEnumerable() && !type.OverridesEquals())
-                    return SourceCode.SequenceEqualsMethod(memberName, $"{otherName}.{memberName}");
+                    return Output.SequenceEqualsMethod(memberName, $"{otherName}.{memberName}");
                 return $"({memberName} is null && {otherName}.{memberName} is null || {memberName}?.{Name}({otherName}.{memberName}) is true)";
             }
             return $"{memberName}.{Name}({otherName}.{memberName})";

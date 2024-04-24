@@ -27,6 +27,7 @@ namespace Aspects.SourceGenerators.Common
 
         public string Name { get; }
 
+
         public IEnumerable<INamedTypeSymbol> OrderedInheritance(bool includeSelf = false)
         {
             var stack = new Stack<INamedTypeSymbol>();

@@ -105,7 +105,7 @@ namespace Aspects.SourceGenerators
                 else
                 {
                     if (field.Type.IsEnumerable() && !field.Type.OverridesEquals())
-                        sb.AppendLine($"\t\tif (!{SourceCode.SequenceEqualsMethod(field.Name, "value")}");
+                        sb.AppendLine($"\t\tif (!{Output.SequenceEqualsMethod(field.Name, "value")}");
 
                     else sb.AppendLine($"\t\tif (!({field.Name} is null) && !{field.Name}.{nameof(Equals)}(value) " +
                         $"|| {field.Name} is null && !(value is null))");

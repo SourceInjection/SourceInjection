@@ -81,7 +81,7 @@ namespace Aspects.SourceGenerators
         {
             if (!MustUseCombinedHashCode(symbol))
                 return symbol.Name;
-            return SourceCode.CombinedHashCodeMethod(symbol.Name);
+            return Output.CombinedHashCodeMethod(symbol.Name);
         }
 
         private bool ShouldIncludeBase(TypeInfo typeInfo)

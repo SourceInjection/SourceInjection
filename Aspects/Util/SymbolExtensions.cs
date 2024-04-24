@@ -31,8 +31,8 @@ namespace Aspects.Util
 
         public static bool IsEnumerable(this ITypeSymbol symbol)
         {
-            return symbol.ToDisplayString() == SourceCode.IEnumerableName
-                ||symbol.AllInterfaces.Any(i => i.ToDisplayString() == SourceCode.IEnumerableName);
+            return symbol.ToDisplayString() == Output.IEnumerableName
+                ||symbol.AllInterfaces.Any(i => i.ToDisplayString() == Output.IEnumerableName);
         }
 
         public static bool OverridesEquals(this ITypeSymbol symbol)

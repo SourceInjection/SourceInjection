@@ -7,6 +7,9 @@ namespace Aspects.Test.Common
     [AutoEqualsAndHashCode]
     public partial class Data : DataBase
     {
+        object? _obj;
+        object? _obj2;
+
         private int _int;
 
         public int Int => _int;
@@ -19,9 +22,18 @@ namespace Aspects.Test.Common
 
         public override string Name { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
-        public object? Object1 { get; }
+        public object? Object1 { get => _obj; }
 
-        public object? Object2 { get; }
+        public object? Object2 
+        {
+            get 
+            {
+                var value = _obj2;
+                _obj2 = value;
+
+                return _obj2;
+            } 
+        }
 
         public object? Object3 { get; }
 
