@@ -1,4 +1,6 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+﻿using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Linq;
 
@@ -24,6 +26,11 @@ namespace Aspects.SourceGenerators.Common
             if (nodeText.Contains('>'))
                 return nodeText.Substring(0, nodeText.IndexOf('>') + 1);
             return nodeText.Substring(0, nodeText.IndexOf(node.Identifier.Text) + node.Identifier.Text.Length);
+        }
+
+        public static bool HasPartialModifier(TypeDeclarationSyntax typeDeclaration)
+        {
+            return typeDeclaration.Modifiers.Any(m => m.IsKind(SyntaxKind.PartialKeyword));
         }
 
         private static string RemoveAttributes(string text)

@@ -4,6 +4,7 @@ namespace Aspects.Attributes
 {
     public enum DataMemberKind 
     {
+        ProjectConfig = 0,
         Field = 1,
         Property = 2,      
         DataMember = Field | Property

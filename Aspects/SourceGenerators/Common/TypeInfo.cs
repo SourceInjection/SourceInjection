@@ -1,7 +1,6 @@
 ﻿using Aspects.Util;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -13,6 +12,7 @@ namespace Aspects.SourceGenerators.Common
         {
             SyntaxNode = syntaxNode;
             Symbol = typeSymbol;
+            HasPartialModifier = Common.Declaration.HasPartialModifier(syntaxNode);
             Declaration = Common.Declaration.GetText(syntaxNode);
             Name = Common.Declaration.GetName(syntaxNode);
         }
@@ -21,16 +21,18 @@ namespace Aspects.SourceGenerators.Common
 
         public INamedTypeSymbol Symbol { get; }
 
+        public bool HasPartialModifier { get; }
+
         public string Declaration { get; }
 
         public string Name { get; }
 
-        public IEnumerable<INamedTypeSymbol> Inheritance(bool includeSelf = false)
+        public IEnumerable<INamedTypeSymbol> OrderedInheritance(bool includeSelf = false)
         {
             var stack = new Stack<INamedTypeSymbol>();
             var sy = includeSelf ? Symbol : Symbol.BaseType;
 
-            while (sy != null && sy.Name != "object")
+            while (sy != null)
             {
                 stack.Push(sy);
                 sy = sy.BaseType;
@@ -45,7 +47,7 @@ namespace Aspects.SourceGenerators.Common
             if (!includeInherited)
                 return Symbol.GetMembers();
 
-            return Inheritance(true).SelectMany(cl => cl.GetMembers());
+            return OrderedInheritance(true).SelectMany(cl => cl.GetMembers());
         }
 
         public IEnumerable<IMethodSymbol> Methods(bool includeInherited = false)

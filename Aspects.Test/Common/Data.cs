@@ -4,7 +4,7 @@ using System.Collections;
 
 namespace Aspects.Test.Common
 {
-    [Equals]
+    [AutoEqualsAndHashCode]
     public partial class Data : DataBase
     {
         private int _int;
@@ -18,9 +18,20 @@ namespace Aspects.Test.Common
         public IList List { get; set; }
 
         public override string Name { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+        public object? Object1 { get; }
+
+        public object? Object2 { get; }
+
+        public object? Object3 { get; }
+
+        public object? Object4 { get; }
+
+        public object? Object5 { get; }
+
     }
 
-    [Equals]
+    [AutoEqualsAndHashCode]
     public abstract partial class DataBase
     {
         public abstract string Name { get; set; }

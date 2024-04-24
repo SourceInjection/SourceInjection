@@ -9,7 +9,7 @@ using Aspects.Attributes.Interfaces;
 namespace Aspects.SourceGenerators
 {
     [Generator]
-    internal class ToStringSourceGenerator : BasicMethodOverrideSourceGeneratorBase<IToStringAttribute, IToStringExcludeAttribute>
+    internal class ToStringSourceGenerator : BasicMethodOverrideSourceGeneratorBase<IToStringConfigAttribute, IToStringAttribute, IToStringExcludeAttribute>
     {
         private protected override string Name => "ToString";
 

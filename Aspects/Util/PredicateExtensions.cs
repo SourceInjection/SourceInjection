@@ -8,10 +8,5 @@ namespace Aspects.Util
         {
             return (T value) => lhs(value) || rhs(value);
         }
-
-        public static Predicate<T> And<T>(this Predicate<T> lhs, Predicate<T> rhs)
-        {
-            return (T value) => lhs(value) && rhs(value);
-        }
     }
 }

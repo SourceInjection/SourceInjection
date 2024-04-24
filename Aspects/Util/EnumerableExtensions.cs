@@ -7,20 +7,17 @@ namespace Aspects.Util
     {
         public static int DeepCombinedHashCode(this IEnumerable col)
         {
-            var hash = 0;
-            const int prime = 31;
+            var hash = new HashCode();
 
             foreach (var item in col)
             {
-                int value;
                 if (item is IEnumerable en)
-                    value = DeepCombinedHashCode(en);
+                    hash.Add(DeepCombinedHashCode(en));
                 else
-                    value = item?.GetHashCode() ?? 0;
-
-                hash = unchecked(hash * prime + value);
+                    hash.Add(item);
             }
-            return hash;
+
+            return hash.ToHashCode();
         }
 
         public static bool DeepSequenceEqual(this IEnumerable col, IEnumerable other)
@@ -39,6 +36,8 @@ namespace Aspects.Util
                 }
             }
 
+            if (otherIt.MoveNext())
+                return DisposedReturn(false, colIt, otherIt);
             return DisposedReturn(true, colIt, otherIt);
         }
 

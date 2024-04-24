@@ -2,6 +2,7 @@
 using Aspects.SourceGenerators.Base;
 using Aspects.SourceGenerators.Common;
 using Aspects.SyntaxReceivers;
+using Aspects.Util;
 using Microsoft.CodeAnalysis;
 using System.Linq;
 using System.Text;
@@ -10,7 +11,7 @@ using TypeInfo = Aspects.SourceGenerators.Common.TypeInfo;
 namespace Aspects.SourceGenerators
 {
     [Generator]
-    public class PropertyChangedSourceGenerator : TypeSourceGeneratorBase
+    public sealed class PropertyChangedSourceGenerator : TypeSourceGeneratorBase
     {
         private protected override string Name { get; } = "PropertyChanged";
 
@@ -100,10 +101,13 @@ namespace Aspects.SourceGenerators
             else
             {
                 if (!field.Type.IsReferenceType)
-                    sb.AppendLine($"\t\tif (!{field.Name}.Equals(value))");
+                    sb.AppendLine($"\t\tif (!{field.Name}.{nameof(Equals)}(value))");
                 else
                 {
-                    sb.AppendLine($"\t\tif (!({field.Name} is null) && !{field.Name}.Equals(value) " +
+                    if (field.Type.IsEnumerable() && !field.Type.OverridesEquals())
+                        sb.AppendLine($"\t\tif (!{SourceCode.SequenceEqualsMethod(field.Name, "value")}");
+
+                    else sb.AppendLine($"\t\tif (!({field.Name} is null) && !{field.Name}.{nameof(Equals)}(value) " +
                         $"|| {field.Name} is null && !(value is null))");
                 }
                 sb.AppendLine("\t\t{");

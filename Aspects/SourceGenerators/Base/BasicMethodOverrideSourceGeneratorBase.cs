@@ -1,5 +1,5 @@
 ﻿using Aspects.Attributes;
-using Aspects.Attributes.Interfaces;
+using Aspects.Attributes.Interfaces.Base;
 using Aspects.SourceGenerators.Common;
 using Aspects.SyntaxReceivers;
 using Aspects.Util;
@@ -11,21 +11,19 @@ using TypeInfo = Aspects.SourceGenerators.Common.TypeInfo;
 
 namespace Aspects.SourceGenerators.Base
 {
-    public abstract class BasicMethodOverrideSourceGeneratorBase<TAttribute, TExcludeAttribute> : TypeSourceGeneratorBase 
-        where TAttribute : IDataMemberAttribute
-        where TExcludeAttribute : IExcludeAttribute
+    public abstract class BasicMethodOverrideSourceGeneratorBase<TConfigAttribute, TAttribute, TExcludeAttribute> : TypeSourceGeneratorBase
+        where TConfigAttribute : IBasicMethodConfigAttribute
     {
         private protected override TypeSyntaxReceiver SyntaxReceiver { get; } = new TypeSyntaxReceiver(
-                Types.WithAttributeOfType<TAttribute>()
-            .Or(Types.WithMembersWithAttributeOfType<TExcludeAttribute>()));
-
+                Types.WithAttributeOfType<TConfigAttribute>()
+            .Or(Types.WithMembersWithAttributeOfType<TAttribute>()));
 
         private protected override string Dependencies(TypeInfo typeInfo)
         {
             return string.Empty;
         }
 
-        protected private IEnumerable<ISymbol> GetDeclaredSymbols(TypeInfo typeInfo)
+        protected private IEnumerable<ISymbol> GetRelevantSymbols(TypeInfo typeInfo)
         {
             return GetSymbols(typeInfo, typeInfo.Members());
         }
@@ -53,17 +51,22 @@ namespace Aspects.SourceGenerators.Base
                 .Where(m => m.HasAttributeOfType<TAttribute>());
         }
 
-        protected virtual private bool TryGetDataMemberKind(TypeInfo typeInfo, out DataMemberKind kind)
+        protected private bool TryGetDataMemberKind(TypeInfo typeInfo, out DataMemberKind kind)
         {
             var kindTypeName = typeof(DataMemberKind).FullName;
 
-            if(typeInfo.Symbol.GetAttributesOfType<TAttribute>()
+            if(typeInfo.Symbol.GetAttributesOfType<TConfigAttribute>()
                 .FirstOrDefault()?.ConstructorArguments
                 .SingleOrDefault(arg => arg.Type.ToDisplayString() == kindTypeName) 
 
                 is TypedConstant typedConstant && typedConstant.Value != null)
             {
                 kind = (DataMemberKind)typedConstant.Value;
+
+                // TODO: extract out of config
+                if (kind == DataMemberKind.ProjectConfig)
+                    kind = DataMemberKind.DataMember;
+
                 return true;
             }
 

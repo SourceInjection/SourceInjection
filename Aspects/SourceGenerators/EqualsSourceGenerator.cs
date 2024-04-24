@@ -1,9 +1,9 @@
 ﻿using Aspects.Attributes.Interfaces;
 using Aspects.SourceGenerators.Base;
+using Aspects.SourceGenerators.Common;
 using Aspects.Util;
 using Microsoft.CodeAnalysis;
 using System;
-using System.Collections;
 using System.Linq;
 using System.Text;
 using TypeInfo = Aspects.SourceGenerators.Common.TypeInfo;
@@ -11,34 +11,41 @@ using TypeInfo = Aspects.SourceGenerators.Common.TypeInfo;
 namespace Aspects.SourceGenerators
 {
     [Generator]
-    internal class EqualsSourceGenerator : BasicMethodOverrideSourceGeneratorBase<IEqualsAttribute, IEqualsExcludeAttribute>
+    public sealed class EqualsSourceGenerator : BasicMethodOverrideSourceGeneratorBase<IEqualsConfigAttribute, IEqualsAttribute, IEqualsExcludeAttribute>
     {
-        private const string arg = "obj";
-        private const string other = "other";
+        private const string argName = "obj";
+        private const string otherName = "other";
 
-        private protected override string Name => "Equals";
+        private protected override string Name { get; } = nameof(Equals);
 
         private protected override string ClassBody(TypeInfo typeInfo)
         {
             var sb = new StringBuilder();
-            sb.AppendLine("#nullable enable");
-            sb.AppendLine($"public override bool {Name}(object? {arg})");
+
+            var useNullable = CanUseNullable(typeInfo);
+
+            if(useNullable)
+                sb.AppendLine("#nullable enable");
+            sb.Append($"public override bool {Name}(object");
+            if (useNullable)
+                sb.Append('?');
+            sb.AppendLine($" {argName})");
             sb.AppendLine("{");
 
             sb.Append($"\treturn");
             if (typeInfo.Symbol.IsReferenceType)
-                sb.Append($" {arg} == this ||");
+                sb.Append($" {argName} == this ||");
 
-            sb.Append($" {arg} is {typeInfo.Name}");
+            sb.Append($" {argName} is {typeInfo.Name}");
 
-            var symbols = GetDeclaredSymbols(typeInfo);
+            var symbols = GetRelevantSymbols(typeInfo);
             if (symbols.Any())
-                sb.Append($" {other}");
+                sb.Append($" {otherName}");
 
             if (ShouldIncludeBase(typeInfo))
             {
                 sb.AppendLine();
-                sb.Append($"\t\t&& base.{Name}({arg})");
+                sb.Append($"\t\t&& base.{Name}({argName})");
             }
 
             foreach (var symbol in symbols)
@@ -50,15 +57,25 @@ namespace Aspects.SourceGenerators
             sb.AppendLine(";");
 
             sb.AppendLine("}");
-            sb.Append("#nullable restore");
+            if(useNullable)
+                sb.Append("#nullable restore");
             return sb.ToString();
+        }
+
+        private bool CanUseNullable(TypeInfo typeInfo)
+        {
+            return typeInfo.Symbol.Inheritance()
+                .SelectMany(cl => cl.GetMembers())
+                .OfType<IMethodSymbol>()
+                .Any(m => m.Name == nameof(Equals) && !m.IsOverride && m.IsVirtual && m.Parameters.Any(p => p.NullableAnnotation == NullableAnnotation.Annotated));
         }
 
         private bool ShouldIncludeBase(TypeInfo typeInfo)
         {
-            return typeInfo.Symbol.HasAttributeOfType<IEqualsAttribute>()
+            return typeInfo.Symbol.HasAttributeOfType<IEqualsConfigAttribute>()
                 || typeInfo.Symbol.OverridesEquals()
-                || typeInfo.Inheritance().SelectMany(cl => cl.GetMembers()).Any(m => m.HasAttributeOfType<IEqualsAttribute>());
+                || typeInfo.Symbol.Inheritance().SelectMany(cl => cl.GetMembers())
+                    .Any(m => m.HasAttributeOfType<IEqualsAttribute>());
         }
 
         private string MemberEquals(ISymbol symbol)
@@ -77,13 +94,10 @@ namespace Aspects.SourceGenerators
             if (type.IsReferenceType)
             {
                 if (type.IsEnumerable() && !type.OverridesEquals())
-                {
-                    var method = $"{typeof(Enumerable).FullName}.{nameof(Enumerable.SequenceEquals)}";
-                    return $"{method}({memberName}, {other}.{memberName})";
-                }
-                return $"{memberName}?.{Name}({other}.{memberName}) is true";
+                    return SourceCode.SequenceEqualsMethod(memberName, $"{otherName}.{memberName}");
+                return $"({memberName} is null && {otherName}.{memberName} is null || {memberName}?.{Name}({otherName}.{memberName}) is true)";
             }
-            return $"{memberName}.{Name}({other}.{memberName})";
+            return $"{memberName}.{Name}({otherName}.{memberName})";
         }
     }
 }

@@ -3,6 +3,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 using System.Text;
 using TypeInfo = Aspects.SourceGenerators.Common.TypeInfo;
+using static Aspects.SourceGenerators.Diagnostics.Errors;
 
 namespace Aspects.SourceGenerators.Base
 {
@@ -19,13 +20,18 @@ namespace Aspects.SourceGenerators.Base
 
         public void Execute(GeneratorExecutionContext context)
         {
-            if (context.SyntaxContextReceiver == SyntaxReceiver)
+            if (context.SyntaxContextReceiver == SyntaxReceiver || context.SyntaxContextReceiver.Equals(SyntaxReceiver))
             {
                 foreach (var typeInfo in SyntaxReceiver.IdentifiedTypes)
                 {
-                    var src = GeneratePartialType(typeInfo);
-                    context.AddSource($"{typeInfo.Symbol.ContainingNamespace.ToDisplayString()}." +
-                        $"{typeInfo.Name.Replace('<', '[').Replace('>', ']')}-{Name}.g.cs", SourceText.From(src, Encoding.UTF8));
+                    if (!typeInfo.HasPartialModifier)
+                        context.ReportDiagnostic(MissingPartialModifier(typeInfo.Symbol, Name));
+                    else
+                    {
+                        var src = GeneratePartialType(typeInfo);
+                        context.AddSource($"{typeInfo.Symbol.ContainingNamespace.ToDisplayString()}." +
+                            $"{typeInfo.Name.Replace('<', '[').Replace('>', ']')}-{Name}.g.cs", SourceText.From(src, Encoding.UTF8));
+                    }
                 }
             }
         }
