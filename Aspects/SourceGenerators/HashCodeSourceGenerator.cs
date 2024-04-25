@@ -19,6 +19,7 @@ namespace Aspects.SourceGenerators
             const int hashCodeCombineMaxArgs = 8;
 
             var sb = new StringBuilder();
+
             sb.AppendLine($"public override int {Name}()");
             sb.AppendLine("{");
 

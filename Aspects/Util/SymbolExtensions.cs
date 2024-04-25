@@ -20,6 +20,38 @@ namespace Aspects.Util
                 || a.AttributeClass.AllInterfaces.Any(i => i.ToDisplayString() == name));
         }
 
+        public static IEnumerable<IFieldSymbol> LocalVisibleFields(this INamedTypeSymbol symbol)
+        {
+            var result = symbol.GetMembers().OfType<IFieldSymbol>();
+            if(symbol.BaseType != null)
+            {
+                result = symbol.BaseType.Inheritance()
+                    .SelectMany(sy => sy.GetMembers().OfType<IFieldSymbol>())
+                    .Where(f => IsVisibleFromDerived(symbol, f));
+            }
+            return result;
+        }
+
+        private static bool IsVisibleFromDerived(INamedTypeSymbol symbol, IFieldSymbol member)
+        {
+            if (member.DeclaredAccessibility == Accessibility.Public 
+                || member.DeclaredAccessibility == Accessibility.Protected 
+                || member.DeclaredAccessibility == Accessibility.ProtectedOrInternal)
+            {
+                return true;
+            }
+
+            if(member.DeclaredAccessibility == Accessibility.ProtectedAndInternal)
+            {
+                var memberAssebly = member.ContainingType?.ContainingAssembly;
+                if (memberAssebly is null)
+                    return false;
+                return symbol.ContainingAssembly.Equals(memberAssebly, SymbolEqualityComparer.Default);
+            }
+
+            return false;
+        }
+
         public static IEnumerable<ITypeSymbol> Inheritance(this ITypeSymbol symbol)
         {
             while(symbol != null)

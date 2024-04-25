@@ -12,15 +12,27 @@ namespace Aspects.SourceGenerators.Common
         private readonly Lazy<string> _declaration;
         private readonly Lazy<string> _name;
         private readonly Lazy<List<INamedTypeSymbol>> _orderedInheritance;
+        private readonly Lazy<List<PropertyInfo>> _localProperties;
 
         public TypeInfo(TypeDeclarationSyntax syntaxNode, INamedTypeSymbol typeSymbol)
         {
             SyntaxNode = syntaxNode;
             Symbol = typeSymbol;
-            _hasPartialModifier = new Lazy<bool>(() => Common.Declaration.HasPartialModifier(syntaxNode));
-            _declaration = new Lazy<string>(() => Common.Declaration.GetText(syntaxNode));
-            _name = new Lazy<string>(() => Common.Declaration.GetName(syntaxNode));
-            _orderedInheritance = new Lazy<List<INamedTypeSymbol>>(LoadInheritance);
+
+            _hasPartialModifier = new Lazy<bool>(
+                () => Common.Declaration.HasPartialModifier(syntaxNode));
+
+            _declaration = new Lazy<string>(
+                () => Common.Declaration.GetText(syntaxNode));
+
+            _name = new Lazy<string>(
+                () => Common.Declaration.GetName(syntaxNode));
+
+            _orderedInheritance = new Lazy<List<INamedTypeSymbol>>(
+                () => Common.Declaration.InheritanceFromBottomToTop(typeSymbol).ToList());
+
+            lköadshlf
+
         }
 
         public TypeDeclarationSyntax SyntaxNode { get; }
@@ -32,6 +44,8 @@ namespace Aspects.SourceGenerators.Common
         public string Declaration => _declaration.Value;
 
         public string Name => _name.Value;
+
+        public IEnumerable<PropertyInfo> LocalProperties => _localProperties.Value;
 
         public IEnumerable<INamedTypeSymbol> OrderedInheritance(bool includeSelf = false)
         {
@@ -46,24 +60,6 @@ namespace Aspects.SourceGenerators.Common
                 return Symbol.GetMembers();
 
             return OrderedInheritance(true).SelectMany(cl => cl.GetMembers());
-        }
-
-        private List<INamedTypeSymbol> LoadInheritance()
-        {
-            var stack = new Stack<INamedTypeSymbol>();
-            var sy = Symbol;
-
-            while (sy != null)
-            {
-                stack.Push(sy);
-                sy = sy.BaseType;
-            }
-
-            var l = new List<INamedTypeSymbol>(stack.Count);
-            while (stack.Count > 0)
-                l.Add(stack.Pop());
-
-            return l;
         }
     }
 }

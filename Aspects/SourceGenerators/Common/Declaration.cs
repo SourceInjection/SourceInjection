@@ -3,6 +3,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace Aspects.SourceGenerators.Common
 {
@@ -26,6 +27,20 @@ namespace Aspects.SourceGenerators.Common
             if (nodeText.Contains('>'))
                 return nodeText.Substring(0, nodeText.IndexOf('>') + 1);
             return nodeText.Substring(0, nodeText.IndexOf(node.Identifier.Text) + node.Identifier.Text.Length);
+        }
+
+        public static IEnumerable<INamedTypeSymbol> InheritanceFromBottomToTop(INamedTypeSymbol symbol)
+        {
+            var stack = new Stack<INamedTypeSymbol>();
+
+            while (symbol != null)
+            {
+                stack.Push(symbol);
+                symbol = symbol.BaseType;
+            }
+
+            while (stack.Count > 0)
+                yield return stack.Pop();
         }
 
         public static bool HasPartialModifier(TypeDeclarationSyntax typeDeclaration)

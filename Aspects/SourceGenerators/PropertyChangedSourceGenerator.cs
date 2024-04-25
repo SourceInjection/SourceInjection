@@ -52,7 +52,7 @@ namespace Aspects.SourceGenerators
 
         private static string PropertyCode(IFieldSymbol field)
         {
-            var name = Property.Name(field.Name);
+            var name = Property.NameFromField(field.Name);
             var sb = new StringBuilder();
 
             var type = field.Type.ToDisplayString();
@@ -83,7 +83,7 @@ namespace Aspects.SourceGenerators
 
         private static string SetterCode(IFieldSymbol field)
         {
-            var name = Property.Name(field.Name);
+            var name = Property.NameFromField(field.Name);
             var sb = new StringBuilder();
 
             var attName = typeof(NotifyPropertyChangedAttribute).FullName;
