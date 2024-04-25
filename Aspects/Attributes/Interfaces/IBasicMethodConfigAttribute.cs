@@ -1,4 +1,4 @@
-﻿namespace Aspects.Attributes.Interfaces.Base
+﻿namespace Aspects.Attributes.Interfaces
 {
     public interface IBasicMethodConfigAttribute
     {

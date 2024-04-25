@@ -1,7 +1,4 @@
-﻿
-using Aspects.Attributes.Interfaces.Base;
-
-namespace Aspects.Attributes.Interfaces
+﻿namespace Aspects.Attributes.Interfaces
 {
     public interface IToStringConfigAttribute : IBasicMethodConfigAttribute { }
 

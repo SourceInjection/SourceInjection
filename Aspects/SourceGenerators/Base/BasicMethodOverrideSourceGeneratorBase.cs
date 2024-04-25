@@ -1,5 +1,5 @@
 ﻿using Aspects.Attributes;
-using Aspects.Attributes.Interfaces.Base;
+using Aspects.Attributes.Interfaces;
 using Aspects.SourceGenerators.Common;
 using Aspects.SyntaxReceivers;
 using Aspects.Util;
@@ -11,7 +11,8 @@ using TypeInfo = Aspects.SourceGenerators.Common.TypeInfo;
 
 namespace Aspects.SourceGenerators.Base
 {
-    public abstract class BasicMethodOverrideSourceGeneratorBase<TConfigAttribute, TAttribute, TExcludeAttribute> : TypeSourceGeneratorBase
+    public abstract class BasicMethodOverrideSourceGeneratorBase<TConfigAttribute, TAttribute, TExcludeAttribute> 
+        : TypeSourceGeneratorBase
         where TConfigAttribute : IBasicMethodConfigAttribute
     {
         private protected override TypeSyntaxReceiver SyntaxReceiver { get; } = new TypeSyntaxReceiver(
@@ -47,7 +48,7 @@ namespace Aspects.SourceGenerators.Base
             }
 
             return members
-                .Where(m => m is IFieldSymbol || m is IPropertySymbol p && PropertyIsValid(p))
+                .Where(m => m is IFieldSymbol || m is IPropertySymbol p && PropertyIsInstanceMember(p))
                 .Where(m => m.HasAttributeOfType<TAttribute>());
         }
 
@@ -102,11 +103,12 @@ namespace Aspects.SourceGenerators.Base
 
         private IEnumerable<IPropertySymbol> GetProperties(IEnumerable<ISymbol> members)
         {
-            return members.OfType<IPropertySymbol>()
-                .Where(p => PropertyIsValid(p) && (!p.IsOverride || p.HasAttributeOfType<TAttribute>()) && !p.HasAttributeOfType<TExcludeAttribute>());
+            return members.OfType<IPropertySymbol>().Where(p => 
+                PropertyIsInstanceMember(p) 
+                && (!p.IsOverride || p.HasAttributeOfType<TAttribute>()) && !p.HasAttributeOfType<TExcludeAttribute>());
         }
 
-        private bool PropertyIsValid(IPropertySymbol property)
+        private bool PropertyIsInstanceMember(IPropertySymbol property)
         {
             return !property.IsImplicitlyDeclared
                 && !property.IsStatic
