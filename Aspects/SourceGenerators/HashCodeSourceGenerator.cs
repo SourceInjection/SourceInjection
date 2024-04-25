@@ -10,7 +10,8 @@ using TypeInfo = Aspects.SourceGenerators.Common.TypeInfo;
 namespace Aspects.SourceGenerators
 {
     [Generator]
-    public sealed class HashCodeSourceGenerator : BasicMethodOverrideSourceGeneratorBase<IHashCodeConfigAttribute, IHashCodeAttribute, IHashCodeExcludeAttribute>
+    public sealed class HashCodeSourceGenerator 
+        : BasicMethodOverrideSourceGeneratorBase<IHashCodeConfigAttribute, IHashCodeAttribute, IHashCodeExcludeAttribute>
     {
         private protected override string Name { get; } = nameof(GetHashCode);
 

@@ -7,45 +7,31 @@ namespace Aspects.Test.Common
     [AutoEqualsAndHashCode]
     public partial class Data : DataBase
     {
-        object? _obj;
-        object? _obj2;
+        private object _obj0;
+        private object _obj1;
+        private object _obj2;
 
-        private int _int;
 
-        public int Int => _int;
-
-        public object? Object { get; }
-
-        public List<List<string>> Strings2d { get; set; }
-
-        public IList List { get; set; }
-
-        public override string Name { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-
-        public object? Object1 { get => _obj; }
-
-        public object? Object2 
+        public object Obj0 => _obj0 ?? null;
+        public object Obj1
         {
-            get 
-            {
-                var value = _obj2;
-                _obj2 = value;
-
-                return _obj2;
-            } 
+            get => _obj1 ?? null;
         }
 
-        public object? Object3 { get; }
+        public object Obj2
+        {
+            get
+            {
+                return _obj2 ?? null;
+            }
+        }
 
-        public object? Object4 { get; }
-
-        public object? Object5 { get; }
-
+        public string Name { get; set; }
     }
 
     [AutoEqualsAndHashCode]
     public abstract partial class DataBase
     {
-        public abstract string Name { get; set; }
+        public string Name { get; set; }
     }
 }

@@ -11,7 +11,8 @@ using TypeInfo = Aspects.SourceGenerators.Common.TypeInfo;
 namespace Aspects.SourceGenerators
 {
     [Generator]
-    public sealed class EqualsSourceGenerator : BasicMethodOverrideSourceGeneratorBase<IEqualsConfigAttribute, IEqualsAttribute, IEqualsExcludeAttribute>
+    public sealed class EqualsSourceGenerator 
+        : BasicMethodOverrideSourceGeneratorBase<IEqualsConfigAttribute, IEqualsAttribute, IEqualsExcludeAttribute>
     {
         private const string argName = "obj";
         private const string otherName = "other";
@@ -67,7 +68,10 @@ namespace Aspects.SourceGenerators
             return typeInfo.Symbol.Inheritance()
                 .SelectMany(cl => cl.GetMembers())
                 .OfType<IMethodSymbol>()
-                .Any(m => m.Name == nameof(Equals) && !m.IsOverride && m.IsVirtual && m.Parameters.Any(p => p.NullableAnnotation == NullableAnnotation.Annotated));
+                .Any(m => m.Name == nameof(Equals) 
+                    && !m.IsOverride 
+                    && m.IsVirtual 
+                    && m.Parameters.Any(p => p.NullableAnnotation == NullableAnnotation.Annotated));
         }
 
         private bool ShouldIncludeBase(TypeInfo typeInfo)
@@ -95,7 +99,9 @@ namespace Aspects.SourceGenerators
             {
                 if (type.IsEnumerable() && !type.OverridesEquals())
                     return Output.SequenceEqualsMethod(memberName, $"{otherName}.{memberName}");
-                return $"({memberName} is null && {otherName}.{memberName} is null || {memberName}?.{Name}({otherName}.{memberName}) is true)";
+
+                return $"({memberName} is null && {otherName}.{memberName} is null " +
+                    $"|| {memberName}?.{Name}({otherName}.{memberName}) is true)";
             }
             return $"{memberName}.{Name}({otherName}.{memberName})";
         }

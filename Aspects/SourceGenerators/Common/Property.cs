@@ -87,7 +87,7 @@ namespace Aspects.SourceGenerators.Common
                         return default;
 
                     result = token.GetNextToken();
-                    if (!result.IsKind(SyntaxKind.IdentifierToken) || !HasValidFollower(token))
+                    if (!result.IsKind(SyntaxKind.IdentifierToken) || !HasValidFollower(result))
                         return default;
                 }
                 token = token.GetNextToken();

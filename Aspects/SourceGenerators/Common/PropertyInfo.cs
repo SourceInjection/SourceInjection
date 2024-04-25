@@ -12,14 +12,20 @@ namespace Aspects.SourceGenerators.Common
     {
         private readonly Lazy<bool> _isDataMember;
         private readonly Lazy<IFieldSymbol> _linkedField;
+        private readonly Lazy<bool> _hidesBasePropertyByName;
 
         public PropertyInfo(PropertyDeclarationSyntax syntaxNode, IPropertySymbol symbol)
         {
             Symbol = symbol;
             SyntaxNode = syntaxNode;
 
-            _isDataMember = new Lazy<bool>(() => Property.IsDataMember(syntaxNode));
+            _isDataMember = new Lazy<bool>(
+                () => Property.IsDataMember(syntaxNode));
+
             _linkedField = new Lazy<IFieldSymbol>(LoadField);
+
+            _hidesBasePropertyByName = new Lazy<bool>(
+                () => Symbol.HidesBasePropertyByName());
         }
 
         public IPropertySymbol Symbol { get; }
@@ -30,13 +36,15 @@ namespace Aspects.SourceGenerators.Common
 
         public bool IsDataMember => _isDataMember.Value;
 
+        public bool HidesBasePropertyByName => _hidesBasePropertyByName.Value;
+
         private IFieldSymbol LoadField()
         {
             if (!Property.TryGetReturnedIdentifier(SyntaxNode, out var identifier))
                 return null;
 
             return Symbol.ContainingType?.LocalVisibleFields()
-                .FirstOrDefault(f => f.Name == identifier.Text);
+                .FirstOrDefault(f => f.Name == identifier.ValueText);
         }
     }
 }

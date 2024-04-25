@@ -23,7 +23,7 @@ namespace Aspects.SyntaxReceivers
         {
             if (context.Node is TypeDeclarationSyntax node && context.SemanticModel.GetDeclaredSymbol(node) is INamedTypeSymbol symbol)
             {
-                var typeInfo = new TypeInfo(node, symbol);
+                var typeInfo = new TypeInfo(context, node, symbol);
                 if (_predicate(typeInfo))
                     _identifiedContexts.Add(typeInfo);
             }

@@ -78,11 +78,19 @@ namespace Aspects.SourceGenerators.Base
         {
             IEnumerable<ISymbol> fields = GetFields(members);
 
-            var properties = GetProperties(members).ToArray();
-            var mappedFields = SourceCode.GetLinkedFields(typeInfo);
+            var properties = typeInfo.LocalProperties
+                .Where(pi => pi.IsDataMember);
 
-            fields = fields.Where(f => !mappedFields.Contains(f.Name)).ToArray();
-            return fields.Concat(properties);
+            var linkedFields = properties
+                .Where(pi => pi.LinkedField != null)
+                .Select(pi => pi.LinkedField)
+                .ToArray();
+
+            fields = fields
+                .Where(f => !Array.Exists(linkedFields, lf => lf.Equals(f, SymbolEqualityComparer.Default)))
+                .ToArray();
+
+            return fields.Concat(properties.Select(pi => pi.Symbol));
         }
 
         private IEnumerable<IFieldSymbol> GetFields(IEnumerable<ISymbol> members)

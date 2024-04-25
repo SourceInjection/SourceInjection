@@ -25,11 +25,22 @@ namespace Aspects.Util
             var result = symbol.GetMembers().OfType<IFieldSymbol>();
             if(symbol.BaseType != null)
             {
-                result = symbol.BaseType.Inheritance()
-                    .SelectMany(sy => sy.GetMembers().OfType<IFieldSymbol>())
-                    .Where(f => IsVisibleFromDerived(symbol, f));
+                result = result.Concat(
+                    symbol.BaseType.Inheritance()
+                        .SelectMany(sy => sy.GetMembers().OfType<IFieldSymbol>())
+                        .Where(f => IsVisibleFromDerived(symbol, f)));
             }
             return result;
+        }
+
+        public static bool HidesBasePropertyByName(this IPropertySymbol symbol)
+        {
+            var type = symbol.ContainingType;
+            if (type is null)
+                return false;
+
+            return type.Inheritance()
+                .Any(t => t.GetMembers().OfType<IPropertySymbol>().Any(p => p.Name == symbol.Name));
         }
 
         private static bool IsVisibleFromDerived(INamedTypeSymbol symbol, IFieldSymbol member)
