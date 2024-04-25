@@ -34,8 +34,9 @@ namespace Aspects.SourceGenerators
                 sb.AppendLine();
             }
 
-            var attributedFields = typeInfo
-                .FieldsWithAttributeOfType<NotifyPropertyChangedAttribute>()
+            var attributedFields = typeInfo.Symbol.GetMembers()
+                .OfType<IFieldSymbol>()
+                .Where(a => a.HasAttributeOfType<NotifyPropertyChangedAttribute>())
                 .ToArray();
 
             sb.Append(PropertyCode(attributedFields[0]));

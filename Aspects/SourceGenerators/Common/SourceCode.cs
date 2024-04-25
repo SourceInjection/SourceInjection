@@ -12,7 +12,9 @@ namespace Aspects.SourceGenerators.Common
     {
         public static IEnumerable<string> GetLinkedFields(TypeInfo typeInfo)
         {
-            var fields = new HashSet<string>(typeInfo.Fields().Where(f => CanBeLinked(f)).Select(f => f.Name));           
+            var fields = new HashSet<string>(typeInfo.Symbol.GetMembers()
+                .OfType<IFieldSymbol>()
+                .Where(f => CanBeLinked(f)).Select(f => f.Name));           
 
             var propertyNodes = typeInfo.SyntaxNode.DescendantNodes()
                 .OfType<PropertyDeclarationSyntax>()
