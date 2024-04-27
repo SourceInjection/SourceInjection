@@ -7,11 +7,11 @@ using static Aspects.SourceGenerators.Diagnostics.Errors;
 
 namespace Aspects.SourceGenerators.Base
 {
-    public abstract class TypeSourceGeneratorBase : ISourceGenerator
+    internal abstract class TypeSourceGeneratorBase : ISourceGenerator
     {
-        protected private abstract string Name { get; }
+        protected abstract string Name { get; }
 
-        protected private abstract TypeSyntaxReceiver SyntaxReceiver { get; }
+        protected abstract TypeSyntaxReceiver SyntaxReceiver { get; }
 
         public void Initialize(GeneratorInitializationContext context)
         {
@@ -36,9 +36,9 @@ namespace Aspects.SourceGenerators.Base
             }
         }
 
-        protected private abstract string Dependencies(TypeInfo typeInfo);
+        protected abstract string Dependencies(TypeInfo typeInfo);
 
-        protected private abstract string ClassBody(TypeInfo typeInfo);
+        protected abstract string ClassBody(TypeInfo typeInfo);
 
         private string GeneratePartialType(TypeInfo typeInfo)
         {

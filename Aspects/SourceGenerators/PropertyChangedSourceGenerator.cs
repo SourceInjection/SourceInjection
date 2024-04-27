@@ -11,20 +11,20 @@ using TypeInfo = Aspects.SourceGenerators.Common.TypeInfo;
 namespace Aspects.SourceGenerators
 {
     [Generator]
-    public sealed class PropertyChangedSourceGenerator : TypeSourceGeneratorBase
+    internal class PropertyChangedSourceGenerator : TypeSourceGeneratorBase
     {
-        private protected override string Name { get; } = "PropertyChanged";
+        protected override string Name { get; } = "PropertyChanged";
 
-        private protected override TypeSyntaxReceiver SyntaxReceiver { get; }
+        protected override TypeSyntaxReceiver SyntaxReceiver { get; }
             = new TypeSyntaxReceiver(Types.WithMembersWithAttributeOfType<NotifyPropertyChangedAttribute>());
 
 
-        private protected override string Dependencies(TypeInfo typeInfo)
+        protected override string Dependencies(TypeInfo typeInfo)
         {
             return "using System.ComponentModel;";
         }
 
-        private protected override string ClassBody(TypeInfo typeInfo)
+        protected override string ClassBody(TypeInfo typeInfo)
         {
             var sb = new StringBuilder();
 

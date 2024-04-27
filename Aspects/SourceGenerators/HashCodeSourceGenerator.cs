@@ -10,12 +10,14 @@ using TypeInfo = Aspects.SourceGenerators.Common.TypeInfo;
 namespace Aspects.SourceGenerators
 {
     [Generator]
-    public sealed class HashCodeSourceGenerator 
+    internal class HashCodeSourceGenerator 
         : BasicMethodOverrideSourceGeneratorBase<IHashCodeConfigAttribute, IHashCodeAttribute, IHashCodeExcludeAttribute>
     {
-        private protected override string Name { get; } = nameof(GetHashCode);
+        protected override string Name { get; } = nameof(GetHashCode);
 
-        private protected override string ClassBody(TypeInfo typeInfo)
+        protected override DataMemberPriority Priority { get; } = DataMemberPriority.Field;
+
+        protected override string ClassBody(TypeInfo typeInfo)
         {
             const int hashCodeCombineMaxArgs = 8;
 

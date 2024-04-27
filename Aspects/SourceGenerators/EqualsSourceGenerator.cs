@@ -11,15 +11,17 @@ using TypeInfo = Aspects.SourceGenerators.Common.TypeInfo;
 namespace Aspects.SourceGenerators
 {
     [Generator]
-    public sealed class EqualsSourceGenerator 
+    internal class EqualsSourceGenerator
         : BasicMethodOverrideSourceGeneratorBase<IEqualsConfigAttribute, IEqualsAttribute, IEqualsExcludeAttribute>
     {
         private const string argName = "obj";
         private const string otherName = "other";
 
-        private protected override string Name { get; } = nameof(Equals);
+        protected override string Name { get; } = nameof(Equals);
 
-        private protected override string ClassBody(TypeInfo typeInfo)
+        protected override DataMemberPriority Priority { get; } = DataMemberPriority.Field;
+
+        protected override string ClassBody(TypeInfo typeInfo)
         {
             var sb = new StringBuilder();
 

@@ -11,25 +11,29 @@ using TypeInfo = Aspects.SourceGenerators.Common.TypeInfo;
 
 namespace Aspects.SourceGenerators.Base
 {
-    public abstract class BasicMethodOverrideSourceGeneratorBase<TConfigAttribute, TAttribute, TExcludeAttribute> 
+    internal abstract class BasicMethodOverrideSourceGeneratorBase<TConfigAttribute, TAttribute, TExcludeAttribute> 
         : TypeSourceGeneratorBase
         where TConfigAttribute : IBasicMethodConfigAttribute
     {
-        private protected override TypeSyntaxReceiver SyntaxReceiver { get; } = new TypeSyntaxReceiver(
+        protected enum DataMemberPriority { Field, Property };
+
+        protected override TypeSyntaxReceiver SyntaxReceiver { get; } = new TypeSyntaxReceiver(
                 Types.WithAttributeOfType<TConfigAttribute>()
             .Or(Types.WithMembersWithAttributeOfType<TAttribute>()));
 
-        private protected override string Dependencies(TypeInfo typeInfo)
+        protected abstract DataMemberPriority Priority { get; }
+
+        protected override string Dependencies(TypeInfo typeInfo)
         {
             return string.Empty;
         }
 
-        protected private IEnumerable<ISymbol> GetRelevantSymbols(TypeInfo typeInfo)
+        protected IEnumerable<ISymbol> GetRelevantSymbols(TypeInfo typeInfo)
         {
             return GetSymbols(typeInfo, typeInfo.Members());
         }
 
-        protected private IEnumerable<ISymbol> GetAllSymbols(TypeInfo typeInfo)
+        protected IEnumerable<ISymbol> GetAllSymbols(TypeInfo typeInfo)
         {
             return GetSymbols(typeInfo, typeInfo.Members(true));
         }
@@ -52,13 +56,13 @@ namespace Aspects.SourceGenerators.Base
                 .Where(m => m.HasAttributeOfType<TAttribute>());
         }
 
-        protected private bool TryGetDataMemberKind(TypeInfo typeInfo, out DataMemberKind kind)
+        private bool TryGetDataMemberKind(TypeInfo typeInfo, out DataMemberKind kind)
         {
             var kindTypeName = typeof(DataMemberKind).FullName;
 
-            if(typeInfo.Symbol.GetAttributesOfType<TConfigAttribute>()
+            if (typeInfo.Symbol.GetAttributesOfType<TConfigAttribute>()
                 .FirstOrDefault()?.ConstructorArguments
-                .SingleOrDefault(arg => arg.Type.ToDisplayString() == kindTypeName) 
+                .SingleOrDefault(arg => arg.Type.ToDisplayString() == kindTypeName)
 
                 is TypedConstant typedConstant && typedConstant.Value != null)
             {
@@ -87,11 +91,21 @@ namespace Aspects.SourceGenerators.Base
                 .Select(pi => pi.LinkedField)
                 .ToArray();
 
-            fields = fields
-                .Where(f => !Array.Exists(linkedFields, lf => lf.Equals(f, SymbolEqualityComparer.Default)))
-                .ToArray();
+            if (Priority == DataMemberPriority.Property)
+            {
+                fields = fields
+                    .Where(f => !Array.Exists(linkedFields, lf => lf.Equals(f, SymbolEqualityComparer.Default)))
+                    .ToArray();
 
-            return fields.Concat(properties.Select(pi => pi.Symbol));
+                return fields.Concat(properties.Select(pi => pi.Symbol));
+            }
+            else if (Priority == DataMemberPriority.Field)
+            {
+                return fields.Concat(properties
+                    .Where(pi => pi.LinkedField is null)
+                    .Select(pi => pi.Symbol));
+            }
+            else throw new NotImplementedException($"{Priority}");
         }
 
         private IEnumerable<IFieldSymbol> GetFields(IEnumerable<ISymbol> members)

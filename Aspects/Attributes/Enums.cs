@@ -20,7 +20,7 @@ namespace Aspects.Attributes
         Public = 32,
     }
 
-    public static class AccessabilityExtensions
+    public static class AccessibilityExtensions
     {
         internal static string ToDisplayString(this Accessibility accessability)
         {
