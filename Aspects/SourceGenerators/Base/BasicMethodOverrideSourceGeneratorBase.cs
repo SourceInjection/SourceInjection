@@ -1,6 +1,6 @@
 ﻿using Aspects.Attributes;
 using Aspects.Attributes.Interfaces;
-using Aspects.SourceGenerators.Common;
+using Aspects.SourceGenerators.Queries;
 using Aspects.SyntaxReceivers;
 using Aspects.Util;
 using Microsoft.CodeAnalysis;
@@ -28,14 +28,14 @@ namespace Aspects.SourceGenerators.Base
             return string.Empty;
         }
 
-        protected IEnumerable<ISymbol> GetRelevantSymbols(TypeInfo typeInfo)
+        protected IEnumerable<ISymbol> GetLocalTargetedSymbols(TypeInfo typeInfo)
         {
             return GetSymbols(typeInfo, typeInfo.Members());
         }
 
-        protected IEnumerable<ISymbol> GetAllSymbols(TypeInfo typeInfo)
+        protected IEnumerable<ISymbol> GetPublicSymbols(TypeInfo typeInfo)
         {
-            return GetSymbols(typeInfo, typeInfo.Members(true));
+            return GetSymbols(typeInfo, typeInfo.Members(true).Where(sy => sy.IsPublicProperty() || sy.IsPublicField()));
         }
 
         private IEnumerable<ISymbol> GetSymbols(TypeInfo typeInfo, IEnumerable<ISymbol> members)
@@ -58,21 +58,18 @@ namespace Aspects.SourceGenerators.Base
 
         private bool TryGetDataMemberKind(TypeInfo typeInfo, out DataMemberKind kind)
         {
-            var kindTypeName = typeof(DataMemberKind).FullName;
-
-            if (typeInfo.Symbol.GetAttributesOfType<TConfigAttribute>()
-                .FirstOrDefault()?.ConstructorArguments
-                .SingleOrDefault(arg => arg.Type.ToDisplayString() == kindTypeName)
-
-                is TypedConstant typedConstant && typedConstant.Value != null)
+            if (typeInfo.Symbol.GetAttributesOfType<TConfigAttribute>().FirstOrDefault() is AttributeData attData)
             {
-                kind = (DataMemberKind)typedConstant.Value;
+                var att = Common.Attribute.Create<TConfigAttribute>(attData);
+                if(att?.DataMemberKind is DataMemberKind dk)
+                {
+                    kind = dk;
+                    // TODO: extract out of config
+                    if (kind == DataMemberKind.ProjectConfig)
+                        kind = DataMemberKind.DataMember;
 
-                // TODO: extract out of config
-                if (kind == DataMemberKind.ProjectConfig)
-                    kind = DataMemberKind.DataMember;
-
-                return true;
+                    return true;
+                }
             }
 
             kind = DataMemberKind.DataMember;

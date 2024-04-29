@@ -41,7 +41,7 @@ namespace Aspects.SourceGenerators
 
             sb.Append($" {argName} is {typeInfo.Name}");
 
-            var symbols = GetRelevantSymbols(typeInfo);
+            var symbols = GetLocalTargetedSymbols(typeInfo);
             if (symbols.Any())
                 sb.Append($" {otherName}");
 
@@ -100,7 +100,7 @@ namespace Aspects.SourceGenerators
             if (type.IsReferenceType)
             {
                 if (type.IsEnumerable() && !type.OverridesEquals())
-                    return Output.SequenceEqualsMethod(memberName, $"{otherName}.{memberName}");
+                    return CodeSnippets.SequenceEqualsMethod(memberName, $"{otherName}.{memberName}");
 
                 return $"({memberName} is null && {otherName}.{memberName} is null " +
                     $"|| {memberName}?.{Name}({otherName}.{memberName}) is true)";

@@ -1,6 +1,7 @@
 ﻿using Aspects.Attributes;
 using Aspects.SourceGenerators.Base;
 using Aspects.SourceGenerators.Common;
+using Aspects.SourceGenerators.Queries;
 using Aspects.SyntaxReceivers;
 using Aspects.Util;
 using Microsoft.CodeAnalysis;
@@ -52,7 +53,7 @@ namespace Aspects.SourceGenerators
 
         private static string PropertyCode(IFieldSymbol field)
         {
-            var name = Property.NameFromField(field.Name);
+            var name = CodeSnippets.PropertyNameFromField(field);
             var sb = new StringBuilder();
 
             var type = field.Type.ToDisplayString();
@@ -83,14 +84,14 @@ namespace Aspects.SourceGenerators
 
         private static string SetterCode(IFieldSymbol field)
         {
-            var name = Property.NameFromField(field.Name);
+            var name = CodeSnippets.PropertyNameFromField(field);
             var sb = new StringBuilder();
 
             var attName = typeof(NotifyPropertyChangedAttribute).FullName;
             var attData = field.GetAttributes()
                 .First(a => a.AttributeClass.ToDisplayString() == attName);
 
-            var attribute = NotifyPropertyChangedAttribute.FromAttributeData(attData);
+            var attribute = Attribute.Create<NotifyPropertyChangedAttribute>(attData);
             if (attribute.Visibility == Attributes.Accessibility.Public)
                 sb.AppendLine("\tset");
             else
@@ -106,7 +107,7 @@ namespace Aspects.SourceGenerators
                 else
                 {
                     if (field.Type.IsEnumerable() && !field.Type.OverridesEquals())
-                        sb.AppendLine($"\t\tif (!{Output.SequenceEqualsMethod(field.Name, "value")}");
+                        sb.AppendLine($"\t\tif (!{CodeSnippets.SequenceEqualsMethod(field.Name, "value")}");
 
                     else sb.AppendLine($"\t\tif (!({field.Name} is null) && !{field.Name}.{nameof(Equals)}(value) " +
                         $"|| {field.Name} is null && !(value is null))");

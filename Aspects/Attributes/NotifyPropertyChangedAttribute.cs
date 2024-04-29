@@ -1,5 +1,4 @@
-﻿using Microsoft.CodeAnalysis;
-using System;
+﻿using System;
 
 namespace Aspects.Attributes
 {
@@ -16,12 +15,5 @@ namespace Aspects.Attributes
         public Accessibility Visibility { get; }
 
         public bool EqualityCheck { get; }
-
-        internal static NotifyPropertyChangedAttribute FromAttributeData(AttributeData data)
-        {
-            return new NotifyPropertyChangedAttribute(
-                (Accessibility)data.ConstructorArguments[0].Value,
-                (bool)data.ConstructorArguments[1].Value);
-        }
     }
 }

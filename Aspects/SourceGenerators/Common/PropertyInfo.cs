@@ -1,6 +1,4 @@
-﻿
-
-using Aspects.LoadingBehaviors;
+﻿using Aspects.LoadingBehaviors;
 using Aspects.Util;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -19,13 +17,9 @@ namespace Aspects.SourceGenerators.Common
             Symbol = symbol;
             SyntaxNode = syntaxNode;
 
-            _isDataMember = new Lazy<bool>(
-                () => Property.IsDataMember(syntaxNode));
-
+            _isDataMember = new Lazy<bool>(() => syntaxNode.IsDataMember());
             _linkedField = new Lazy<IFieldSymbol>(LoadField);
-
-            _hidesBasePropertyByName = new Lazy<bool>(
-                () => Symbol.HidesBasePropertyByName());
+            _hidesBasePropertyByName = new Lazy<bool>(() => Symbol.HidesBasePropertyByName());
         }
 
         public IPropertySymbol Symbol { get; }
@@ -40,7 +34,7 @@ namespace Aspects.SourceGenerators.Common
 
         private IFieldSymbol LoadField()
         {
-            if (!Property.TryGetReturnedIdentifier(SyntaxNode, out var identifier))
+            if (!SyntaxNode.TryGetReturnedIdentifier(out var identifier))
                 return null;
 
             return Symbol.ContainingType?.LocalVisibleFields()

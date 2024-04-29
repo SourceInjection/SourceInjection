@@ -26,7 +26,7 @@ namespace Aspects.SourceGenerators
             sb.AppendLine($"public override int {Name}()");
             sb.AppendLine("{");
 
-            var symbols = GetRelevantSymbols(typeInfo).ToArray();
+            var symbols = GetLocalTargetedSymbols(typeInfo).ToArray();
             var includeBase = ShouldIncludeBase(typeInfo);
             var length = symbols.Length + (includeBase ? 1 : 0);
 
@@ -85,7 +85,7 @@ namespace Aspects.SourceGenerators
         {
             if (!MustUseCombinedHashCode(symbol))
                 return symbol.Name;
-            return Output.CombinedHashCodeMethod(symbol.Name);
+            return CodeSnippets.CombinedHashCodeMethod(symbol.Name);
         }
 
         private bool ShouldIncludeBase(TypeInfo typeInfo)

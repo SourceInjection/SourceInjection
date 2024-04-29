@@ -1,5 +1,4 @@
 ﻿using Aspects.Attributes;
-using System.Collections;
 
 
 namespace Aspects.Test.Common

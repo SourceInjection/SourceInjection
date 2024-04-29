@@ -3,7 +3,6 @@ using Microsoft.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using TypeInfo = Aspects.SourceGenerators.Common.TypeInfo;
-using Accessibility = Microsoft.CodeAnalysis.Accessibility;
 using Aspects.Attributes.Interfaces;
 
 namespace Aspects.SourceGenerators
@@ -24,8 +23,7 @@ namespace Aspects.SourceGenerators
 
             sb.Append($"\treturn $\"({typeInfo.Name})");
 
-            var symbols = GetAllSymbols(typeInfo)
-                .Where(sy => IsPublicProperty(sy) || IsPublicField(sy));
+            var symbols = GetPublicSymbols(typeInfo);
 
             if (symbols.Any())
             {
@@ -41,21 +39,6 @@ namespace Aspects.SourceGenerators
             sb.Append('}');
 
             return sb.ToString();
-        }
-
-        public static bool IsPublicProperty(ISymbol symbol)
-        {
-            return symbol is IPropertySymbol property
-                && property.DeclaredAccessibility == Accessibility.Public
-                && property.GetMethod != null
-                && (property.GetMethod.DeclaredAccessibility == Accessibility.NotApplicable 
-                    || property.GetMethod.DeclaredAccessibility == Accessibility.Public);
-        }
-
-        public static bool IsPublicField(ISymbol symbol)
-        {
-            return symbol is IFieldSymbol field
-                && field.DeclaredAccessibility == Accessibility.Public;
         }
     }
 }

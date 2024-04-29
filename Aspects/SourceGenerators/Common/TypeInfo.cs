@@ -1,4 +1,5 @@
 ﻿using Aspects.LoadingBehaviors;
+using Aspects.Util;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Generic;
@@ -19,20 +20,11 @@ namespace Aspects.SourceGenerators.Common
             SyntaxNode = syntaxNode;
             Symbol = typeSymbol;
 
-            _hasPartialModifier = new Lazy<bool>(
-                () => Common.Declaration.HasPartialModifier(syntaxNode));
-
-            _declaration = new Lazy<string>(
-                () => Common.Declaration.GetText(syntaxNode));
-
-            _name = new Lazy<string>(
-                () => Common.Declaration.GetName(syntaxNode));
-
-            _orderedInheritance = new Lazy<List<INamedTypeSymbol>>(
-                () => Common.Declaration.InheritanceFromBottomToTop(typeSymbol).ToList());
-
-            _localProperties = new Lazy<List<PropertyInfo>>(
-                () => LoadProperties(context));
+            _hasPartialModifier = new Lazy<bool>(() => syntaxNode.HasPartialModifier());
+            _declaration = new Lazy<string>(() => syntaxNode.Declaration());
+            _name = new Lazy<string>(() => syntaxNode.NameWithGenericParameters());
+            _orderedInheritance = new Lazy<List<INamedTypeSymbol>>(() => typeSymbol.InheritanceFromBottomToTop().ToList());
+            _localProperties = new Lazy<List<PropertyInfo>>(() => LoadProperties(context));
         }
 
         public TypeDeclarationSyntax SyntaxNode { get; }

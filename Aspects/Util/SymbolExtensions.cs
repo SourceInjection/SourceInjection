@@ -7,6 +7,20 @@ namespace Aspects.Util
 {
     internal static class SymbolExtensions
     {
+        public static IEnumerable<INamedTypeSymbol> InheritanceFromBottomToTop(this INamedTypeSymbol symbol)
+        {
+            var stack = new Stack<INamedTypeSymbol>();
+
+            while (symbol != null)
+            {
+                stack.Push(symbol);
+                symbol = symbol.BaseType;
+            }
+
+            while (stack.Count > 0)
+                yield return stack.Pop();
+        }
+
         public static bool HasAttributeOfType<T>(this ISymbol symbol)
         {
             return symbol.GetAttributesOfType<T>().Any();
@@ -74,8 +88,8 @@ namespace Aspects.Util
 
         public static bool IsEnumerable(this ITypeSymbol symbol)
         {
-            return symbol.ToDisplayString() == Output.IEnumerableName
-                ||symbol.AllInterfaces.Any(i => i.ToDisplayString() == Output.IEnumerableName);
+            return symbol.ToDisplayString() == CodeSnippets.IEnumerableName
+                ||symbol.AllInterfaces.Any(i => i.ToDisplayString() == CodeSnippets.IEnumerableName);
         }
 
         public static bool OverridesEquals(this ITypeSymbol symbol)
@@ -101,6 +115,21 @@ namespace Aspects.Util
             var s = symbol.ToDisplayString();
             return s == typeName
                 || s == typeName + '?';
+        }
+
+        public static bool IsPublicProperty(this ISymbol symbol)
+        {
+            return symbol is IPropertySymbol property
+                && property.DeclaredAccessibility == Accessibility.Public
+                && property.GetMethod != null
+                && (property.GetMethod.DeclaredAccessibility == Accessibility.NotApplicable
+                    || property.GetMethod.DeclaredAccessibility == Accessibility.Public);
+        }
+
+        public static bool IsPublicField(this ISymbol symbol)
+        {
+            return symbol is IFieldSymbol field
+                && field.DeclaredAccessibility == Accessibility.Public;
         }
     }
 }
