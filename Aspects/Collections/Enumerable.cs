@@ -5,6 +5,11 @@ namespace Aspects.Collections
 {
     public static class Enumerable
     {
+        /// <summary>
+        /// Computes the hash code of <see cref="IEnumerable"/>s.
+        /// </summary>
+        /// <param name="en">The <see cref="IEnumerable"/> for which the hash code is computed.</param>
+        /// <returns>The hash code of the <see cref="IEnumerable"/>.</returns>
         public static int CombinedHashCode(IEnumerable en)
         {
             if (en is null)
@@ -12,6 +17,12 @@ namespace Aspects.Collections
             return en.DeepCombinedHashCode();
         }
 
+        /// <summary>
+        /// Compares two <see cref="IEnumerable"/> on equality.
+        /// </summary>
+        /// <param name="a">The first collect<see cref="IEnumerable"/>.ion</param>
+        /// <param name="b">The second <see cref="IEnumerable"/>.</param>
+        /// <returns>true if the <see cref="IEnumerable"/>s are equal else false.</returns>
         public static bool SequenceEquals(IEnumerable a, IEnumerable b)
         {
             if (a is null && b is null)

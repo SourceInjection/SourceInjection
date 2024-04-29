@@ -8,7 +8,7 @@ using TypeInfo = Aspects.SourceGenerators.Common.TypeInfo;
 namespace Aspects.SyntaxReceivers
 {
     /// <summary>
-    /// A syntax receiver that matches types using a defined predicate
+    /// A <see cref="ISyntaxContextReceiver"/> that matches types using a defined <see cref="Predicate{T}"/>.
     /// </summary>
     internal class TypeSyntaxReceiver : ISyntaxContextReceiver
     {
@@ -16,16 +16,17 @@ namespace Aspects.SyntaxReceivers
         private readonly List<TypeInfo> _identifiedTypes = new List<TypeInfo>(256);
 
         /// <summary>
-        /// Creates an instance of this type matching syntax receiver
+        /// Creates an instance of this type matching <see cref="ISyntaxContextReceiver"/>.
         /// </summary>
-        /// <param name="predicate">the predicate which must be fullfilled</param>
+        /// <param name="predicate">the <see cref="Predicate{T}"/> which must be fullfilled on <see cref="TypeInfo"/>s 
+        /// so that it is included in <see cref="IdentifiedTypes"/>.</param>
         public TypeSyntaxReceiver(Predicate<TypeInfo> predicate)
         {
             _predicate = predicate;
         }
 
         /// <summary>
-        /// Contains the types which fullfilled the given predicate
+        /// Contains the <see cref="TypeInfo"/> which fullfilled the given <see cref="Predicate{T}"/>.
         /// </summary>
         public IReadOnlyList<TypeInfo> IdentifiedTypes => _identifiedTypes;
 
