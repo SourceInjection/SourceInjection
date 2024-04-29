@@ -91,7 +91,7 @@ namespace Aspects.SourceGenerators
             var attData = field.GetAttributes()
                 .First(a => a.AttributeClass.ToDisplayString() == attName);
 
-            var attribute = Attribute.Create<NotifyPropertyChangedAttribute>(attData);
+            var attribute = AttributeFactory.Create<NotifyPropertyChangedAttribute>(attData);
             if (attribute.Visibility == Attributes.Accessibility.Public)
                 sb.AppendLine("\tset");
             else

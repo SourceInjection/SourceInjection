@@ -7,17 +7,27 @@ using TypeInfo = Aspects.SourceGenerators.Common.TypeInfo;
 
 namespace Aspects.SyntaxReceivers
 {
+    /// <summary>
+    /// A syntax receiver that matches types using a defined predicate
+    /// </summary>
     internal class TypeSyntaxReceiver : ISyntaxContextReceiver
     {
         private readonly Predicate<TypeInfo> _predicate;
-        private readonly List<TypeInfo> _identifiedContexts = new List<TypeInfo>(256);
+        private readonly List<TypeInfo> _identifiedTypes = new List<TypeInfo>(256);
 
+        /// <summary>
+        /// Creates an instance of this type matching syntax receiver
+        /// </summary>
+        /// <param name="predicate">the predicate which must be fullfilled</param>
         public TypeSyntaxReceiver(Predicate<TypeInfo> predicate)
         {
             _predicate = predicate;
         }
 
-        public IReadOnlyList<TypeInfo> IdentifiedTypes => _identifiedContexts;
+        /// <summary>
+        /// Contains the types which fullfilled the given predicate
+        /// </summary>
+        public IReadOnlyList<TypeInfo> IdentifiedTypes => _identifiedTypes;
 
         public void OnVisitSyntaxNode(GeneratorSyntaxContext context)
         {
@@ -25,7 +35,7 @@ namespace Aspects.SyntaxReceivers
             {
                 var typeInfo = new TypeInfo(context, node, symbol);
                 if (_predicate(typeInfo))
-                    _identifiedContexts.Add(typeInfo);
+                    _identifiedTypes.Add(typeInfo);
             }
         }
     }

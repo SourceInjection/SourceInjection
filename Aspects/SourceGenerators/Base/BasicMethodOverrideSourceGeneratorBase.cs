@@ -1,5 +1,6 @@
 ﻿using Aspects.Attributes;
 using Aspects.Attributes.Interfaces;
+using Aspects.SourceGenerators.Common;
 using Aspects.SourceGenerators.Queries;
 using Aspects.SyntaxReceivers;
 using Aspects.Util;
@@ -11,7 +12,7 @@ using TypeInfo = Aspects.SourceGenerators.Common.TypeInfo;
 
 namespace Aspects.SourceGenerators.Base
 {
-    internal abstract class BasicMethodOverrideSourceGeneratorBase<TConfigAttribute, TAttribute, TExcludeAttribute> 
+    internal abstract class BasicMethodOverrideSourceGeneratorBase<TConfigAttribute, TAttribute, TExcludeAttribute>
         : TypeSourceGeneratorBase
         where TConfigAttribute : IBasicMethodConfigAttribute
     {
@@ -58,18 +59,11 @@ namespace Aspects.SourceGenerators.Base
 
         private bool TryGetDataMemberKind(TypeInfo typeInfo, out DataMemberKind kind)
         {
-            if (typeInfo.Symbol.GetAttributesOfType<TConfigAttribute>().FirstOrDefault() is AttributeData attData)
+            if (AttributeFactory.TryCreate<TConfigAttribute>(
+                typeInfo.Symbol.AttributesOfType<TConfigAttribute>().FirstOrDefault(), out var att))
             {
-                var att = Common.Attribute.Create<TConfigAttribute>(attData);
-                if(att?.DataMemberKind is DataMemberKind dk)
-                {
-                    kind = dk;
-                    // TODO: extract out of config
-                    if (kind == DataMemberKind.ProjectConfig)
-                        kind = DataMemberKind.DataMember;
-
-                    return true;
-                }
+                kind = att.DataMemberKind;
+                return true;
             }
 
             kind = DataMemberKind.DataMember;
@@ -80,7 +74,7 @@ namespace Aspects.SourceGenerators.Base
         {
             IEnumerable<ISymbol> fields = GetFields(members);
 
-            var properties = typeInfo.LocalProperties
+            var properties = typeInfo.LocalPropertyInfos
                 .Where(pi => pi.IsDataMember);
 
             var linkedFields = properties
@@ -114,8 +108,8 @@ namespace Aspects.SourceGenerators.Base
 
         private IEnumerable<IPropertySymbol> GetProperties(IEnumerable<ISymbol> members)
         {
-            return members.OfType<IPropertySymbol>().Where(p => 
-                PropertyIsInstanceMember(p) 
+            return members.OfType<IPropertySymbol>().Where(p =>
+                PropertyIsInstanceMember(p)
                 && (!p.IsOverride || p.HasAttributeOfType<TAttribute>()) && !p.HasAttributeOfType<TExcludeAttribute>());
         }
 

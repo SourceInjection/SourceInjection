@@ -6,7 +6,7 @@ namespace Aspects.Attributes
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, Inherited = false, AllowMultiple = false)]
     public class AutoHashCodeAttribute : Attribute, IHashCodeConfigAttribute
     {
-        public AutoHashCodeAttribute(DataMemberKind dataMemberKind = DataMemberKind.ProjectConfig)
+        public AutoHashCodeAttribute(DataMemberKind dataMemberKind = DataMemberKind.DataMember)
         {
             DataMemberKind = dataMemberKind;
         }

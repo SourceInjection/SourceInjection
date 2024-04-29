@@ -1,6 +1,9 @@
 ﻿namespace Aspects.Attributes.Interfaces
 {
-    public interface IToStringConfigAttribute : IBasicMethodConfigAttribute { }
+    public interface IToStringConfigAttribute : IBasicMethodConfigAttribute 
+    {
+        bool CollectionsEnabled { get; }
+    }
 
     public interface IToStringAttribute { }
 

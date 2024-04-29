@@ -5,6 +5,11 @@ namespace Aspects.Util
 {
     internal static class EnumerableExtensions
     {
+        /// <summary>
+        /// Computes the hash code of collections
+        /// </summary>
+        /// <param name="col">The collection for that the hash code is computed</param>
+        /// <returns>The hash code of the collection</returns>
         public static int DeepCombinedHashCode(this IEnumerable col)
         {
             var hash = new HashCode();
@@ -20,6 +25,12 @@ namespace Aspects.Util
             return hash.ToHashCode();
         }
 
+        /// <summary>
+        /// Compares two collections on equality
+        /// </summary>
+        /// <param name="col">The first collection</param>
+        /// <param name="other">The second collection</param>
+        /// <returns>true if the collections are equal</returns>
         public static bool DeepSequenceEqual(this IEnumerable col, IEnumerable other)
         {
             var colIt = col.GetEnumerator();

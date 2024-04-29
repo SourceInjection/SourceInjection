@@ -6,7 +6,7 @@ namespace Aspects.Attributes
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, Inherited = false, AllowMultiple = false)]
     public class AutoEqualsAndHashCodeAttribute : Attribute, IEqualsConfigAttribute, IHashCodeConfigAttribute
     {
-        public AutoEqualsAndHashCodeAttribute(DataMemberKind dataMemberKind = DataMemberKind.ProjectConfig)
+        public AutoEqualsAndHashCodeAttribute(DataMemberKind dataMemberKind = DataMemberKind.DataMember)
         {
             DataMemberKind = dataMemberKind;
         }

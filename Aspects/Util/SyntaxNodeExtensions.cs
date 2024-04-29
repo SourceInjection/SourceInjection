@@ -1,13 +1,17 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace Aspects.Util
 {
     internal static class SyntaxNodeExtensions
     {
+        /// <summary>
+        /// Extracts the name of the syntax node with generic type attributes.
+        /// </summary>
+        /// <param name="node">The node for which the name and the generic type arguments are extracted</param>
+        /// <returns>The name with generic type attributes</returns>
         public static string NameWithGenericParameters(this TypeDeclarationSyntax node)
         {
             if (node.TypeParameterList is null)
@@ -17,6 +21,12 @@ namespace Aspects.Util
             return typeDec.Substring(typeDec.IndexOf(node.Identifier.Text)).Trim();
         }
 
+        /// <summary>
+        /// Extracts the declaration of the syntax node.
+        /// e.g. "public partial class MyClass"
+        /// </summary>
+        /// <param name="node">The node for which the declaration is extracted</param>
+        /// <returns>The declaration of the type</returns>
         public static string Declaration(this TypeDeclarationSyntax node)
         {
             var nodeText = node.GetText().ToString();
@@ -28,23 +38,61 @@ namespace Aspects.Util
             return nodeText.Substring(0, nodeText.IndexOf(node.Identifier.Text) + node.Identifier.Text.Length);
         }
 
+        /// <summary>
+        /// Checks if the type declaration has a partial modifier
+        /// </summary>
+        /// <param name="typeDeclaration">The node wich is checked</param>
+        /// <returns>true if the node has a partial modifier else false</returns>
         public static bool HasPartialModifier(this TypeDeclarationSyntax typeDeclaration)
         {
             return typeDeclaration.Modifiers
                 .Any(m => m.IsKind(SyntaxKind.PartialKeyword));
         }
 
+        /// <summary>
+        /// Checks if the property declaration is a data member.<br/>
+        /// A Data Member matches the following syntax:
+        /// <code>
+        /// modifier* propertyName "=>" identifier ( ";" | "??" anySymbol* ";" )
+        /// | modifier* propertyName "{" "get" "=>" identifier ( ";" | "??" anySymbol* ";" ) "}"
+        /// | modifier* propertyName "{" "get" "{" anyButReturnSymbol* "return" identifier ( ";" | "??" anySymbol* ";" ) "}" "}"
+        /// </code>
+        /// </summary>
+        /// <param name="propertySyntax">The property node which is scanned for the linked identifier</param>
+        /// <returns>true if the property node is a data member else false</returns>
         public static bool IsDataMember(this PropertyDeclarationSyntax propertySyntax)
         {
             return IsDataMember(propertySyntax, GetReturnedIdentifier(propertySyntax));
         }
 
+        /// <summary>
+        /// Tries to get the syntax token which is linked wiith the property in the get method.<br/>
+        /// Matches the following property definition grammer:
+        /// <code>
+        /// modifier* propertyName "=>" identifier ( ";" | "??" anySymbol* ";" )
+        /// | modifier* propertyName "{" "get" "=>" identifier ( ";" | "??" anySymbol* ";" ) "}"
+        /// | modifier* propertyName "{" "get" "{" anyButReturnSymbol* "return" identifier ( ";" | "??" anySymbol* ";" ) "}" "}"
+        /// </code>
+        /// </summary>
+        /// <param name="propertySyntax">The property node which is scanned for the linked identifier</param>
+        /// <param name="identifier">The resulting identifier token</param>
+        /// <returns>true if the property is linked with an identifier else false</returns>
         public static bool TryGetReturnedIdentifier(this PropertyDeclarationSyntax propertySyntax, out SyntaxToken identifier)
         {
             identifier = GetReturnedIdentifier(propertySyntax);
             return identifier.IsKind(SyntaxKind.IdentifierToken);
         }
 
+        /// <summary>
+        /// Gets the identifier symbol which matches the following property definition grammer:
+        /// <code>
+        /// modifier* propertyName "=>" identifier ( ";" | "??" anySymbol* ";" )
+        /// | modifier* propertyName "{" "get" "=>" identifier ( ";" | "??" anySymbol* ";" ) "}"
+        /// | modifier* propertyName "{" "get" "{" anyButReturnSymbol* "return" identifier ( ";" | "??" anySymbol* ";" ) "}" "}"
+        /// </code>
+        /// </summary>
+        /// <param name="propertySyntax">The property node which is scanned for the linked identifier</param>
+        /// <returns>The <see cref="SyntaxToken"/> of the identifier.<br/><see cref="default"/> if not found.</returns>
         public static SyntaxToken GetReturnedIdentifier(this PropertyDeclarationSyntax propertySyntax)
         {
             var token = propertySyntax.DescendantTokens()

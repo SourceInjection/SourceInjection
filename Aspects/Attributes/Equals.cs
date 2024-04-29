@@ -6,7 +6,7 @@ namespace Aspects.Attributes
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, Inherited = false, AllowMultiple = false)]
     public class AutoEqualsAttribute : Attribute, IEqualsConfigAttribute
     {
-        public AutoEqualsAttribute(DataMemberKind dataMemberKind = DataMemberKind.ProjectConfig)
+        public AutoEqualsAttribute(DataMemberKind dataMemberKind = DataMemberKind.DataMember)
         {
             DataMemberKind = dataMemberKind;
         }

@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using TypeInfo = Aspects.SourceGenerators.Common.TypeInfo;
 using Aspects.Attributes.Interfaces;
+using Aspects.SourceGenerators.Common;
+using Aspects.Util;
 
 namespace Aspects.SourceGenerators
 {
@@ -24,6 +26,12 @@ namespace Aspects.SourceGenerators
             sb.Append($"\treturn $\"({typeInfo.Name})");
 
             var symbols = GetPublicSymbols(typeInfo);
+            if (!CollectionsEnabled(typeInfo))
+            {
+                symbols = symbols.Where(sy =>
+                    sy is IPropertySymbol p && !p.Type.IsEnumerable()
+                    || sy is IFieldSymbol f && !f.Type.IsEnumerable());
+            }
 
             if (symbols.Any())
             {
@@ -39,6 +47,13 @@ namespace Aspects.SourceGenerators
             sb.Append('}');
 
             return sb.ToString();
+        }
+
+        private bool CollectionsEnabled(TypeInfo typeInfo)
+        {
+            return AttributeFactory.TryCreate<IToStringConfigAttribute>(
+                    typeInfo.Symbol.AttributesOfType<IToStringConfigAttribute>().FirstOrDefault(), out var att) 
+                && att.CollectionsEnabled;
         }
     }
 }

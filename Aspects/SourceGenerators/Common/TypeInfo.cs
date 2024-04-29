@@ -12,8 +12,8 @@ namespace Aspects.SourceGenerators.Common
         private readonly Lazy<bool> _hasPartialModifier;
         private readonly Lazy<string> _declaration;
         private readonly Lazy<string> _name;
-        private readonly Lazy<List<INamedTypeSymbol>> _orderedInheritance;
-        private readonly Lazy<List<PropertyInfo>> _localProperties;
+        private readonly Lazy<List<INamedTypeSymbol>> _inheritanceFromBottomToTop;
+        private readonly Lazy<List<PropertyInfo>> _localPropertyInfos;
 
         public TypeInfo(GeneratorSyntaxContext context, TypeDeclarationSyntax syntaxNode, INamedTypeSymbol typeSymbol)
         {
@@ -23,8 +23,8 @@ namespace Aspects.SourceGenerators.Common
             _hasPartialModifier = new Lazy<bool>(() => syntaxNode.HasPartialModifier());
             _declaration = new Lazy<string>(() => syntaxNode.Declaration());
             _name = new Lazy<string>(() => syntaxNode.NameWithGenericParameters());
-            _orderedInheritance = new Lazy<List<INamedTypeSymbol>>(() => typeSymbol.InheritanceFromBottomToTop().ToList());
-            _localProperties = new Lazy<List<PropertyInfo>>(() => LoadProperties(context));
+            _inheritanceFromBottomToTop = new Lazy<List<INamedTypeSymbol>>(() => typeSymbol.InheritanceFromBottomToTop().ToList());
+            _localPropertyInfos = new Lazy<List<PropertyInfo>>(() => LoadProperties(context));
         }
 
         public TypeDeclarationSyntax SyntaxNode { get; }
@@ -37,13 +37,13 @@ namespace Aspects.SourceGenerators.Common
 
         public string Name => _name.Value;
 
-        public IEnumerable<PropertyInfo> LocalProperties => _localProperties.Value;
+        public IEnumerable<PropertyInfo> LocalPropertyInfos => _localPropertyInfos.Value;
 
         public IEnumerable<INamedTypeSymbol> InheritanceFromBottomToTop(bool includeSelf = false)
         {
             if (includeSelf)
-                return _orderedInheritance.Value;
-            return _orderedInheritance.Value.Take(_orderedInheritance.Value.Count - 1);
+                return _inheritanceFromBottomToTop.Value;
+            return _inheritanceFromBottomToTop.Value.Take(_inheritanceFromBottomToTop.Value.Count - 1);
         }
 
         public IEnumerable<ISymbol> Members(bool includeInherited = false)
