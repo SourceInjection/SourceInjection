@@ -8,10 +8,10 @@ namespace Aspects.Util
     internal static class SyntaxNodeExtensions
     {
         /// <summary>
-        /// Extracts the name of the syntax node with generic type attributes.
+        /// Extracts the name of the <see cref="TypeDeclarationSyntax"/> with generic type attributes.
         /// </summary>
-        /// <param name="node">The node for which the name and the generic type arguments are extracted</param>
-        /// <returns>The name with generic type attributes</returns>
+        /// <param name="node">The <see cref="TypeDeclarationSyntax"/> for which the name and the generic type arguments are extracted.</param>
+        /// <returns>The name with generic type attributes.</returns>
         public static string NameWithGenericParameters(this TypeDeclarationSyntax node)
         {
             if (node.TypeParameterList is null)
@@ -22,11 +22,13 @@ namespace Aspects.Util
         }
 
         /// <summary>
-        /// Extracts the declaration of the syntax node.
-        /// E.g. "public partial class MyClass" or "public readonly struct MyGenericStruct<![CDATA[<]]>T<![CDATA[>]]>".
+        /// Extracts the declaration of the <see cref="TypeDeclarationSyntax"/>.<br/>
+        /// e.g. "public partial class MyClass" or 
+        /// "public partial readonly struct MyGenericStruct<![CDATA[<]]>T<![CDATA[>]]>".<br/>
+        /// Base class, implemented interfaces and attributes are not included.
         /// </summary>
-        /// <param name="node">The node for which the declaration is extracted</param>
-        /// <returns>The declaration of the type</returns>
+        /// <param name="node">The node for which the declaration is extracted.</param>
+        /// <returns>The declaration of the <see cref="TypeDeclarationSyntax"/>.</returns>
         public static string Declaration(this TypeDeclarationSyntax node)
         {
             var nodeText = node.GetText().ToString();
@@ -39,10 +41,10 @@ namespace Aspects.Util
         }
 
         /// <summary>
-        /// Checks if the type declaration has a partial modifier
+        /// Checks if the <see cref="TypeDeclarationSyntax"/> has a <see cref="partial"/> modifier.
         /// </summary>
-        /// <param name="typeDeclaration">The node wich is checked</param>
-        /// <returns>true if the node has a partial modifier else false</returns>
+        /// <param name="typeDeclaration">The <see cref="TypeDeclarationSyntax"/> wich is checked.</param>
+        /// <returns>true if the <see cref="TypeDeclarationSyntax"/> has a partial modifier else false.</returns>
         public static bool HasPartialModifier(this TypeDeclarationSyntax typeDeclaration)
         {
             return typeDeclaration.Modifiers
@@ -50,25 +52,28 @@ namespace Aspects.Util
         }
 
         /// <summary>
-        /// Checks if the property declaration is a data member.<br/>
-        /// A Data Member matches the following syntax:
+        /// Checks if the <see cref="PropertyDeclarationSyntax"/> counts as a data member.<br/>
+        /// A Data Member matches the following grammar:
         /// <include file="Comments.xml" path="doc/members/member[@name='Properties:PropertySyntax']/*"/>
         /// </summary>
-        /// <param name="propertySyntax">The property node which is scanned for the linked identifier</param>
-        /// <returns>true if the property node is a data member else false</returns>
+        /// <param name="propertySyntax">The <see cref="PropertyDeclarationSyntax"/> 
+        /// which is scanned for the linked <see cref="SyntaxToken"/> with kind <see cref="SyntaxKind.IdentifierToken"/>.</param>
+        /// <returns>true if the <see cref="PropertyDeclarationSyntax"/> is a data member else false.</returns>
         public static bool IsDataMember(this PropertyDeclarationSyntax propertySyntax)
         {
             return IsDataMember(propertySyntax, GetReturnedIdentifier(propertySyntax));
         }
 
         /// <summary>
-        /// Tries to get the syntax token which is linked wiith the property in the get method.<br/>
+        /// Tries to get <see cref="SyntaxToken"/> with kind <see cref="SyntaxKind.IdentifierToken"/> 
+        /// which is linked with the property in the get method.<br/>
         /// Matches the following property definition grammer:
         /// <include file="Comments.xml" path="doc/members/member[@name='Properties:PropertySyntax']/*"/>
         /// </summary>
-        /// <param name="propertySyntax">The property node which is scanned for the linked identifier</param>
-        /// <param name="identifier">The resulting identifier token</param>
-        /// <returns>true if the property is linked with an identifier else false</returns>
+        /// <param name="propertySyntax">The <see cref="PropertyDeclarationSyntax"/> 
+        /// which is scanned for the linked <see cref="SyntaxToken"/> with kind <see cref="SyntaxKind.IdentifierToken"/>.</param>
+        /// <param name="identifier">The resulting <see cref="SyntaxToken"/>.</param>
+        /// <returns>true if the property is linked with an <see cref="SyntaxToken"/> with kind <see cref="SyntaxKind.IdentifierToken"/> else false.</returns>
         public static bool TryGetReturnedIdentifier(this PropertyDeclarationSyntax propertySyntax, out SyntaxToken identifier)
         {
             identifier = GetReturnedIdentifier(propertySyntax);
@@ -76,11 +81,14 @@ namespace Aspects.Util
         }
 
         /// <summary>
-        /// Gets the identifier symbol which matches the following property definition grammer:
+        /// Gets the <see cref="SyntaxToken"/> with kind <see cref="SyntaxKind.IdentifierToken"/> 
+        /// which is linked with the property in the get method.<br/>
+        /// Matches the following property definition grammer:
         /// <include file="Comments.xml" path="doc/members/member[@name='Properties:PropertySyntax']/*"/>
         /// </summary>
-        /// <param name="propertySyntax">The property node which is scanned for the linked identifier</param>
-        /// <returns>The <see cref="SyntaxToken"/> of the identifier.<br/><see cref="default"/> if not found.</returns>
+        /// <param name="propertySyntax">The <see cref="PropertyDeclarationSyntax"/> 
+        /// which is scanned for the linked <see cref="SyntaxToken"/> with kind <see cref="SyntaxKind.IdentifierToken"/>.</param>
+        /// <returns>The <see cref="SyntaxToken"/> of kind <see cref="SyntaxKind.IdentifierToken"/>.<br/>default(<see cref="SyntaxToken"/>) if not found.</returns>
         public static SyntaxToken GetReturnedIdentifier(this PropertyDeclarationSyntax propertySyntax)
         {
             var token = propertySyntax.DescendantTokens()
