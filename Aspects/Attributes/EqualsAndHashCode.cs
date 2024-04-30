@@ -1,4 +1,5 @@
-﻿using Aspects.Attributes.Interfaces;
+﻿using Aspects.Attributes.Base;
+using Aspects.Attributes.Interfaces;
 using System;
 
 namespace Aspects.Attributes
@@ -7,7 +8,7 @@ namespace Aspects.Attributes
     /// Combines attributes <see cref="AutoEqualsAttribute"/> and <see cref="AutoHashCodeAttribute"/>.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, Inherited = false, AllowMultiple = false)]
-    public class AutoEqualsAndHashCodeAttribute : Attribute, IEqualsConfigAttribute, IHashCodeConfigAttribute
+    public class AutoEqualsAndHashCodeAttribute : BasicMethodConfigAttribute, IEqualsConfigAttribute, IHashCodeConfigAttribute
     {
         /// <summary>
         /// Creates an instance of <see cref="AutoEqualsAndHashCodeAttribute"/>.
@@ -21,12 +22,7 @@ namespace Aspects.Attributes
         /// Linked fields can only be detected when the property fullfilles the following grammar:
         /// <include file="Comments.xml" path="doc/members/member[@name='Properties:PropertySyntax']/*"/>
         /// </param>
-        public AutoEqualsAndHashCodeAttribute(DataMemberKind dataMemberKind = DataMemberKind.DataMember)
-        {
-            DataMemberKind = dataMemberKind;
-        }
-
-        public DataMemberKind DataMemberKind { get; }
+        public AutoEqualsAndHashCodeAttribute(DataMemberKind dataMemberKind = DataMemberKind.DataMember) : base(dataMemberKind) { }
     }
 
     /// <summary>

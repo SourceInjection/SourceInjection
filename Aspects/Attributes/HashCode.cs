@@ -1,4 +1,5 @@
-﻿using Aspects.Attributes.Interfaces;
+﻿using Aspects.Attributes.Base;
+using Aspects.Attributes.Interfaces;
 using System;
 
 namespace Aspects.Attributes
@@ -12,7 +13,7 @@ namespace Aspects.Attributes
     /// <include file="Comments.xml" path="doc/members/member[@name='Properties:PropertySyntax']/*"/>
     /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, Inherited = false, AllowMultiple = false)]
-    public class AutoHashCodeAttribute : Attribute, IHashCodeConfigAttribute
+    public class AutoHashCodeAttribute : BasicMethodConfigAttribute, IHashCodeConfigAttribute
     {
         /// <summary>
         /// Creates an instance of <see cref="AutoHashCodeAttribute"/>.
@@ -26,12 +27,7 @@ namespace Aspects.Attributes
         /// Linked fields can only be detected when the property fullfilles the following grammar:
         /// <include file="Comments.xml" path="doc/members/member[@name='Properties:PropertySyntax']/*"/>
         /// </param>
-        public AutoHashCodeAttribute(DataMemberKind dataMemberKind = DataMemberKind.DataMember)
-        {
-            DataMemberKind = dataMemberKind;
-        }
-
-        public DataMemberKind DataMemberKind { get; }
+        public AutoHashCodeAttribute(DataMemberKind dataMemberKind = DataMemberKind.DataMember) : base(dataMemberKind) { }
     }
 
     /// <summary>
