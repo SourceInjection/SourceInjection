@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<doc>
+	<members>
+		<member name="Properties:PropertySyntax">
+			<code>
+modifier* propertyName "=>" identifier [ "??" anyButSemiColonSymbol* ] ";"
+| modifier* propertyName "{" "get" "=>" identifier [ "??" anyButSemiColonSymbol* ] ";" [ setter ] "}"
+| modifier* propertyName "{" "get" "{" anyButReturnSymbol* "return" identifier [ "??" anyButSemiColonSymbol* ] ";" "}" [ setter ] "}"
+			</code>
+		</member>
+	</members>
+</doc>

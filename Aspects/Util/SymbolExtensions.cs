@@ -129,6 +129,7 @@ namespace Aspects.Util
                 ||symbol.AllInterfaces.Any(i => i.ToDisplayString() == CodeSnippets.IEnumerableName);
         }
 
+
         /// <summary>
         /// Checks if the type overrides Equals itself or in any base class
         /// </summary>

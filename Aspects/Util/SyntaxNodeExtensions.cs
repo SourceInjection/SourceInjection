@@ -23,7 +23,7 @@ namespace Aspects.Util
 
         /// <summary>
         /// Extracts the declaration of the syntax node.
-        /// e.g. "public partial class MyClass"
+        /// E.g. "public partial class MyClass" or "public readonly struct MyGenericStruct<![CDATA[<]]>T<![CDATA[>]]>".
         /// </summary>
         /// <param name="node">The node for which the declaration is extracted</param>
         /// <returns>The declaration of the type</returns>
@@ -52,11 +52,7 @@ namespace Aspects.Util
         /// <summary>
         /// Checks if the property declaration is a data member.<br/>
         /// A Data Member matches the following syntax:
-        /// <code>
-        /// modifier* propertyName "=>" identifier ( ";" | "??" anySymbol* ";" )
-        /// | modifier* propertyName "{" "get" "=>" identifier ( ";" | "??" anySymbol* ";" ) "}"
-        /// | modifier* propertyName "{" "get" "{" anyButReturnSymbol* "return" identifier ( ";" | "??" anySymbol* ";" ) "}" "}"
-        /// </code>
+        /// <include file="Comments.xml" path="doc/members/member[@name='Properties:PropertySyntax']/*"/>
         /// </summary>
         /// <param name="propertySyntax">The property node which is scanned for the linked identifier</param>
         /// <returns>true if the property node is a data member else false</returns>
@@ -68,11 +64,7 @@ namespace Aspects.Util
         /// <summary>
         /// Tries to get the syntax token which is linked wiith the property in the get method.<br/>
         /// Matches the following property definition grammer:
-        /// <code>
-        /// modifier* propertyName "=>" identifier ( ";" | "??" anySymbol* ";" )
-        /// | modifier* propertyName "{" "get" "=>" identifier ( ";" | "??" anySymbol* ";" ) "}"
-        /// | modifier* propertyName "{" "get" "{" anyButReturnSymbol* "return" identifier ( ";" | "??" anySymbol* ";" ) "}" "}"
-        /// </code>
+        /// <include file="Comments.xml" path="doc/members/member[@name='Properties:PropertySyntax']/*"/>
         /// </summary>
         /// <param name="propertySyntax">The property node which is scanned for the linked identifier</param>
         /// <param name="identifier">The resulting identifier token</param>
@@ -85,11 +77,7 @@ namespace Aspects.Util
 
         /// <summary>
         /// Gets the identifier symbol which matches the following property definition grammer:
-        /// <code>
-        /// modifier* propertyName "=>" identifier ( ";" | "??" anySymbol* ";" )
-        /// | modifier* propertyName "{" "get" "=>" identifier ( ";" | "??" anySymbol* ";" ) "}"
-        /// | modifier* propertyName "{" "get" "{" anyButReturnSymbol* "return" identifier ( ";" | "??" anySymbol* ";" ) "}" "}"
-        /// </code>
+        /// <include file="Comments.xml" path="doc/members/member[@name='Properties:PropertySyntax']/*"/>
         /// </summary>
         /// <param name="propertySyntax">The property node which is scanned for the linked identifier</param>
         /// <returns>The <see cref="SyntaxToken"/> of the identifier.<br/><see cref="default"/> if not found.</returns>
