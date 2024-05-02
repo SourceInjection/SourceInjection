@@ -1,13 +1,8 @@
-﻿using Microsoft.CodeAnalysis;
-
-namespace Aspects.Attributes.Interfaces
+﻿namespace Aspects.Attributes.Interfaces
 {
     public enum PropertyEvent { Changing, Changed };
 
-    public interface IGeneratesPropertyFromFieldAttribute
-    {
-        string PropertyName(IFieldSymbol field);
-    }
+    public interface IGeneratesPropertyFromFieldAttribute { }
 
     public interface IPropertyEventGenerationAttribute : IGeneratesPropertyFromFieldAttribute 
     {

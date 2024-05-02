@@ -1,5 +1,4 @@
-﻿using Aspects.Attributes;
-using Aspects.Attributes.Interfaces;
+﻿using Aspects.Attributes.Interfaces;
 using Aspects.SourceGenerators.Base;
 using Aspects.SourceGenerators.Common;
 using Aspects.SourceGenerators.Queries;
@@ -7,11 +6,8 @@ using Aspects.SyntaxReceivers;
 using Aspects.Util;
 using Microsoft.CodeAnalysis;
 using System;
-using System.ComponentModel;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Text;
-using System.Xml.Linq;
 using TypeInfo = Aspects.SourceGenerators.Common.TypeInfo;
 
 namespace Aspects.SourceGenerators
@@ -78,7 +74,7 @@ namespace Aspects.SourceGenerators
             sb.AppendLine($"public {type} {name}");
             sb.AppendLine("{");
             sb.AppendLine(GetterCode(field));
-            sb.AppendLine(SetterCode(field));
+            sb.AppendLine(SetterCode(field, name));
             sb.Append("}");
 
             if (enableNull)
@@ -95,9 +91,8 @@ namespace Aspects.SourceGenerators
             return $"\tget => {field.Name};";
         }
 
-        private static string SetterCode(IFieldSymbol field)
+        private static string SetterCode(IFieldSymbol field, string propertyName)
         {
-            var name = CodeSnippets.PropertyNameFromField(field);
             var sb = new StringBuilder();
             sb.AppendLine("\tset");
 
@@ -112,41 +107,49 @@ namespace Aspects.SourceGenerators
                     sb.AppendLine(EqualityCheck(field));
                     sb.AppendLine("\t{");
                     sb.AppendLine(SetField(field.Name, tab));
-                    sb.AppendLine(RaiseChangedEvent(name, tab));
+                    sb.AppendLine(RaiseChangedEvent(propertyName, tab));
                     sb.AppendLine("\t}");
                 }
                 else
                 {
                     const int tab = 1;
                     sb.AppendLine(SetField(field.Name, tab));
-                    sb.AppendLine(RaiseChangedEvent(name, tab));
+                    sb.AppendLine(RaiseChangedEvent(propertyName, tab));
                 }
             }
             else if (!changingAttribute.EqualityCheck)
             {
-                sb.AppendLine(RaiseChangedEvent(name, 1));
-            }
+                sb.AppendLine(RaiseChangingEvent(propertyName, 1));
+                sb.AppendLine(SetField(field.Name, 1));
 
-            if (changingAttribute?.EqualityCheck is false && changedAttribute?.EqualityCheck is false)
-            {
-                const int tab = 1;
-                sb.AppendLine(RaiseChangingEvent(name, tab));
-                sb.AppendLine(SetField(field.Name, tab));
-                sb.AppendLine(RaiseChangedEvent(name, tab));
+                if(changedAttribute != null)
+                {
+                    if (!changedAttribute.EqualityCheck)
+                        sb.AppendLine(RaiseChangedEvent(propertyName, 1));
+                    else
+                    {
+                        sb.AppendLine(EqualityCheck(field));
+                        sb.AppendLine("\t{");
+                        sb.AppendLine(RaiseChangedEvent(propertyName, 2));
+                        sb.AppendLine("\t}");
+                    }
+                }
             }
-            else if (changingAttribute?.EqualityCheck is true && changedAttribute?.EqualityCheck is true)
+            else
             {
-                const int tab = 2;
                 sb.AppendLine(EqualityCheck(field));
                 sb.AppendLine("\t{");
-                sb.AppendLine(RaiseChangingEvent(name, tab));
-                sb.AppendLine(SetField(field.Name, tab));
-                sb.AppendLine(RaiseChangedEvent(name, tab));
+                sb.AppendLine(RaiseChangingEvent(propertyName, 2));
+                if (!(changedAttribute?.EqualityCheck is false))
+                    sb.AppendLine(SetField(field.Name, 2));
+                if(changedAttribute?.EqualityCheck is true)
+                    sb.AppendLine(RaiseChangedEvent(propertyName, 2));
                 sb.AppendLine("\t}");
-            }
-            else if(changingAttribute?.EqualityCheck is false && )
-            {
-
+                if (changedAttribute?.EqualityCheck is false)
+                {
+                    sb.AppendLine(SetField(field.Name, 1));
+                    sb.AppendLine(RaiseChangedEvent(propertyName, 1));
+                }
             }
 
             return sb.ToString();
