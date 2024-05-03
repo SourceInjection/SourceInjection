@@ -10,7 +10,7 @@ namespace Aspects.SourceGenerators
 {
     [Generator]
     internal class ToStringSourceGenerator 
-        : BasicMethodOverrideSourceGeneratorBase<IToStringConfigAttribute, IToStringAttribute, IToStringExcludeAttribute>
+        : ObjectMethodSourceGeneratorBase<IToStringConfigAttribute, IToStringAttribute, IToStringExcludeAttribute>
     {
         protected override string Name { get; } = nameof(ToString);
 

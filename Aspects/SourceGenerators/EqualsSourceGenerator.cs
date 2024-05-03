@@ -12,7 +12,7 @@ namespace Aspects.SourceGenerators
 {
     [Generator]
     internal class EqualsSourceGenerator
-        : BasicMethodOverrideSourceGeneratorBase<IEqualsConfigAttribute, IEqualsAttribute, IEqualsExcludeAttribute>
+        : ObjectMethodSourceGeneratorBase<IEqualsConfigAttribute, IEqualsAttribute, IEqualsExcludeAttribute>
     {
         private const string argName = "obj";
         private const string otherName = "other";

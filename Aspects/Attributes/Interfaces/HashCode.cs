@@ -1,6 +1,6 @@
 ﻿namespace Aspects.Attributes.Interfaces
 {
-    public interface IHashCodeConfigAttribute : IBasicMethodConfigAttribute { }
+    public interface IHashCodeConfigAttribute : IObjectMethodConfigAttribute { }
 
     public interface IHashCodeAttribute { }
 

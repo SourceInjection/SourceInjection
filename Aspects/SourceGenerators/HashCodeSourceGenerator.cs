@@ -11,7 +11,7 @@ namespace Aspects.SourceGenerators
 {
     [Generator]
     internal class HashCodeSourceGenerator 
-        : BasicMethodOverrideSourceGeneratorBase<IHashCodeConfigAttribute, IHashCodeAttribute, IHashCodeExcludeAttribute>
+        : ObjectMethodSourceGeneratorBase<IHashCodeConfigAttribute, IHashCodeAttribute, IHashCodeExcludeAttribute>
     {
         protected override string Name { get; } = nameof(GetHashCode);
 

@@ -1,6 +1,6 @@
 ﻿namespace Aspects.Attributes.Interfaces
 {
-    public interface IBasicMethodConfigAttribute
+    public interface IObjectMethodConfigAttribute
     {
         DataMemberKind DataMemberKind { get; }
     }

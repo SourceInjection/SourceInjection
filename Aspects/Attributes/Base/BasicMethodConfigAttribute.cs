@@ -3,7 +3,7 @@ using System;
 
 namespace Aspects.Attributes.Base
 {
-    public abstract class BasicMethodConfigAttribute : Attribute, IBasicMethodConfigAttribute
+    public abstract class BasicMethodConfigAttribute : Attribute, IObjectMethodConfigAttribute
     {
         protected BasicMethodConfigAttribute(DataMemberKind dataMemberKind)
         {

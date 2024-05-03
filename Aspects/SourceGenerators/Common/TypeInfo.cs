@@ -1,4 +1,4 @@
-﻿using Aspects.LoadingBehaviors;
+﻿using Aspects.SourceGenerators.Common.LoadingBehaviors;
 using Aspects.Util;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;

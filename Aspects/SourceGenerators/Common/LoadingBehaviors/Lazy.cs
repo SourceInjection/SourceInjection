@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Aspects.LoadingBehaviors
+namespace Aspects.SourceGenerators.Common.LoadingBehaviors
 {
     internal class Lazy<T>
     {
@@ -9,14 +9,14 @@ namespace Aspects.LoadingBehaviors
 
         public Lazy(Func<T> loadingFun)
         {
-            if(loadingFun is null)
+            if (loadingFun is null)
                 throw new ArgumentNullException(nameof(loadingFun));
-           _loadingFun = loadingFun;
+            _loadingFun = loadingFun;
         }
 
-        public T Value 
+        public T Value
         {
-            get 
+            get
             {
                 if (_loadingFun != null)
                 {
@@ -24,7 +24,7 @@ namespace Aspects.LoadingBehaviors
                     _loadingFun = null;
                 }
                 return _value;
-            } 
+            }
         }
     }
 }

@@ -12,9 +12,9 @@ using TypeInfo = Aspects.SourceGenerators.Common.TypeInfo;
 
 namespace Aspects.SourceGenerators.Base
 {
-    internal abstract class BasicMethodOverrideSourceGeneratorBase<TConfigAttribute, TAttribute, TExcludeAttribute>
+    internal abstract class ObjectMethodSourceGeneratorBase<TConfigAttribute, TAttribute, TExcludeAttribute>
         : TypeSourceGeneratorBase
-        where TConfigAttribute : IBasicMethodConfigAttribute
+        where TConfigAttribute : IObjectMethodConfigAttribute
     {
         protected enum DataMemberPriority { Field, Property };
 

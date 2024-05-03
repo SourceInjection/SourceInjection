@@ -1,6 +1,6 @@
 ﻿namespace Aspects.Attributes.Interfaces
 {
-    public interface IEqualsConfigAttribute : IBasicMethodConfigAttribute { }
+    public interface IEqualsConfigAttribute : IObjectMethodConfigAttribute { }
 
     public interface IEqualsAttribute { }
 
