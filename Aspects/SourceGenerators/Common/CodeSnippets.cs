@@ -2,6 +2,7 @@
 using Aspects.Collections;
 using Microsoft.CodeAnalysis;
 using System.Collections;
+using System.Text;
 
 namespace Aspects.SourceGenerators.Common
 {
@@ -61,6 +62,21 @@ namespace Aspects.SourceGenerators.Common
                 fieldName = char.ToUpper(fieldName[0]) + fieldName.Substring(1);
 
             return fieldName;
+        }
+
+        /// <summary>
+        /// Indents a string with tabulators (\t)-
+        /// </summary>
+        /// <param name="value">The value to indent.</param>
+        /// <param name="tabCount">The number of tabulators used.</param>
+        /// <returns>An indented string.</returns>
+        public static string Indent(string value, int tabCount)
+        {
+            var sb = new StringBuilder();
+            for (int i = 0; i < tabCount; i++)
+                sb.Append('\t');
+            sb.Append(value);
+            return sb.ToString();
         }
     }
 }

@@ -101,6 +101,18 @@ namespace Aspects.Util
         }
 
         /// <summary>
+        /// Checks if the symbol implements the given interface.
+        /// </summary>
+        /// <typeparam name="T">The interface type to be checked.</typeparam>
+        /// <param name="symbol">The symbol for wich the interface implementation is checked.</param>
+        /// <returns>true if the symbol implements the given interface else false</returns>
+        public static bool Implements<T>(this ITypeSymbol symbol)
+        {
+            var name = typeof(T).FullName;
+            return symbol.AllInterfaces.Any(i => i.ToDisplayString() == name);
+        }
+
+        /// <summary>
         /// Checks if the <see cref="ITypeSymbol"/> implements the interface <see cref="IEnumerable"/>.
         /// </summary>
         /// <param name="symbol">The <see cref="ITypeSymbol"/> which is checked to be a <see cref="IEnumerable"/>.</param>

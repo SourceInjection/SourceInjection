@@ -4,6 +4,8 @@ using Microsoft.CodeAnalysis.Text;
 using System.Text;
 using TypeInfo = Aspects.SourceGenerators.Common.TypeInfo;
 using static Aspects.SourceGenerators.Diagnostics.Errors;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Aspects.SourceGenerators.Base
 {
@@ -38,6 +40,11 @@ namespace Aspects.SourceGenerators.Base
 
         protected abstract string Dependencies(TypeInfo typeInfo);
 
+        protected virtual IEnumerable<string> AdditionalInterfaces(TypeInfo typeInfo)
+        {
+            return Enumerable.Empty<string>();
+        }
+
         protected abstract string ClassBody(TypeInfo typeInfo);
 
         private string GeneratePartialType(TypeInfo typeInfo)
@@ -55,7 +62,12 @@ namespace Aspects.SourceGenerators.Base
             sb.AppendLine("{");
             sb.Append('\t');
 
-            sb.AppendLine(typeInfo.Declaration);
+            sb.Append(typeInfo.Declaration);
+            var ifaces = AdditionalInterfaces(typeInfo);
+            if (!ifaces.Any())
+                sb.AppendLine();
+            else
+                sb.AppendLine($" : {string.Join(", ", ifaces)}");
             sb.AppendLine("\t{");
 
             sb.AppendLine(ClassBody(typeInfo).Replace("\n", "\n\t\t").Insert(0, "\t\t"));
