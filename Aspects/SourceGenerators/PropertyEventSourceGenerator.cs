@@ -131,7 +131,7 @@ namespace Aspects.SourceGenerators
             else if (!changingAttribute.EqualityCheck)
                 sb.Append(WithoutChangingCheckCode(field, changedAttribute));
             else
-                sb.Append(WithChangingCheckCode(field, changingAttribute, changedAttribute));
+                sb.Append(WithChangingCheckCode(field, changedAttribute));
 
             return sb.ToString();
         }
@@ -183,7 +183,7 @@ namespace Aspects.SourceGenerators
             return sb.ToString();
         }
 
-        private static string WithChangingCheckCode(IFieldSymbol field, INotifyPropertyChangingAttribute changingAttribute, INotifyPropertyChangedAttribute changedAttribute)
+        private static string WithChangingCheckCode(IFieldSymbol field, INotifyPropertyChangedAttribute changedAttribute)
         {
             var sb = new StringBuilder();
             var propertyName = CodeSnippets.PropertyNameFromField(field);
