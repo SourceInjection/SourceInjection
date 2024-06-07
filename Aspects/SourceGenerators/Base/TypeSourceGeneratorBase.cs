@@ -40,7 +40,7 @@ namespace Aspects.SourceGenerators.Base
 
         protected abstract string Dependencies(TypeInfo typeInfo);
 
-        protected virtual IEnumerable<string> AdditionalInterfaces(TypeInfo typeInfo)
+        protected virtual IEnumerable<string> InterfacesToAdd(TypeInfo typeInfo)
         {
             return Enumerable.Empty<string>();
         }
@@ -63,7 +63,7 @@ namespace Aspects.SourceGenerators.Base
             sb.Append('\t');
 
             sb.Append(typeInfo.Declaration);
-            var ifaces = AdditionalInterfaces(typeInfo);
+            var ifaces = InterfacesToAdd(typeInfo);
             if (!ifaces.Any())
                 sb.AppendLine();
             else

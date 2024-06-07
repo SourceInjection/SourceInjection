@@ -14,8 +14,8 @@ namespace Aspects.SourceGenerators.Common
         /// <typeparam name="T">The <see cref="Type"/> to wich the instance is casted.</typeparam>
         /// <param name="data">The <see cref="AttributeData"/> from which the <see cref="Type"/> is extracted.</param>
         /// <param name="result">The resulting <see cref="Attribute"/>.</param>
-        /// <returns>true if the <see cref="Attribute"/> creation is successful and 
-        /// false if an <see cref="Exception"/> is thrown.</returns>
+        /// <returns><see langword="true"/> if the <see cref="Attribute"/> creation is successful and 
+        /// <see langword="false"/> if an <see cref="Exception"/> is thrown.</returns>
         public static bool TryCreate<T>(AttributeData data, out T result)
         {
             try

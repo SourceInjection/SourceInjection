@@ -30,7 +30,7 @@ namespace Aspects.Util
         /// </summary>
         /// <param name="col">The first collect<see cref="IEnumerable"/>.ion</param>
         /// <param name="other">The second <see cref="IEnumerable"/>.</param>
-        /// <returns>true if the <see cref="IEnumerable"/>s are equal else false.</returns>
+        /// <returns><see langword="true"/> if the <see cref="IEnumerable"/>s are equal else <see langword="false"/>.</returns>
         public static bool DeepSequenceEqual(this IEnumerable col, IEnumerable other)
         {
             var colIt = col.GetEnumerator();

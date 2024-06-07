@@ -16,7 +16,7 @@ namespace Aspects.Attributes
         /// <summary>
         /// Creates an instance of <see cref="NotifyPropertyChangedAttribute"/>.
         /// </summary>
-        /// <param name="equalityCheck">When set to true, event will just be fired when the value wich is set does not equal the field value.</param>
+        /// <param name="equalityCheck">When set to <see langword="true"/>, event will just be fired when the value wich is set does not equal the field value.</param>
         public NotifyPropertyChangedAttribute(bool equalityCheck = false) : base (equalityCheck) { }
 
         public override PropertyEvent PropertyEvent { get; } = PropertyEvent.Changed;
@@ -33,7 +33,7 @@ namespace Aspects.Attributes
         /// <summary>
         /// Creates an instance of <see cref="NotifyPropertyChangingAttribute"/>.
         /// </summary>
-        /// <param name="equalityCheck">When set to true, event will just be fired when the value wich is set does not equal the field value.</param>
+        /// <param name="equalityCheck">When set to <see langword="true"/>, event will just be fired when the value wich is set does not equal the field value.</param>
         public NotifyPropertyChangingAttribute(bool equalityCheck = false) : base(equalityCheck) { }
 
         public override PropertyEvent PropertyEvent { get; } = PropertyEvent.Changing;

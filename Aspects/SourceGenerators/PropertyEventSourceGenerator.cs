@@ -5,6 +5,7 @@ using Aspects.SourceGenerators.Queries;
 using Aspects.SyntaxReceivers;
 using Aspects.Util;
 using Microsoft.CodeAnalysis;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -24,6 +25,21 @@ namespace Aspects.SourceGenerators
         private const string PropertyChangingArgs = nameof(PropertyChangingEventArgs);
         private const string PropertyChangingHandler = nameof(PropertyChangingEventHandler);
 
+        private const string PropertyChangedNotifyMethod = "RaisePropertyChanged";
+        private const string PropertyChangingNotifyMethod = "RaisePropertyChanging";
+
+        private static readonly string ChangingRaiseMethod =
+$@"protected virtual void {PropertyChangingNotifyMethod}(string propertyName)
+{{
+    {PropertyChanging}?.Invoke(this, new {PropertyChangingArgs}(propertyName));
+}}";
+
+        private static readonly string ChangedRaiseMethod =
+$@"protected virtual void {PropertyChangedNotifyMethod}(string propertyName)
+{{
+    {PropertyChanged}?.Invoke(this, new {PropertyChangedArgs}(propertyName));
+}}";
+
         protected override string Name { get; } = "PropertyEvent";
 
         protected override TypeSyntaxReceiver SyntaxReceiver { get; } = new TypeSyntaxReceiver(
@@ -36,7 +52,7 @@ namespace Aspects.SourceGenerators
             return "using System.ComponentModel;";
         }
 
-        protected override IEnumerable<string> AdditionalInterfaces(TypeInfo typeInfo)
+        protected override IEnumerable<string> InterfacesToAdd(TypeInfo typeInfo)
         {
             if(CanBeImplemented<INotifyPropertyChangingAttribute, INotifyPropertyChanging>(typeInfo))
                 yield return nameof(INotifyPropertyChanging);
@@ -57,16 +73,38 @@ namespace Aspects.SourceGenerators
                 && !typeInfo.Members(true).Any(sy => sy.Name == memberName);
         }
 
+        private bool MustAddRaiseMethod<TAttribute>(TypeInfo typeInfo, string name)
+        {
+            return GetFields(typeInfo).Any(f => f.HasAttributeOfType<TAttribute>())
+                && !typeInfo.Members(true)
+                    .OfType<IMethodSymbol>()
+                    .Any(m => MethodIsRaiseMethod(m, name));
+        }
+
+        private bool MethodIsRaiseMethod(IMethodSymbol method, string name)
+        {
+            return method.Name == name
+                && (method.Parameters.Length == 1 
+                    || method.Parameters.Length > 1 && method.Parameters.Skip(1).All(p => p.HasExplicitDefaultValue))
+                && method.Parameters[0].Type.Name == nameof(String);
+        }
+
         protected override string ClassBody(TypeInfo typeInfo)
         {
             var sb = new StringBuilder();
             var fields = GetFields(typeInfo);
 
             if (MustAddHandler<INotifyPropertyChangingAttribute>(typeInfo, PropertyChanging))
+            {
                 sb.AppendLine($"public event {PropertyChangingHandler} {PropertyChanging};");
+                sb.AppendLine();
+            }
             
-            if(MustAddHandler<INotifyPropertyChangedAttribute>(typeInfo, PropertyChanged))
+            if (MustAddHandler<INotifyPropertyChangedAttribute>(typeInfo, PropertyChanged))
+            {
                 sb.AppendLine($"public event {PropertyChangedHandler} {PropertyChanged};");
+                sb.AppendLine();
+            }
 
             sb.Append(PropertyCode(fields.First()));
             foreach(var field in fields.Skip(1))
@@ -74,6 +112,20 @@ namespace Aspects.SourceGenerators
                 sb.AppendLine();
                 sb.AppendLine();
                 sb.Append(PropertyCode(field));
+            }
+
+            if (MustAddRaiseMethod<INotifyPropertyChangingAttribute>(typeInfo, PropertyChangingNotifyMethod))
+            {
+                sb.AppendLine();
+                sb.AppendLine();
+
+            }
+
+            if (MustAddRaiseMethod<INotifyPropertyChangedAttribute>(typeInfo, PropertyChangedNotifyMethod))
+            {
+                sb.AppendLine();
+                sb.AppendLine();
+
             }
 
             return sb.ToString();
@@ -127,16 +179,16 @@ namespace Aspects.SourceGenerators
             var changedAttribute = GetAttribute<INotifyPropertyChangedAttribute>(field);
 
             if (changingAttribute is null)
-                sb.AppendLine(ChangedOnlyCode(field, changedAttribute));
+                sb.AppendLine(SetterCodeWithoutChangingEvent(field, changedAttribute));
             else if (!changingAttribute.EqualityCheck)
-                sb.Append(WithoutChangingCheckCode(field, changedAttribute));
+                sb.Append(SetterCodeWithoutChangingEqualityCheck(field, changedAttribute));
             else
-                sb.Append(WithChangingCheckCode(field, changedAttribute));
+                sb.Append(SetterCodeWithChangingEqualityCheck(field, changedAttribute));
 
             return sb.ToString();
         }
 
-        private static string ChangedOnlyCode(IFieldSymbol field, INotifyPropertyChangedAttribute changedAttribute)
+        private static string SetterCodeWithoutChangingEvent(IFieldSymbol field, INotifyPropertyChangedAttribute changedAttribute)
         {
             var sb = new StringBuilder();
             var propertyName = CodeSnippets.PropertyNameFromField(field);
@@ -159,7 +211,7 @@ namespace Aspects.SourceGenerators
             return sb.ToString();
         }
 
-        private static string WithoutChangingCheckCode(IFieldSymbol field, INotifyPropertyChangedAttribute changedAttribute)
+        private static string SetterCodeWithoutChangingEqualityCheck(IFieldSymbol field, INotifyPropertyChangedAttribute changedAttribute)
         {
             var sb = new StringBuilder();
             var propertyName = CodeSnippets.PropertyNameFromField(field);
@@ -183,7 +235,7 @@ namespace Aspects.SourceGenerators
             return sb.ToString();
         }
 
-        private static string WithChangingCheckCode(IFieldSymbol field, INotifyPropertyChangedAttribute changedAttribute)
+        private static string SetterCodeWithChangingEqualityCheck(IFieldSymbol field, INotifyPropertyChangedAttribute changedAttribute)
         {
             var sb = new StringBuilder();
             var propertyName = CodeSnippets.PropertyNameFromField(field);
@@ -211,15 +263,17 @@ namespace Aspects.SourceGenerators
         private static string EqualityCheckCode(IFieldSymbol field)
         {
             if (!field.Type.IsReferenceType)
-                return $"\t\tif (!{field.Name}.{nameof(Equals)}(value))";
-            else
             {
-                if (field.Type.IsEnumerable() && !field.Type.OverridesEquals())
-                    return $"\t\tif (!{CodeSnippets.SequenceEqualsMethod(field.Name, "value")}";
-
-                return $"\t\tif (!({field.Name} is null) && !{field.Name}.{nameof(Equals)}(value) " +
-                    $"|| {field.Name} is null && !(value is null))";
+                if (field.Type.IsUnmanagedType || field.Type.Name == nameof(String))
+                    return $"\t\tif ({field.Name} != value)";
+                return $"\t\tif (!{field.Name}.{nameof(Equals)}(value))";
             }
+
+            if (field.Type.IsEnumerable() && !field.Type.OverridesEquals())
+                return $"\t\tif (!{CodeSnippets.SequenceEqualsMethod(field.Name, "value")}";
+
+            return $"\t\tif (!({field.Name} is null) && !{field.Name}.{nameof(Equals)}(value) " +
+                $"|| {field.Name} is null && !(value is null))";
         }
 
         private static T GetAttribute<T>(IFieldSymbol field)
@@ -235,7 +289,7 @@ namespace Aspects.SourceGenerators
 
         private static string SetField(string fieldName, int tabCount)
         {
-            return CodeSnippets.Indent(fieldName, tabCount);
+            return CodeSnippets.Indent($"{fieldName} = value;", tabCount);
         }
 
         private static string RaiseChangingEvent(string propName, int tabCount)

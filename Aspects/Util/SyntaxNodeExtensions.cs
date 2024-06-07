@@ -44,7 +44,7 @@ namespace Aspects.Util
         /// Checks if the <see cref="TypeDeclarationSyntax"/> has a <see cref="partial"/> modifier.
         /// </summary>
         /// <param name="typeDeclaration">The <see cref="TypeDeclarationSyntax"/> wich is checked.</param>
-        /// <returns>true if the <see cref="TypeDeclarationSyntax"/> has a partial modifier else false.</returns>
+        /// <returns><see langword="true"/> if the <see cref="TypeDeclarationSyntax"/> has a partial modifier else <see langword="false"/>.</returns>
         public static bool HasPartialModifier(this TypeDeclarationSyntax typeDeclaration)
         {
             return typeDeclaration.Modifiers
@@ -58,7 +58,7 @@ namespace Aspects.Util
         /// </summary>
         /// <param name="propertySyntax">The <see cref="PropertyDeclarationSyntax"/> 
         /// which is scanned for the linked <see cref="SyntaxToken"/> with kind <see cref="SyntaxKind.IdentifierToken"/>.</param>
-        /// <returns>true if the <see cref="PropertyDeclarationSyntax"/> is a data member else false.</returns>
+        /// <returns><see langword="true"/> if the <see cref="PropertyDeclarationSyntax"/> is a data member else <see langword="false"/>.</returns>
         public static bool IsDataMember(this PropertyDeclarationSyntax propertySyntax)
         {
             return IsDataMember(propertySyntax, GetReturnedIdentifier(propertySyntax));
@@ -73,7 +73,7 @@ namespace Aspects.Util
         /// <param name="propertySyntax">The <see cref="PropertyDeclarationSyntax"/> 
         /// which is scanned for the linked <see cref="SyntaxToken"/> with kind <see cref="SyntaxKind.IdentifierToken"/>.</param>
         /// <param name="identifier">The resulting <see cref="SyntaxToken"/>.</param>
-        /// <returns>true if the property is linked with an <see cref="SyntaxToken"/> with kind <see cref="SyntaxKind.IdentifierToken"/> else false.</returns>
+        /// <returns><see langword="true"/> if the property is linked with an <see cref="SyntaxToken"/> with kind <see cref="SyntaxKind.IdentifierToken"/> else <see langword="false"/>.</returns>
         public static bool TryGetReturnedIdentifier(this PropertyDeclarationSyntax propertySyntax, out SyntaxToken identifier)
         {
             identifier = GetReturnedIdentifier(propertySyntax);

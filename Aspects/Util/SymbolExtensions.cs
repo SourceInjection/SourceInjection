@@ -33,7 +33,7 @@ namespace Aspects.Util
         /// </summary>
         /// <typeparam name="T">The <see cref="Type"/> of the <see cref="Attribute"/>.</typeparam>
         /// <param name="symbol">The <see cref="ISymbol"/> which is checked if it has an <see cref="Attribute"/> of type T.</param>
-        /// <returns>true if the <see cref="ISymbol"/> has an <see cref="Attribute"/> of type T else false.</returns>
+        /// <returns><see langword="true"/> if the <see cref="ISymbol"/> has an <see cref="Attribute"/> of type T else <see langword="false"/>.</returns>
         public static bool HasAttributeOfType<T>(this ISymbol symbol)
         {
             return symbol.AttributesOfType<T>().Any();
@@ -75,7 +75,7 @@ namespace Aspects.Util
         /// Checks if a property hides a base property by name.
         /// </summary>
         /// <param name="symbol">The <see cref="IPropertySymbol"/> which is checked.</param>
-        /// <returns>true if any base property is hidden else false.</returns>
+        /// <returns><see langword="true"/> if any base property is hidden else <see langword="false"/>.</returns>
         public static bool HidesBasePropertyByName(this IPropertySymbol symbol)
         {
             var type = symbol.ContainingType;
@@ -105,7 +105,7 @@ namespace Aspects.Util
         /// </summary>
         /// <typeparam name="T">The interface type to be checked.</typeparam>
         /// <param name="symbol">The symbol for wich the interface implementation is checked.</param>
-        /// <returns>true if the symbol implements the given interface else false</returns>
+        /// <returns><see langword="true"/> if the symbol implements the given interface else <see langword="false"/></returns>
         public static bool Implements<T>(this ITypeSymbol symbol)
         {
             var name = typeof(T).FullName;
@@ -116,7 +116,7 @@ namespace Aspects.Util
         /// Checks if the <see cref="ITypeSymbol"/> implements the interface <see cref="IEnumerable"/>.
         /// </summary>
         /// <param name="symbol">The <see cref="ITypeSymbol"/> which is checked to be a <see cref="IEnumerable"/>.</param>
-        /// <returns>true if the <see cref="ITypeSymbol"/> is a <see cref="IEnumerable"/> else false</returns>
+        /// <returns><see langword="true"/> if the <see cref="ITypeSymbol"/> is a <see cref="IEnumerable"/> else <see langword="false"/></returns>
         public static bool IsEnumerable(this ITypeSymbol symbol)
         {
             return symbol.ToDisplayString() == CodeSnippets.IEnumerableName
@@ -128,7 +128,7 @@ namespace Aspects.Util
         /// Checks if the <see cref="ITypeSymbol"/> overrides <see cref="object.Equals(object)"/> itself or in any base class.
         /// </summary>
         /// <param name="symbol">the <see cref="ITypeSymbol"/> which is checked to override <see cref="object.Equals(object)"/>.</param>
-        /// <returns>true if the <see cref="object.Equals(object)"/> method is overridden else false.</returns>
+        /// <returns><see langword="true"/> if the <see cref="object.Equals(object)"/> method is overridden else <see langword="false"/>.</returns>
         public static bool OverridesEquals(this ITypeSymbol symbol)
         {
             return symbol.Inheritance().Any(cl => cl.GetMembers().OfType<IMethodSymbol>().Any(m =>
@@ -143,7 +143,7 @@ namespace Aspects.Util
         /// Checks if the <see cref="ITypeSymbol"/> overrides <see cref="object.GetHashCode"/> itself or in any base class.
         /// </summary>
         /// <param name="symbol">the <see cref="ITypeSymbol"/> which is checked to override <see cref="object.GetHashCode"/>.</param>
-        /// <returns>true if the <see cref="object.GetHashCode"/> method is overridden else false</returns>
+        /// <returns><see langword="true"/> if the <see cref="object.GetHashCode"/> method is overridden else <see langword="false"/></returns>
         public static bool OverridesGetHashCode(this ITypeSymbol symbol)
         {
             return symbol.Inheritance().Any(cl => cl.GetMembers().OfType<IMethodSymbol>().Any(m =>
@@ -156,7 +156,7 @@ namespace Aspects.Util
         /// Checks if the <see cref="ISymbol"/> is a public <see cref="IPropertySymbol"/>.
         /// </summary>
         /// <param name="symbol">The symbol which is checked to be a public <see cref="IPropertySymbol".</param>
-        /// <returns>true if the <see cref="ISymbol"/> is a public <see cref="IPropertySymbol"/> else false.</returns>
+        /// <returns><see langword="true"/> if the <see cref="ISymbol"/> is a public <see cref="IPropertySymbol"/> else <see langword="false"/>.</returns>
         public static bool IsPublicProperty(this ISymbol symbol)
         {
             return symbol is IPropertySymbol property
@@ -170,7 +170,7 @@ namespace Aspects.Util
         /// Checks if the given <see cref="ISymbol"/> is a public <see cref="IFieldSymbol"/>.
         /// </summary>
         /// <param name="symbol">The <see cref="ISymbol"/> which is checked to be a public <see cref="IFieldSymbol"/>.</param>
-        /// <returns>true if the <see cref="ISymbol"/> is a public <see cref="IFieldSymbol"/> else false.</returns>
+        /// <returns><see langword="true"/> if the <see cref="ISymbol"/> is a public <see cref="IFieldSymbol"/> else <see langword="false"/>.</returns>
         public static bool IsPublicField(this ISymbol symbol)
         {
             return symbol is IFieldSymbol field
