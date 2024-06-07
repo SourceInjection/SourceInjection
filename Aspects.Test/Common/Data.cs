@@ -3,34 +3,37 @@
 
 namespace Aspects.Test.Common
 {
-    [AutoEqualsAndHashCode]
-    public partial class Data : DataBase
+    
+    public partial class Data
     {
-        private object _obj0;
-        private object _obj1;
-        private object _obj2;
+        [NotifyPropertyChanging(true)]
+        [NotifyPropertyChanged(true)]
+        private string _stringValue;
+
+        [NotifyPropertyChanging]
+        [NotifyPropertyChanged]
+        private object _oValue;
+
+        [NotifyPropertyChanging()]
+        [NotifyPropertyChanged(true)]
+        private IEnumerable<object> _values;
+
+        [NotifyPropertyChanging(true)]
+        [NotifyPropertyChanged()]
+        private MyStruct _str;
+
+        [NotifyPropertyChanged(true)]
+        private int _intValue;
 
 
-        public object Obj0 => _obj0 ?? null;
-        public object Obj1
-        {
-            get => _obj1 ?? null;
-        }
+        [NotifyPropertyChanging(true)]
+        private int _intValue2;
 
-        public object Obj2
-        {
-            get
-            {
-                return _obj2 ?? null;
-            }
-        }
+        [NotifyPropertyChanged()]
+        private int _intValue3;
 
-        public string Name { get; set; }
-    }
 
-    [AutoEqualsAndHashCode]
-    public abstract partial class DataBase
-    {
-        public string Name { get; set; }
+        [NotifyPropertyChanging()]
+        private int _intValue4;
     }
 }

@@ -97,15 +97,10 @@ namespace Aspects.SourceGenerators
 
         private string Comparison(ITypeSymbol type, string memberName)
         {
-            if (type.IsReferenceType)
-            {
-                if (type.IsEnumerable() && !type.OverridesEquals())
-                    return CodeSnippets.SequenceEqualsMethod(memberName, $"{otherName}.{memberName}");
-
-                return $"({memberName} is null && {otherName}.{memberName} is null " +
-                    $"|| {memberName}?.{Name}({otherName}.{memberName}) is true)";
-            }
-            return $"{memberName}.{Name}({otherName}.{memberName})";
+            var snippet = CodeSnippets.EqualityCheck(type, memberName, $"{otherName}.{memberName}");
+            return snippet.Contains("||")
+                ? $"({snippet})"
+                : snippet;
         }
     }
 }

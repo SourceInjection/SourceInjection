@@ -1,5 +1,6 @@
 ﻿
 using Aspects.Collections;
+using Aspects.Util;
 using Microsoft.CodeAnalysis;
 using System.Collections;
 using System.Text;
@@ -77,6 +78,56 @@ namespace Aspects.SourceGenerators.Common
                 sb.Append('\t');
             sb.Append(value);
             return sb.ToString();
+        }
+
+        /// <summary>
+        /// A code snippet for a inequality comparison.<br/>
+        /// - '!=' for types which have inequality operator by default (e.g. simple types)<br/>
+        /// - !Equals for types which are neither reference types nor have an default inequality operator (e.g. structs)<br/>
+        /// - !Aspects.Collections.Enumerable.SequenceEquals for collections<br/>
+        /// - a safe version of inequality for every other type
+        /// </summary>
+        /// <param name="type">The type of the two identifiers.</param>
+        /// <param name="nameA">The first identifier.</param>
+        /// <param name="nameB">The second identifier.</param>
+        /// <returns>The inequality code.</returns>
+        public static string InequalityCheck(ITypeSymbol type, string nameA, string nameB)
+        {
+            if (type.CanUseEqualityOperatorsByDefault())
+                return $"{nameA} != {nameB}";
+
+            if (!type.IsReferenceType)
+                return $"!{nameA}.{nameof(Equals)}({nameB})";
+
+            if (type.IsEnumerable() && !type.OverridesEquals())
+                return $"!{SequenceEqualsMethod(nameA, nameB)}";
+
+            return $"!({nameA} is null) && !{nameA}.{nameof(Equals)}({nameB}) || {nameA} is null && !({nameB} is null)";
+        }
+
+        /// <summary>
+        /// A code snippet for a equality comparison.<br/>
+        /// - '==' for types which have equality operator by default (e.g. simple types)<br/>
+        /// - Equals for types which are neither reference types nor have an default inequality operator (e.g. structs)<br/>
+        /// - Aspects.Collections.Enumerable.SequenceEquals for collections<br/>
+        /// - a safe version of equality for every other type
+        /// </summary>
+        /// <param name="type">The type of the two identifiers.</param>
+        /// <param name="nameA">The first identifier.</param>
+        /// <param name="nameB">The second identifier.</param>
+        /// <returns>The equality code.</returns>
+        public static string EqualityCheck(ITypeSymbol type, string nameA, string nameB)
+        {
+            if (type.CanUseEqualityOperatorsByDefault())
+                return $"{nameA} == {nameB}";
+
+            if (!type.IsReferenceType)
+                return $"{nameA}.{nameof(Equals)}({nameB})";
+
+            if (type.IsEnumerable() && !type.OverridesEquals())
+                return $"{SequenceEqualsMethod(nameA, nameB)}";
+
+            return $"{nameA} is null && {nameB} is null || {nameA}?.{nameof(Equals)}({nameB}) is true";
         }
     }
 }
