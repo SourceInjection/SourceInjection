@@ -3,21 +3,42 @@ using Aspects.Collections;
 using Aspects.Util;
 using Microsoft.CodeAnalysis;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Aspects.SourceGenerators.Common
 {
     internal static class CodeSnippets
     {
-        private static readonly string s_enumerableClass = typeof(Enumerable).FullName;
-        private static readonly string s_sequenceEquals = $"{s_enumerableClass}.{nameof(Enumerable.SequenceEquals)}";
-        private static readonly string s_combinedHashCode = $"{s_enumerableClass}.{nameof(Enumerable.CombinedHashCode)}";
+        private static readonly string s_enumerableClass = typeof(Collections.Enumerable).FullName;
+        private static readonly string s_sequenceEquals = $"{s_enumerableClass}.{nameof(Collections.Enumerable.SequenceEquals)}";
+        private static readonly string s_combinedHashCode = $"{s_enumerableClass}.{nameof(Collections.Enumerable.CombinedHashCode)}";
         private static readonly string s_iEnumerableName = typeof(IEnumerable).FullName;
 
         /// <summary>
         /// Gets the full name of <see cref="IEnumerable"/>.
         /// </summary>
         public static string IEnumerableName => s_iEnumerableName;
+
+        /// <summary>
+        /// Creates a local variable and resolves conflicts with already given members.
+        /// E.g. desired with name 'temp' but field with name 'temp' already exists then it will check for 'temp0', 'temp1' and so on.
+        /// </summary>
+        /// <param name="type">The type symbol from wich the members are scanned.</param>
+        /// <param name="name">The desired name.</param>
+        /// <param name="alreadyCreatedVariables">if multiple variables are needed you may wan't to take care of them too.</param>
+        /// <returns>A variable name without conflicts within its containing type.</returns>
+        public static string CreateVariable(INamedTypeSymbol type, string name = "temp", ISet<string> alreadyCreatedVariables = null)
+        {
+            var raw = name;
+            var i = 0;
+
+            while (type.GetMembers(name).Length > 0 || alreadyCreatedVariables != null && alreadyCreatedVariables.Contains(name))
+                name = $"{raw}{i++}";
+
+            return name;
+        }
 
         /// <summary>
         /// Creates a combined hash code method call which evaluates the hash code of <see cref="IEnumerable"/>s.

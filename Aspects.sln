@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Aspects.Test", "Aspects.Tes
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Aspects", "Aspects\Aspects.csproj", "{B48A7A48-A283-4627-9D97-026757E63244}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aspects.Test.NetStandard2.0", "Aspects.Test.NetStandard2.0\Aspects.Test.NetStandard2.0.csproj", "{0A7B0484-7475-4502-B00D-97581308DB20}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Aspects.Test.NetStandard2.0", "Aspects.Test.NetStandard2.0\Aspects.Test.NetStandard2.0.csproj", "{0A7B0484-7475-4502-B00D-97581308DB20}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

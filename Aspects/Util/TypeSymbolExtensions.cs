@@ -8,14 +8,6 @@ namespace Aspects.Util
 {
     internal static class TypeSymbolExtensions
     {
-        private static readonly string[] SimpleTypes = new string[]
-        {
-            nameof(Byte), nameof(SByte), nameof(Int16), nameof(UInt16), 
-            nameof(Int32), nameof(UInt32), nameof(Int64), nameof(UInt64),
-            nameof(Boolean), nameof(Char),
-            nameof(Single), nameof(Double), nameof(Decimal)
-        };
-
         /// <summary>
         /// Computes the inheritance of a <see cref="ITypeSymbol"/> (including itself).
         /// </summary>
@@ -28,6 +20,16 @@ namespace Aspects.Util
                 yield return symbol;
                 symbol = symbol.BaseType;
             }
+        }
+
+        /// <summary>
+        /// Checks if the type has a nullable annotation '?'.
+        /// </summary>
+        /// <param name="symbol">The type to check.</param>
+        /// <returns><see cref="true"/> if the type has a '?' annotation </returns>
+        public static bool HasNullableAnnotation(this ITypeSymbol symbol)
+        {
+            return symbol.NullableAnnotation == NullableAnnotation.None;
         }
 
         /// <summary>
@@ -53,7 +55,6 @@ namespace Aspects.Util
                 || symbol.AllInterfaces.Any(i => i.ToDisplayString() == CodeSnippets.IEnumerableName);
         }
 
-
         /// <summary>
         /// Checks if the <see cref="ITypeSymbol"/> overrides <see cref="object.Equals(object)"/> itself or in any base class.
         /// </summary>
@@ -64,9 +65,9 @@ namespace Aspects.Util
             return symbol.Inheritance().Any(cl => cl.GetMembers().OfType<IMethodSymbol>().Any(m =>
                 m.Name == nameof(Equals)
                 && m.IsOverride
-                && m.ReturnType.ToDisplayString() == "bool"
+                && m.ReturnType.IsBoolean()
                 && m.Parameters.Length == 1
-                && m.Parameters[0].Type.IsTypeOrNullableType("object")));
+                && m.Parameters[0].Type.IsObject(true)));
         }
 
         /// <summary>
@@ -94,27 +95,26 @@ namespace Aspects.Util
         /// <see langword="float"/>, <see langword="double"/>, <see langword="decimal"/>.<br/>
         /// Also any pointer type counts as primitive type.
         /// </summary>
-        /// <param name="symbol"></param>
+        /// <param name="symbol">The symbol to be checked.</param>
+        /// <param name="allowNullable">Defines if nullable annotatoin '?' is allowed</param>
         /// <returns><see langword="true"/> if the type is primitive else <see langword="false"/></returns>
-        public static bool IsPrimitive(this ITypeSymbol symbol)
+        public static bool IsPrimitive(this ITypeSymbol symbol, bool allowNullable)
         {
-            return symbol.IsUnmanagedType
-                && !symbol.IsTupleType
-                && symbol.TypeKind != TypeKind.Enum
-                && symbol.TypeKind != TypeKind.Struct
-                || symbol.IsNativeIntegerType
-                || SimpleTypes.Contains(symbol.Name);
-            // TODO check if it is a struct or a primitive
-        }
-
-        /// <summary>
-        /// Checks if the <see cref="ITypeSymbol"/> is a <see langword="string"/>.
-        /// </summary>
-        /// <param name="symbol"></param>
-        /// <returns><see langword="true"/> if the type is a <see langword="string"/> else <see langword="false"/></returns>
-        public static bool IsString(this ITypeSymbol symbol)
-        {
-            return symbol.Name == nameof(String);
+            return symbol.IsBoolean(allowNullable)
+                || symbol.IsSByte(allowNullable)
+                || symbol.IsByte(allowNullable)
+                || symbol.IsInt16(allowNullable)
+                || symbol.IsUInt16(allowNullable)
+                || symbol.IsInt32(allowNullable)
+                || symbol.IsUInt32(allowNullable)
+                || symbol.IsInt64(allowNullable)
+                || symbol.IsUInt64(allowNullable)
+                || symbol.IsSingle(allowNullable)
+                || symbol.IsDouble(allowNullable)
+                || symbol.IsDecimal(allowNullable)
+                || symbol.IsChar(allowNullable)
+                || (symbol.IsNativeIntegerType || symbol.TypeKind == TypeKind.Pointer) 
+                    && (!symbol.HasNullableAnnotation() || allowNullable);
         }
 
         /// <summary>
@@ -128,15 +128,195 @@ namespace Aspects.Util
         {
             return symbol.IsRecord
                 || symbol.TypeKind == TypeKind.Enum
-                || symbol.IsString()
-                || symbol.IsPrimitive();
+                || symbol.IsString(true)
+                || symbol.IsPrimitive(true);
         }
 
-        private static bool IsTypeOrNullableType(this ITypeSymbol symbol, string typeName)
+        /// <summary>
+        /// Checks if the type has exactly type <see langword="object"/>.
+        /// </summary>
+        /// <param name="symbol">The type to be checked.</param>
+        /// <param name="allowNullable">Allows nullability annotation '?' if set to <see langword="true"/>.</param>
+        /// <returns><see langword="true"/> if the type has exactly type <see langword="object"/> else <see langword="false"/></returns>
+        public static bool IsObject(this ITypeSymbol symbol, bool allowNullable = false)
         {
-            var s = symbol.ToDisplayString();
+            return symbol.IsType("object", allowNullable)
+                || symbol.IsType($"{nameof(System)}.{nameof(Object)}", allowNullable);
+        }
+
+        /// <summary>
+        /// Checks if the type has exactly type <see langword="string"/>.
+        /// </summary>
+        /// <param name="symbol">The type to be checked.</param>
+        /// <param name="allowNullable">Allows nullability annotation '?' if set to <see langword="true"/>.</param>
+        /// <returns><see langword="true"/> if the type has exactly type <see langword="string"/> else <see langword="false"/></returns>
+        public static bool IsString(this ITypeSymbol symbol, bool allowNullable = false)
+        {
+            return symbol.IsType("string", allowNullable)
+                || symbol.IsType($"{nameof(System)}.{nameof(String)}", allowNullable);
+        }
+
+        /// <summary>
+        /// Checks if the type has exactly type <see langword="bool"/>.
+        /// </summary>
+        /// <param name="symbol">The type to be checked.</param>
+        /// <param name="allowNullable">Allows nullability annotation '?' if set to <see langword="true"/>.</param>
+        /// <returns><see langword="true"/> if the type has exactly type <see langword="bool"/> else <see langword="false"/></returns>
+        public static bool IsBoolean(this ITypeSymbol symbol, bool allowNullable = false)
+        {
+            return symbol.IsType("bool", allowNullable)
+                || symbol.IsType($"{nameof(System)}.{nameof(Boolean)}", allowNullable);
+        }
+
+        /// <summary>
+        /// Checks if the type has exactly type <see langword="char"/>.
+        /// </summary>
+        /// <param name="symbol">The type to be checked.</param>
+        /// <param name="allowNullable">Allows nullability annotation '?' if set to <see langword="true"/>.</param>
+        /// <returns><see langword="true"/> if the type has exactly type <see langword="char"/> else <see langword="false"/></returns>
+        public static bool IsChar(this ITypeSymbol symbol, bool allowNullable = false)
+        {
+            return symbol.IsType("char", allowNullable)
+                || symbol.IsType($"{nameof(System)}.{nameof(Char)}", allowNullable);
+        }
+
+        /// <summary>
+        /// Checks if the type has exactly type <see langword="sbyte"/>.
+        /// </summary>
+        /// <param name="symbol">The type to be checked.</param>
+        /// <param name="allowNullable">Allows nullability annotation '?' if set to <see langword="true"/>.</param>
+        /// <returns><see langword="true"/> if the type has exactly type <see langword="sbyte"/> else <see langword="false"/></returns>
+        public static bool IsSByte(this ITypeSymbol symbol, bool allowNullable = false)
+        {
+            return symbol.IsType("sbyte", allowNullable)
+                || symbol.IsType($"{nameof(System)}.{nameof(SByte)}", allowNullable);
+        }
+
+        /// <summary>
+        /// Checks if the type has exactly type <see langword="byte"/>.
+        /// </summary>
+        /// <param name="symbol">The type to be checked.</param>
+        /// <param name="allowNullable">Allows nullability annotation '?' if set to <see langword="true"/>.</param>
+        /// <returns><see langword="true"/> if the type has exactly type <see langword="byte"/> else <see langword="false"/></returns>
+        public static bool IsByte(this ITypeSymbol symbol, bool allowNullable = false)
+        {
+            return symbol.IsType("byte", allowNullable)
+                || symbol.IsType($"{nameof(System)}.{nameof(Byte)}", allowNullable);
+        }
+
+        /// <summary>
+        /// Checks if the type has exactly type <see langword="short"/>.
+        /// </summary>
+        /// <param name="symbol">The type to be checked.</param>
+        /// <param name="allowNullable">Allows nullability annotation '?' if set to <see langword="true"/>.</param>
+        /// <returns><see langword="true"/> if the type has exactly type <see langword="short"/> else <see langword="false"/></returns>
+        public static bool IsInt16(this ITypeSymbol symbol, bool allowNullable = false)
+        {
+            return symbol.IsType("short", allowNullable)
+                || symbol.IsType($"{nameof(System)}.{nameof(Int16)}", allowNullable);
+        }
+
+        /// <summary>
+        /// Checks if the type has exactly type <see langword="ushort"/>.
+        /// </summary>
+        /// <param name="symbol">The type to be checked.</param>
+        /// <param name="allowNullable">Allows nullability annotation '?' if set to <see langword="true"/>.</param>
+        /// <returns><see langword="true"/> if the type has exactly type <see langword="ushort"/> else <see langword="false"/></returns>
+        public static bool IsUInt16(this ITypeSymbol symbol, bool allowNullable = false)
+        {
+            return symbol.IsType("ushort", allowNullable)
+                || symbol.IsType($"{nameof(System)}.{nameof(UInt16)}", allowNullable);
+        }
+
+        /// <summary>
+        /// Checks if the type has exactly type <see langword="int"/>.
+        /// </summary>
+        /// <param name="symbol">The type to be checked.</param>
+        /// <param name="allowNullable">Allows nullability annotation '?' if set to <see langword="true"/>.</param>
+        /// <returns><see langword="true"/> if the type has exactly type <see langword="int"/> else <see langword="false"/></returns>
+        public static bool IsInt32(this ITypeSymbol symbol, bool allowNullable = false)
+        {
+            return symbol.IsType("int", allowNullable)
+                || symbol.IsType($"{nameof(System)}.{nameof(Int32)}", allowNullable);
+        }
+
+        /// <summary>
+        /// Checks if the type has exactly type <see langword="uint"/>.
+        /// </summary>
+        /// <param name="symbol">The type to be checked.</param>
+        /// <param name="allowNullable">Allows nullability annotation '?' if set to <see langword="true"/>.</param>
+        /// <returns><see langword="true"/> if the type has exactly type <see langword="uint"/> else <see langword="false"/></returns>
+        public static bool IsUInt32(this ITypeSymbol symbol, bool allowNullable = false)
+        {
+            return symbol.IsType("uint", allowNullable)
+                || symbol.IsType($"{nameof(System)}.{nameof(UInt32)}", allowNullable);
+        }
+
+        /// <summary>
+        /// Checks if the type has exactly type <see langword="long"/>.
+        /// </summary>
+        /// <param name="symbol">The type to be checked.</param>
+        /// <param name="allowNullable">Allows nullability annotation '?' if set to <see langword="true"/>.</param>
+        /// <returns><see langword="true"/> if the type has exactly type <see langword="long"/> else <see langword="false"/></returns>
+        public static bool IsInt64(this ITypeSymbol symbol, bool allowNullable = false)
+        {
+            return symbol.IsType("long", allowNullable)
+                || symbol.IsType($"{nameof(System)}.{nameof(Int64)}", allowNullable);
+        }
+
+        /// <summary>
+        /// Checks if the type has exactly type <see langword="ulong"/>.
+        /// </summary>
+        /// <param name="symbol">The type to be checked.</param>
+        /// <param name="allowNullable">Allows nullability annotation '?' if set to <see langword="true"/>.</param>
+        /// <returns><see langword="true"/> if the type has exactly type <see langword="ulong"/> else <see langword="false"/></returns>
+        public static bool IsUInt64(this ITypeSymbol symbol, bool allowNullable = false)
+        {
+            return symbol.IsType("ulong", allowNullable)
+                || symbol.IsType($"{nameof(System)}.{nameof(UInt64)}", allowNullable);
+        }
+
+        /// <summary>
+        /// Checks if the type has exactly type <see langword="float"/>.
+        /// </summary>
+        /// <param name="symbol">The type to be checked.</param>
+        /// <param name="allowNullable">Allows nullability annotation '?' if set to <see langword="true"/>.</param>
+        /// <returns><see langword="true"/> if the type has exactly type <see langword="float"/> else <see langword="false"/></returns>
+        public static bool IsSingle(this ITypeSymbol symbol, bool allowNullable = false)
+        {
+            return symbol.IsType("float", allowNullable)
+                || symbol.IsType($"{nameof(System)}.{nameof(Single)}", allowNullable);
+        }
+
+        /// <summary>
+        /// Checks if the type has exactly type <see langword="double"/>.
+        /// </summary>
+        /// <param name="symbol">The type to be checked.</param>
+        /// <param name="allowNullable">Allows nullability annotation '?' if set to <see langword="true"/>.</param>
+        /// <returns><see langword="true"/> if the type has exactly type <see langword="double"/> else <see langword="false"/></returns>
+        public static bool IsDouble(this ITypeSymbol symbol, bool allowNullable = false)
+        {
+            return symbol.IsType("double", allowNullable)
+                || symbol.IsType($"{nameof(System)}.{nameof(Double)}", allowNullable);
+        }
+
+        /// <summary>
+        /// Checks if the type has exactly type <see langword="decimal"/>.
+        /// </summary>
+        /// <param name="symbol">The type to be checked.</param>
+        /// <param name="allowNullable">Allows nullability annotation '?' if set to <see langword="true"/>.</param>
+        /// <returns><see langword="true"/> if the type has exactly type <see langword="decimal"/> else <see langword="false"/></returns>
+        public static bool IsDecimal(this ITypeSymbol symbol, bool allowNullable = false)
+        {
+            return symbol.IsType("decimal", allowNullable)
+                || symbol.IsType($"{nameof(System)}.{nameof(Decimal)}", allowNullable);
+        }
+
+        private static bool IsType(this ITypeSymbol type, string typeName, bool alsoCheckNullable = false)
+        {
+            var s = type.ToDisplayString();
             return s == typeName
-                || s == typeName + '?';
+                || alsoCheckNullable && s == typeName + '?';
         }
     }
 }

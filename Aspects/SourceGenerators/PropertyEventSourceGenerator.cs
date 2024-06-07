@@ -210,20 +210,30 @@ $@"protected virtual void {PropertyChangingNotifyMethod}(string propertyName)
 
         private static string SetterCodeWithoutChangingEqualityCheck(IFieldSymbol field, INotifyPropertyChangedAttribute changedAttribute)
         {
+            const int tab = 2;
+
+            string tempVar = null;
             var sb = new StringBuilder();
             var propertyName = CodeSnippets.PropertyNameFromField(field);
 
-            const int tab = 2;
             sb.AppendLine(RaiseChangingEvent(propertyName, tab));
-            sb.AppendLine(SetField(field.Name, tab));
+
+            if (changedAttribute?.EqualityCheck is true)
+            {
+                tempVar = CodeSnippets.CreateVariable(field.ContainingType);
+                sb.AppendLine(CodeSnippets.Indent($"var {tempVar} = {field.Name};", tab));
+            }
+
+            sb.Append(SetField(field.Name, tab));
 
             if (changedAttribute != null)
             {
+                sb.AppendLine();
                 if (!changedAttribute.EqualityCheck)
                     sb.Append(RaiseChangedEvent(propertyName, tab));
                 else
                 {
-                    sb.AppendLine(InequalityConditionCode(field));
+                    sb.AppendLine(InequalityConditionCode(field, $"{tempVar}"));
                     sb.AppendLine(CodeSnippets.Indent("{", tab));
                     sb.AppendLine(RaiseChangedEvent(propertyName, tab + 1));
                     sb.Append(CodeSnippets.Indent("}", tab));
@@ -257,10 +267,10 @@ $@"protected virtual void {PropertyChangingNotifyMethod}(string propertyName)
             return sb.ToString().TrimEnd();
         }
 
-        private static string InequalityConditionCode(IFieldSymbol symbol)
+        private static string InequalityConditionCode(IFieldSymbol symbol, string other = "value")
         {
             return CodeSnippets.Indent(
-                $"if ({CodeSnippets.InequalityCheck(symbol.Type, symbol.Name, "value")})", 2);
+                $"if ({CodeSnippets.InequalityCheck(symbol.Type, symbol.Name, other)})", 2);
         }
 
         private static T GetAttribute<T>(IFieldSymbol field)

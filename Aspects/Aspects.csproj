@@ -12,6 +12,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Attribute.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Attribute.settings</DependentUpon>
+    </Compile>
     <Compile Update="SourceGenerators\Diagnostics\Errors_en.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -24,6 +29,13 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Errors_en.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Attribute.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Attribute.Designer.cs</LastGenOutput>
+    </None>
   </ItemGroup>
 
 </Project>

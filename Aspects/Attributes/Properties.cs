@@ -18,8 +18,6 @@ namespace Aspects.Attributes
         /// </summary>
         /// <param name="equalityCheck">When set to <see langword="true"/>, event will just be fired when the value wich is set does not equal the field value.</param>
         public NotifyPropertyChangedAttribute(bool equalityCheck = false) : base (equalityCheck) { }
-
-        public override PropertyEvent PropertyEvent { get; } = PropertyEvent.Changed;
     }
 
     /// <summary>
@@ -35,7 +33,22 @@ namespace Aspects.Attributes
         /// </summary>
         /// <param name="equalityCheck">When set to <see langword="true"/>, event will just be fired when the value wich is set does not equal the field value.</param>
         public NotifyPropertyChangingAttribute(bool equalityCheck = false) : base(equalityCheck) { }
-
-        public override PropertyEvent PropertyEvent { get; } = PropertyEvent.Changing;
     }
+
+    /// <summary>
+    /// Attribute for automatic <see cref="INotifyPropertyChanging.PropertyChanging"/> and <see cref="INotifyPropertyChanged.PropertyChanged"/> code generation.<br/>
+    /// Creates public property code that is linked to the attributed field.
+    /// Also adds <see cref="PropertyChangingEventHandler"/> PropertyChanging and <see cref="PropertyChangedEventHandler"/> PropertyChanged to the class if not exist.
+    /// Interfaces <see cref="INotifyPropertyChanging"/> and <see cref="INotifyPropertyChanged"/> are added if not defined.
+    /// </summary>
+    public class NotifyPropertyEventsAttribute : PropertyEventGenerationAttribute, INotifyPropertyEventsAttribute
+    {
+        /// <summary>
+        /// Creates an instance of <see cref="NotifyPropertyEventsAttribute"/>.
+        /// </summary>
+        /// <param name="equalityCheck">When set to <see langword="true"/>, events will just be fired when the value wich is set does not equal the field value.</param>
+        public NotifyPropertyEventsAttribute(bool equalityCheck = false) : base(equalityCheck) { }
+    }
+
+    
 }

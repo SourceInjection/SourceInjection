@@ -13,8 +13,6 @@ namespace Aspects.Attributes.Base
             EqualityCheck = equalityCheck;
         }
 
-        public abstract PropertyEvent PropertyEvent { get; }
-
         public bool EqualityCheck { get; }
 
         public string PropertyName(IFieldSymbol field)
