@@ -1,9 +1,10 @@
 ﻿using Aspects.Attributes;
-using System.Collections.Generic;
 
-namespace Aspects.Test.CompileTime
+namespace Aspects.Test.CompileTime.PropertyEvents
 {
-    [AutoEqualsAndHashCode]
+
+#pragma warning disable IDE0044, IDE0051
+
     public partial class PropertyEventTestClass
     {
         public enum En { x, y, z }
@@ -129,3 +130,5 @@ namespace Aspects.Test.CompileTime
         private int _intBothChangedEquality;
     }
 }
+
+#pragma warning restore IDE0044, IDE0051

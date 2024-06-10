@@ -76,7 +76,24 @@ namespace Aspects.SourceGenerators.Common
         /// </returns>
         public static string PropertyNameFromField(IFieldSymbol field)
         {
-            var fieldName = field.Name;
+            return PropertyNameFromField(field.Name);
+        }
+
+        /// <summary>
+        /// Evaluates the property name based on the parameter <paramref name="fieldName"/>.<br/>
+        /// Allows the following syntax:
+        /// <code>
+        /// '_'* ['a'..'z'] .*
+        /// </code>
+        /// And Produces a property without leading '_' and starting with an uppercase letter.
+        /// </summary>
+        /// <param name="fieldName">The name of the field for wich the name is evaluated.</param>
+        /// <returns>
+        /// The name of the property.
+        /// If <param name="fieldName"/> does not match the pattern '_'* ['a'..'z'] .* the name of the field is returned.
+        /// </returns>
+        public static string PropertyNameFromField(string fieldName)
+        {
             while (fieldName.Length > 0 && fieldName[0] == '_')
                 fieldName = fieldName.Substring(1);
 
