@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Aspects\Aspects.csproj" OutputItemType="Analyzer" />
+    <ProjectReference Include="..\Aspects\Aspects.csproj" OutputItemType="Analyzer"/>
   </ItemGroup>
 
 </Project>

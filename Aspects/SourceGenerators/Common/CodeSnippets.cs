@@ -87,16 +87,16 @@ namespace Aspects.SourceGenerators.Common
         }
 
         /// <summary>
-        /// Indents a string with tabulators (\t)-
+        /// Indents a string with tabulators (two spaces)-
         /// </summary>
         /// <param name="value">The value to indent.</param>
         /// <param name="tabCount">The number of tabulators used.</param>
         /// <returns>An indented string.</returns>
-        public static string Indent(string value, int tabCount)
+        public static string Indent(string value = "", int tabCount = 1)
         {
             var sb = new StringBuilder();
             for (int i = 0; i < tabCount; i++)
-                sb.Append('\t');
+                sb.Append("  ");
             sb.Append(value);
             return sb.ToString();
         }
@@ -106,24 +106,26 @@ namespace Aspects.SourceGenerators.Common
         /// - '!=' for types which have inequality operator by default (e.g. simple types)<br/>
         /// - !Equals for types which are neither reference types nor have an default inequality operator (e.g. structs)<br/>
         /// - !Aspects.Collections.Enumerable.SequenceEquals for collections<br/>
-        /// - a safe version of inequality for every other type
+        /// - a safe version of inequality for every other type if <param name="nullSafe"/> is enabled
+        /// - Equals else
         /// </summary>
-        /// <param name="type">The type of the two identifiers.</param>
+        /// <param name="type">The type of both identifiers.</param>
         /// <param name="nameA">The first identifier.</param>
         /// <param name="nameB">The second identifier.</param>
+        /// <param name="nullSafe">Enables null safety</param>
         /// <returns>The inequality code.</returns>
-        public static string InequalityCheck(ITypeSymbol type, string nameA, string nameB)
+        public static string InequalityCheck(ITypeSymbol type, string nameA, string nameB, bool nullSafe)
         {
             if (type.CanUseEqualityOperatorsByDefault())
                 return $"{nameA} != {nameB}";
 
-            if (!type.IsReferenceType)
-                return $"!{nameA}.{nameof(Equals)}({nameB})";
-
             if (type.IsEnumerable() && !type.OverridesEquals())
                 return $"!{SequenceEqualsMethod(nameA, nameB)}";
 
-            return $"!({nameA} is null) && !{nameA}.{nameof(Equals)}({nameB}) || {nameA} is null && !({nameB} is null)";
+            if (!type.IsReferenceType || !nullSafe)
+                return $"!{nameA}.{nameof(Equals)}({nameB})";
+
+            return $"{nameA} != null && !{nameA}.{nameof(Equals)}({nameB}) || {nameA} == null && {nameB} != null";
         }
 
         /// <summary>
@@ -131,24 +133,26 @@ namespace Aspects.SourceGenerators.Common
         /// - '==' for types which have equality operator by default (e.g. simple types)<br/>
         /// - Equals for types which are neither reference types nor have an default inequality operator (e.g. structs)<br/>
         /// - Aspects.Collections.Enumerable.SequenceEquals for collections<br/>
-        /// - a safe version of equality for every other type
+        /// - a safe version of equality for every other type if <param name="nullSafe"/> is enabled
+        /// - Equals else
         /// </summary>
-        /// <param name="type">The type of the two identifiers.</param>
+        /// <param name="type">The type of both identifiers.</param>
         /// <param name="nameA">The first identifier.</param>
         /// <param name="nameB">The second identifier.</param>
+        /// <param name="nullSafe">Enables null safety</param>
         /// <returns>The equality code.</returns>
-        public static string EqualityCheck(ITypeSymbol type, string nameA, string nameB)
+        public static string EqualityCheck(ITypeSymbol type, string nameA, string nameB, bool nullSafe)
         {
             if (type.CanUseEqualityOperatorsByDefault())
                 return $"{nameA} == {nameB}";
 
-            if (!type.IsReferenceType)
-                return $"{nameA}.{nameof(Equals)}({nameB})";
-
             if (type.IsEnumerable() && !type.OverridesEquals())
                 return $"{SequenceEqualsMethod(nameA, nameB)}";
 
-            return $"{nameA} is null && {nameB} is null || {nameA}?.{nameof(Equals)}({nameB}) is true";
+            if (!type.IsReferenceType || !nullSafe)
+                return $"{nameA}.{nameof(Equals)}({nameB})";
+
+            return $"{nameA} == null && {nameB} == null || {nameA}?.{nameof(Equals)}({nameB}) is true";
         }
     }
 }

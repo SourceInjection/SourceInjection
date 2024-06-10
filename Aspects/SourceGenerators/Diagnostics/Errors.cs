@@ -1,4 +1,5 @@
 ﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Linq;
 
 namespace Aspects.SourceGenerators.Diagnostics
@@ -8,13 +9,13 @@ namespace Aspects.SourceGenerators.Diagnostics
         public static Diagnostic MissingPartialModifier(ISymbol symbol, string generatorName)
         {
             return Diagnostic.Create(new DiagnosticDescriptor(
-                    "AG001", 
+                    "ASG001", 
                     Errors_en.Error_MissingPartialModifier_Title, 
                     Errors_en.Error_MissingPartialModifier_Text, 
                     Errors_en.Category_Codegeneration, 
                     DiagnosticSeverity.Error,
                     true), 
-                symbol.Locations.FirstOrDefault(), generatorName, symbol.Name);
+                symbol.Locations.FirstOrDefault(), generatorName, symbol.ToDisplayString());
         }
     }
 }

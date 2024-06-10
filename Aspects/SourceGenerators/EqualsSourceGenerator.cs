@@ -25,17 +25,15 @@ namespace Aspects.SourceGenerators
         {
             var sb = new StringBuilder();
 
-            var useNullable = CanUseNullable(typeInfo);
-
-            if(useNullable)
+            if(typeInfo.HasNullableEnabled)
                 sb.AppendLine("#nullable enable");
             sb.Append($"public override bool {Name}(object");
-            if (useNullable)
+            if (typeInfo.HasNullableEnabled)
                 sb.Append('?');
             sb.AppendLine($" {argName})");
             sb.AppendLine("{");
 
-            sb.Append($"\treturn");
+            sb.Append(CodeSnippets.Indent("return"));
             if (typeInfo.Symbol.IsReferenceType)
                 sb.Append($" {argName} == this ||");
 
@@ -48,56 +46,52 @@ namespace Aspects.SourceGenerators
             if (ShouldIncludeBase(typeInfo))
             {
                 sb.AppendLine();
-                sb.Append($"\t\t&& base.{Name}({argName})");
+                sb.Append(CodeSnippets.Indent($"&& base.{Name}({argName})", 2));
             }
 
             foreach (var symbol in symbols)
             {
                 sb.AppendLine();
-                sb.Append($"\t\t&& {MemberEquals(symbol)}");
+                sb.Append(CodeSnippets.Indent($"&& {MemberEquals(symbol, typeInfo.HasNullableEnabled)}", 2));
             }
             
             sb.AppendLine(";");
 
             sb.AppendLine("}");
-            if(useNullable)
+            if(typeInfo.HasNullableEnabled)
                 sb.Append("#nullable restore");
             return sb.ToString();
         }
 
-        private bool CanUseNullable(TypeInfo typeInfo)
-        {
-            return typeInfo.Symbol.Inheritance()
-                .SelectMany(cl => cl.GetMembers())
-                .OfType<IMethodSymbol>()
-                .Any(m => m.Name == nameof(Equals) 
-                    && !m.IsOverride 
-                    && m.IsVirtual 
-                    && m.Parameters.Any(p => p.NullableAnnotation == NullableAnnotation.Annotated));
-        }
-
         private bool ShouldIncludeBase(TypeInfo typeInfo)
         {
-            return typeInfo.Symbol.HasAttributeOfType<IEqualsConfigAttribute>()
-                || typeInfo.Symbol.OverridesEquals()
-                || typeInfo.Symbol.Inheritance().SelectMany(cl => cl.GetMembers())
-                    .Any(m => m.HasAttributeOfType<IEqualsAttribute>());
+            return typeInfo.Symbol.BaseType is ITypeSymbol syBase && (
+                syBase.HasAttributeOfType<IEqualsConfigAttribute>()
+                || syBase.OverridesEquals()
+                || syBase.Inheritance().Any(
+                    sy => sy.HasAttributeOfType<IEqualsConfigAttribute>()
+                    || sy.GetMembers().Any(m => m.HasAttributeOfType<IEqualsAttribute>())));
         }
 
-        private string MemberEquals(ISymbol symbol)
+        private string MemberEquals(ISymbol symbol, bool nullableEnabled)
         {
-            var memberName = symbol.Name;
+            var type = GetType(symbol);
+            var nullSafe = !nullableEnabled || type.HasNullableAnnotation();
+            return Comparison(type, symbol.Name, nullSafe);
+        }
 
+        private ITypeSymbol GetType(ISymbol symbol)
+        {
             if (symbol is IFieldSymbol field)
-                return Comparison(field.Type, memberName);
-            else if (symbol is IPropertySymbol property)
-                return Comparison(property.Type, memberName);
-            else throw new NotImplementedException();
+                return field.Type;
+            if (symbol is IPropertySymbol property)
+                return property.Type;
+            throw new NotImplementedException();
         }
 
-        private string Comparison(ITypeSymbol type, string memberName)
+        private string Comparison(ITypeSymbol type, string memberName, bool nullSafe)
         {
-            var snippet = CodeSnippets.EqualityCheck(type, memberName, $"{otherName}.{memberName}");
+            var snippet = CodeSnippets.EqualityCheck(type, memberName, $"{otherName}.{memberName}", nullSafe);
             return snippet.Contains("||")
                 ? $"({snippet})"
                 : snippet;

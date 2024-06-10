@@ -41,27 +41,27 @@ namespace Aspects.SourceGenerators
         private string HashCodeHash(ISymbol[] symbols, bool includeBase)
         {
             var sb = new StringBuilder();
-            sb.AppendLine("\tvar hash = new System.HashCode();");
+            sb.AppendLine(CodeSnippets.Indent("var hash = new System.HashCode();"));
 
             if (includeBase)
-                sb.AppendLine($"\thash.Add(base.{Name}());");
+                sb.AppendLine(CodeSnippets.Indent($"hash.Add(base.{Name}());"));
 
             for (int i = 0; i < symbols.Length; i++)
-                sb.AppendLine($"\thash.Add({MemberHash(symbols[i])});");
+                sb.AppendLine(CodeSnippets.Indent($"hash.Add({MemberHash(symbols[i])});"));
 
-            sb.Append("\treturn hash.ToHashCode();");
+            sb.Append(CodeSnippets.Indent("return hash.ToHashCode();"));
             return sb.ToString();
         }
 
         private string HashCodeCombine(ISymbol[] symbols, bool includeBase)
         {
             var sb = new StringBuilder();
-            sb.Append("\treturn System.HashCode.Combine(");
+            sb.Append(CodeSnippets.Indent("return System.HashCode.Combine("));
 
             if (includeBase)
             {
                 sb.AppendLine();
-                sb.Append($"\t\tbase.{Name}()");
+                sb.Append(CodeSnippets.Indent($"base.{Name}()", 2));
                 if (symbols.Length > 0)
                     sb.Append(',');
             }
@@ -69,12 +69,12 @@ namespace Aspects.SourceGenerators
             if (symbols.Length > 0)
             {
                 sb.AppendLine();
-                sb.Append($"\t\t{MemberHash(symbols[0])}");
+                sb.Append(CodeSnippets.Indent($"{MemberHash(symbols[0])}", 2));
 
                 for (var i = 1; i < symbols.Length; i++)
                 {
                     sb.AppendLine(",");
-                    sb.Append($"\t\t{MemberHash(symbols[i])}");
+                    sb.Append(CodeSnippets.Indent($"{MemberHash(symbols[i])}", 2));
                 }
             }
             sb.Append(");");
@@ -90,10 +90,12 @@ namespace Aspects.SourceGenerators
 
         private bool ShouldIncludeBase(TypeInfo typeInfo)
         {
-            return typeInfo.Symbol.HasAttributeOfType<IHashCodeConfigAttribute>()
-                || typeInfo.Symbol.OverridesGetHashCode()
-                || typeInfo.Symbol.Inheritance().SelectMany(cl => cl.GetMembers())
-                    .Any(m => m.HasAttributeOfType<IHashCodeAttribute>());
+            return typeInfo.Symbol.BaseType is ITypeSymbol syBase && (
+                syBase.HasAttributeOfType<IHashCodeConfigAttribute>()
+                || syBase.OverridesGetHashCode()
+                || syBase.Inheritance().Any(
+                    sy => sy.HasAttributeOfType<IHashCodeConfigAttribute>()
+                    || sy.GetMembers().Any(m => m.HasAttributeOfType<IHashCodeAttribute>())));
         }
 
         private bool MustUseCombinedHashCode(ISymbol symbol)

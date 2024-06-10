@@ -24,10 +24,7 @@ namespace Aspects.SourceGenerators.Base
 
         protected abstract DataMemberPriority Priority { get; }
 
-        protected override string Dependencies(TypeInfo typeInfo)
-        {
-            return string.Empty;
-        }
+        protected override IEnumerable<string> Dependencies(TypeInfo typeInfo) => Enumerable.Empty<string>();
 
         protected IEnumerable<ISymbol> GetLocalTargetedSymbols(TypeInfo typeInfo)
         {

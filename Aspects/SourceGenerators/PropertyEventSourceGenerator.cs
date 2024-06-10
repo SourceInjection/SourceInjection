@@ -44,9 +44,9 @@ $@"protected virtual void {PropertyChangingNotifyMethod}(string propertyName)
                 .Or(Types.WithMembersWithAttributeOfType<INotifyPropertyChangingAttribute>()));
 
 
-        protected override string Dependencies(TypeInfo typeInfo)
+        protected override IEnumerable<string> Dependencies(TypeInfo typeInfo)
         {
-            return "using System.ComponentModel;";
+            yield return "using System.ComponentModel;";
         }
 
         protected override IEnumerable<string> InterfacesToAdd(TypeInfo typeInfo)
@@ -102,12 +102,12 @@ $@"protected virtual void {PropertyChangingNotifyMethod}(string propertyName)
                 sb.AppendLine();
             }
 
-            sb.Append(PropertyCode(fields.First()));
+            sb.Append(PropertyCode(fields.First(), typeInfo.HasNullableEnabled));
             foreach(var field in fields.Skip(1))
             {
                 sb.AppendLine(); 
                 sb.AppendLine();
-                sb.Append(PropertyCode(field));
+                sb.Append(PropertyCode(field, typeInfo.HasNullableEnabled));
             }
 
             if (MustAddRaiseMethod<INotifyPropertyChangingAttribute>(typeInfo, PropertyChangingNotifyMethod))
@@ -134,24 +134,24 @@ $@"protected virtual void {PropertyChangingNotifyMethod}(string propertyName)
                     || f.HasAttributeOfType<INotifyPropertyChangingAttribute>());
         }
 
-        private static string PropertyCode(IFieldSymbol field)
+        private static string PropertyCode(IFieldSymbol field, bool nullableEnabled)
         {
             var name = CodeSnippets.PropertyNameFromField(field);
             var sb = new StringBuilder();
 
             var type = field.Type.ToDisplayString();
-            var enableNull = field.Type.NullableAnnotation == NullableAnnotation.Annotated;
+            var isNullableField = field.Type.NullableAnnotation == NullableAnnotation.Annotated;
 
-            if (enableNull)
+            if (isNullableField)
                 sb.AppendLine("#nullable enable");
 
             sb.AppendLine($"public {type} {name}");
             sb.AppendLine("{");
             sb.AppendLine(GetterCode(field));
-            sb.AppendLine(SetterCode(field));
+            sb.AppendLine(SetterCode(field, nullableEnabled));
             sb.Append("}");
 
-            if (enableNull)
+            if (isNullableField)
             {
                 sb.AppendLine();
                 sb.Append("#nullable restore");
@@ -162,30 +162,33 @@ $@"protected virtual void {PropertyChangingNotifyMethod}(string propertyName)
 
         private static string GetterCode(IFieldSymbol field)
         {
-            return $"\tget => {field.Name};";
+            return CodeSnippets.Indent($"get => {field.Name};");
         }
 
-        private static string SetterCode(IFieldSymbol field)
+        private static string SetterCode(IFieldSymbol field, bool nullableEnabled)
         {
             var sb = new StringBuilder();
-            sb.AppendLine("\tset");
-            sb.AppendLine("\t{");
+            sb.AppendLine(CodeSnippets.Indent("set"));
+            sb.AppendLine(CodeSnippets.Indent("{"));
 
             var changingAttribute = GetAttribute<INotifyPropertyChangingAttribute>(field);
             var changedAttribute = GetAttribute<INotifyPropertyChangedAttribute>(field);
 
-            if (changingAttribute is null)
-                sb.AppendLine(SetterCodeWithoutChangingEvent(field, changedAttribute));
-            else if (!changingAttribute.EqualityCheck)
-                sb.AppendLine(SetterCodeWithoutChangingEqualityCheck(field, changedAttribute));
-            else
-                sb.AppendLine(SetterCodeWithChangingEqualityCheck(field, changedAttribute));
+            var nullSafe = !nullableEnabled || field.Type.HasNullableAnnotation();
 
-            sb.Append("\t}");
+            if (changingAttribute is null)
+                sb.AppendLine(SetterCodeWithoutChangingEvent(field, changedAttribute, nullSafe));
+            else if (!changingAttribute.EqualityCheck)
+                sb.AppendLine(SetterCodeWithoutChangingEqualityCheck(field, changedAttribute, nullSafe));
+            else
+                sb.AppendLine(SetterCodeWithChangingEqualityCheck(field, changedAttribute, nullSafe));
+
+            sb.Append(CodeSnippets.Indent("}"));
             return sb.ToString();
         }
 
-        private static string SetterCodeWithoutChangingEvent(IFieldSymbol field, INotifyPropertyChangedAttribute changedAttribute)
+        private static string SetterCodeWithoutChangingEvent(
+            IFieldSymbol field, INotifyPropertyChangedAttribute changedAttribute, bool nullSafe)
         {
             var sb = new StringBuilder();
             var propertyName = CodeSnippets.PropertyNameFromField(field);
@@ -193,7 +196,7 @@ $@"protected virtual void {PropertyChangingNotifyMethod}(string propertyName)
             if (changedAttribute?.EqualityCheck is true)
             {
                 const int tab = 3;
-                sb.AppendLine(InequalityConditionCode(field));
+                sb.AppendLine(InequalityConditionCode(field, nullSafe));
                 sb.AppendLine(CodeSnippets.Indent("{", tab - 1));
                 sb.AppendLine(SetField(field.Name, tab));
                 sb.AppendLine(RaiseChangedEvent(propertyName, tab));
@@ -208,7 +211,8 @@ $@"protected virtual void {PropertyChangingNotifyMethod}(string propertyName)
             return sb.ToString();
         }
 
-        private static string SetterCodeWithoutChangingEqualityCheck(IFieldSymbol field, INotifyPropertyChangedAttribute changedAttribute)
+        private static string SetterCodeWithoutChangingEqualityCheck(
+            IFieldSymbol field, INotifyPropertyChangedAttribute changedAttribute, bool nullSafe)
         {
             const int tab = 2;
 
@@ -233,7 +237,7 @@ $@"protected virtual void {PropertyChangingNotifyMethod}(string propertyName)
                     sb.Append(RaiseChangedEvent(propertyName, tab));
                 else
                 {
-                    sb.AppendLine(InequalityConditionCode(field, $"{tempVar}"));
+                    sb.AppendLine(InequalityConditionCode(field, nullSafe, $"{tempVar}"));
                     sb.AppendLine(CodeSnippets.Indent("{", tab));
                     sb.AppendLine(RaiseChangedEvent(propertyName, tab + 1));
                     sb.Append(CodeSnippets.Indent("}", tab));
@@ -242,13 +246,14 @@ $@"protected virtual void {PropertyChangingNotifyMethod}(string propertyName)
             return sb.ToString();
         }
 
-        private static string SetterCodeWithChangingEqualityCheck(IFieldSymbol field, INotifyPropertyChangedAttribute changedAttribute)
+        private static string SetterCodeWithChangingEqualityCheck(
+            IFieldSymbol field, INotifyPropertyChangedAttribute changedAttribute, bool nullSafe)
         {
             var sb = new StringBuilder();
             var propertyName = CodeSnippets.PropertyNameFromField(field);
 
             const int tab = 3;
-            sb.AppendLine(InequalityConditionCode(field));
+            sb.AppendLine(InequalityConditionCode(field, nullSafe));
             sb.AppendLine(CodeSnippets.Indent("{", tab - 1));
             sb.AppendLine(RaiseChangingEvent(propertyName, tab));
 
@@ -267,10 +272,10 @@ $@"protected virtual void {PropertyChangingNotifyMethod}(string propertyName)
             return sb.ToString().TrimEnd();
         }
 
-        private static string InequalityConditionCode(IFieldSymbol symbol, string other = "value")
+        private static string InequalityConditionCode(IFieldSymbol symbol, bool nullSafe, string other = "value")
         {
             return CodeSnippets.Indent(
-                $"if ({CodeSnippets.InequalityCheck(symbol.Type, symbol.Name, other)})", 2);
+                $"if ({CodeSnippets.InequalityCheck(symbol.Type, symbol.Name, other, nullSafe)})", 2);
         }
 
         private static T GetAttribute<T>(IFieldSymbol field)

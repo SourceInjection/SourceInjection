@@ -1,7 +1,7 @@
 ﻿using Aspects.Attributes;
 using System.Collections.Generic;
 
-namespace Aspects.Test.CompileTime
+namespace Aspects.Test.NetStandard2_0.CompileTime
 {
     [AutoEqualsAndHashCode]
     public partial class PropertyEventTestClass
@@ -9,52 +9,52 @@ namespace Aspects.Test.CompileTime
         public enum En { x, y, z }
 
         [NotifyPropertyChanging()]
-        private string _stringChangingNoEquality = null!;
+        private string _stringChangingNoEquality;
 
         [NotifyPropertyChanging(true)]
-        private string _stringChanging = null!;
+        private string _stringChanging;
 
         [NotifyPropertyChanged()]
-        private string? _stringChangedNoEquality;
+        private string _stringChangedNoEquality;
 
         [NotifyPropertyChanged(true)]
-        private string? _stringChanged;
+        private string _stringChanged;
 
         [NotifyPropertyEvents()]
-        private string _stringBothNoEquality = null!;
+        private string _stringBothNoEquality;
 
         [NotifyPropertyEvents(true)]
-        private string _stringBoth = null!;
+        private string _stringBoth;
 
         [NotifyPropertyChanging(true), NotifyPropertyChanged()]
-        private string _stringBothChangingEquality = null!;
+        private string _stringBothChangingEquality;
 
         [NotifyPropertyChanging(), NotifyPropertyChanged(true)]
-        private string _stringBothChangedEquality = null!;
+        private string _stringBothChangedEquality;
 
         [NotifyPropertyChanging()]
-        private object _objectChangingNoEquality = null!;
+        private object _objectChangingNoEquality;
 
         [NotifyPropertyChanging(true)]
-        private object _objectChanging = null!;
+        private object _objectChanging;
 
         [NotifyPropertyChanged()]
-        private object? _objectChangedNoEquality;
+        private object _objectChangedNoEquality;
 
         [NotifyPropertyChanged(true)]
-        private object? _objectChanged;
+        private object _objectChanged;
 
         [NotifyPropertyEvents()]
-        private object _objectBothNoEquality = null!;
+        private object _objectBothNoEquality;
 
         [NotifyPropertyEvents(true)]
-        private object _objectBoth = null!;
+        private object _objectBoth;
 
         [NotifyPropertyChanging(true), NotifyPropertyChanged()]
-        private object _objectBothChangingEquality = null!;
+        private object _objectBothChangingEquality;
 
         [NotifyPropertyChanging(), NotifyPropertyChanged(true)]
-        private object _objectBothChangedEquality = null!;
+        private object _objectBothChangedEquality;
 
         [NotifyPropertyChanging()]
         private En _EnChangingNoEquality;
@@ -63,10 +63,10 @@ namespace Aspects.Test.CompileTime
         private En _EnChanging;
 
         [NotifyPropertyChanged()]
-        private En? _EnChangedNoEquality;
+        private En _EnChangedNoEquality;
 
         [NotifyPropertyChanged(true)]
-        private En? _EnChanged;
+        private En _EnChanged;
 
         [NotifyPropertyEvents()]
         private En _EnBothNoEquality;
@@ -81,28 +81,28 @@ namespace Aspects.Test.CompileTime
         private En _EnBothChangedEquality;
 
         [NotifyPropertyChanging()]
-        private IEnumerable<string> _collectionChangingNoEquality = null!;
+        private IEnumerable<string> _collectionChangingNoEquality;
 
         [NotifyPropertyChanging(true)]
-        private IEnumerable<string> _collectionChanging = null!;
+        private IEnumerable<string> _collectionChanging;
 
         [NotifyPropertyChanged()]
-        private IEnumerable<string>? _collectionChangedNoEquality;
+        private IEnumerable<string> _collectionChangedNoEquality;
 
         [NotifyPropertyChanged(true)]
-        private IEnumerable<string>? _collectionChanged;
+        private IEnumerable<string> _collectionChanged;
 
         [NotifyPropertyEvents()]
-        private IEnumerable<string> _collectionBothNoEquality = null!;
+        private IEnumerable<string> _collectionBothNoEquality;
 
         [NotifyPropertyEvents(true)]
-        private IEnumerable<string> _collectionBoth = null!;
+        private IEnumerable<string> _collectionBoth;
 
         [NotifyPropertyChanging(true), NotifyPropertyChanged()]
-        private IEnumerable<string> _collectionBothChangingEquality = null!;
+        private IEnumerable<string> _collectionBothChangingEquality;
 
         [NotifyPropertyChanging(), NotifyPropertyChanged(true)]
-        private IEnumerable<string> _collectionBothChangedEquality = null!;
+        private IEnumerable<string> _collectionBothChangedEquality;
 
         [NotifyPropertyChanging()]
         private int _intChangingNoEquality;
@@ -111,10 +111,10 @@ namespace Aspects.Test.CompileTime
         private int _intChanging;
 
         [NotifyPropertyChanged()]
-        private int? _intChangedNoEquality;
+        private int _intChangedNoEquality;
 
         [NotifyPropertyChanged(true)]
-        private int? _intChanged;
+        private int _intChanged;
 
         [NotifyPropertyEvents()]
         private int _intBothNoEquality;

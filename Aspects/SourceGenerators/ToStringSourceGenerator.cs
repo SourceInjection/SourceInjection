@@ -5,6 +5,7 @@ using System.Text;
 using TypeInfo = Aspects.SourceGenerators.Common.TypeInfo;
 using Aspects.Attributes.Interfaces;
 using Aspects.Util;
+using Aspects.SourceGenerators.Common;
 
 namespace Aspects.SourceGenerators
 {
@@ -22,7 +23,7 @@ namespace Aspects.SourceGenerators
             sb.AppendLine($"public override string {Name}()");
             sb.AppendLine("{");
 
-            sb.Append($"\treturn $\"({typeInfo.Name})");
+            sb.Append(CodeSnippets.Indent($"return $\"({typeInfo.Name})"));
 
             var symbols = GetPublicSymbols(typeInfo)
                 .Where(sy => !IsExcluded(sy));

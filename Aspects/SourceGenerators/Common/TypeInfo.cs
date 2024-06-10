@@ -19,6 +19,7 @@ namespace Aspects.SourceGenerators.Common
         {
             SyntaxNode = syntaxNode;
             Symbol = typeSymbol;
+            HasNullableEnabled = context.SemanticModel.GetNullableContext(0).AnnotationsEnabled();
 
             _hasPartialModifier = new Lazy<bool>(() => syntaxNode.HasPartialModifier());
             _declaration = new Lazy<string>(() => syntaxNode.Declaration());
@@ -36,6 +37,8 @@ namespace Aspects.SourceGenerators.Common
         public string Declaration => _declaration.Value;
 
         public string Name => _name.Value;
+
+        public bool HasNullableEnabled { get; }
 
         public IEnumerable<PropertyInfo> LocalPropertyInfos => _localPropertyInfos.Value;
 

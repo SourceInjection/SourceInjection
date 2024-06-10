@@ -29,7 +29,7 @@ namespace Aspects.Util
         /// <returns><see cref="true"/> if the type has a '?' annotation </returns>
         public static bool HasNullableAnnotation(this ITypeSymbol symbol)
         {
-            return symbol.NullableAnnotation == NullableAnnotation.None;
+            return symbol.NullableAnnotation == NullableAnnotation.Annotated;
         }
 
         /// <summary>
