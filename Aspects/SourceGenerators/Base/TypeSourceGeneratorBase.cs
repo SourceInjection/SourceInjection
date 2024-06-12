@@ -12,7 +12,7 @@ namespace Aspects.SourceGenerators.Base
 {
     internal abstract class TypeSourceGeneratorBase : ISourceGenerator
     {
-        protected abstract string Name { get; }
+        protected internal abstract string Name { get; }
 
         protected abstract TypeSyntaxReceiver SyntaxReceiver { get; }
 

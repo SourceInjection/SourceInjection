@@ -13,7 +13,7 @@ namespace Aspects.SourceGenerators
     internal class HashCodeSourceGenerator 
         : ObjectMethodSourceGeneratorBase<IHashCodeConfigAttribute, IHashCodeAttribute, IHashCodeExcludeAttribute>
     {
-        protected override string Name { get; } = nameof(GetHashCode);
+        protected internal override string Name { get; } = nameof(GetHashCode);
 
         protected override DataMemberPriority Priority { get; } = DataMemberPriority.Field;
 

@@ -1,2 +1,4 @@
 ﻿
-Console.WriteLine("If it compiles, tests are successful");
+
+
+Console.WriteLine(Environment.CurrentDirectory);

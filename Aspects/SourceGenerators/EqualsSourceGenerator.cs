@@ -17,7 +17,7 @@ namespace Aspects.SourceGenerators
         private const string argName = "obj";
         private const string otherName = "other";
 
-        protected override string Name { get; } = nameof(Equals);
+        protected internal override string Name { get; } = nameof(Equals);
 
         protected override DataMemberPriority Priority { get; } = DataMemberPriority.Field;
 
