@@ -1,4 +1,4 @@
-﻿namespace Aspects.Parsers.Tree
+﻿namespace Aspects.Parsers.CSharp.Tree
 {
 #pragma warning disable CS0659 // Type overrides Object.Equals(object o) but does not override Object.GetHashCode()
     internal class UsingAliasDirective(string value, string newName, string oldName, bool isTypeDefinition)

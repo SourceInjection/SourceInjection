@@ -1,4 +1,4 @@
-﻿namespace Aspects.Parsers.Tree
+﻿namespace Aspects.Parsers.CSharp.Tree
 {
     public enum MemberKind
     {

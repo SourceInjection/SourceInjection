@@ -22,6 +22,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="CSharp\Visitors\" />
+    <Folder Include="CSharp\Queries\" />
   </ItemGroup>
 </Project>
