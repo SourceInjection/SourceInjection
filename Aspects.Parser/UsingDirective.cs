@@ -1,4 +1,4 @@
-﻿namespace Aspects.Parsers.CSharp.Tree.Usings
+﻿namespace Aspects.Parsers.CSharp
 {
     public enum UsingDirectiveKind
     {

@@ -1,12 +1,13 @@
-﻿
-namespace Aspects.Parsers.CSharp.Tree.Members
+﻿namespace Aspects.Parsers.CSharp
 {
-    public class FieldInfo(string name, AccessModifier accessModifier, 
+    public class FieldInfo(string name, AccessModifier accessModifier,
         string type, bool isStatic, bool isReadonly, bool isNew)
 
         : MemberInfo(name, accessModifier)
     {
         public override MemberKind MemberKind { get; } = MemberKind.Field;
+
+        public override AccessModifier DefaultAccessability { get; } = CSharp.AccessModifier.Private;
 
         public string Type => type;
 

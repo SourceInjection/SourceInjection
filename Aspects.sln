@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Aspects.Test", "Aspects.Tes
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Aspects", "Aspects\Aspects.csproj", "{B48A7A48-A283-4627-9D97-026757E63244}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aspects.Parsers", "Aspects.Parser\Aspects.Parsers.csproj", "{8E91F6B8-04FB-4492-AE55-E48C127671A9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Aspects.Parsers.CSharp", "Aspects.Parser\Aspects.Parsers.CSharp.csproj", "{8E91F6B8-04FB-4492-AE55-E48C127671A9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
