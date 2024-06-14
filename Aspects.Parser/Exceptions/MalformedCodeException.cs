@@ -1,8 +1,13 @@
-﻿
-namespace Aspects.Parsers.CSharp.Exceptions
+﻿namespace Aspects.Parsers.CSharp.Exceptions
 {
-    [Serializable]
-    public class MalformedCodeException(string message, Exception innerException) 
-        : Exception(message, innerException)
-    { }
+    public class MalformedCodeException : Exception
+    {
+        public MalformedCodeException(string message, Exception innerException)
+            : base(message, innerException) 
+        { }
+
+        public MalformedCodeException(string message)
+            : base(message) 
+        { }
+    }
 }

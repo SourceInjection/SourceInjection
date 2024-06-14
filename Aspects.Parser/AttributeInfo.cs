@@ -1,7 +1,11 @@
 ﻿namespace Aspects.Parsers.CSharp
 {
-    internal class AttributeInfo
+    public class AttributeInfo(string name, IReadOnlyList<ArgumentInfo> arguments)
     {
-        // TODO
+        public AttributeGroupInfo ContainingSection { get; internal set; } = null!;
+
+        public string Name => name;
+
+        public IReadOnlyList<ArgumentInfo> Arguments => arguments;
     }
 }
