@@ -8,10 +8,11 @@ namespace Aspects.Parsers.CSharp.Visitors
     {
         public override NamespaceInfo VisitCompilation_unit([NotNull] Compilation_unitContext context)
         {
-            return new NamespaceInfo(name: string.Empty,
-                directives: GetUsingDirectivesFromContext(context.using_directives()),
-                namespaces: GetNamespacesFromContext(context.namespace_member_declarations()),
-                types: GetTypesFromContext(context.namespace_member_declarations()),
+            return new NamespaceInfo(
+                name:          string.Empty,
+                directives:    GetUsingDirectivesFromContext(context.using_directives()),
+                namespaces:    GetNamespacesFromContext(context.namespace_member_declarations()),
+                types:         GetTypesFromContext(context.namespace_member_declarations()),
                 externAliases: GetExternAliasFromContext(context.extern_alias_directives()));
         }
 
@@ -23,10 +24,11 @@ namespace Aspects.Parsers.CSharp.Visitors
 
         private NamespaceInfo GetNamespaceFromBody(string name, Namespace_bodyContext context)
         {
-            return new NamespaceInfo(name: name,
-                directives: GetUsingDirectivesFromContext(context.using_directives()),
-                namespaces: GetNamespacesFromContext(context.namespace_member_declarations()),
-                types: GetTypesFromContext(context.namespace_member_declarations()),
+            return new NamespaceInfo(
+                name:          name,
+                directives:    GetUsingDirectivesFromContext(context.using_directives()),
+                namespaces:    GetNamespacesFromContext(context.namespace_member_declarations()),
+                types:         GetTypesFromContext(context.namespace_member_declarations()),
                 externAliases: GetExternAliasFromContext(context.extern_alias_directives()));
         }
 
@@ -36,9 +38,9 @@ namespace Aspects.Parsers.CSharp.Visitors
                 .Select(c => new ExternAliasInfo(c.identifier().GetText())).ToList();
         }
 
-        private static List<UsingDirective> GetUsingDirectivesFromContext(Using_directivesContext context)
+        private static List<UsingDirectiveInfo> GetUsingDirectivesFromContext(Using_directivesContext context)
         {
-            var usingDirectives = new List<UsingDirective>();
+            var usingDirectives = new List<UsingDirectiveInfo>();
             var visitor = new UsingVisitor();
             foreach (var c in context.using_directive())
             {

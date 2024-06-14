@@ -1,6 +1,15 @@
 ﻿namespace Aspects.Parsers.CSharp
 {
-    public enum TypeKind { Enum, Class, Record, Struct, Interface, Delegate }
+    public enum TypeKind 
+    {
+        Enum, 
+        Class, 
+        Record, 
+        Struct,
+        Interface, 
+        Delegate, 
+        Tuple 
+    }
 
     public abstract class TypeInfo(string name, AccessModifier? accessModifier) : MemberInfo(name, accessModifier)
     {

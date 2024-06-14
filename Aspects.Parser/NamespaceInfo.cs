@@ -2,7 +2,7 @@
 {
     public class NamespaceInfo
     {
-        public NamespaceInfo(string name, IReadOnlyList<UsingDirective> directives,
+        public NamespaceInfo(string name, IReadOnlyList<UsingDirectiveInfo> directives,
             IReadOnlyList<NamespaceInfo> namespaces, IReadOnlyList<TypeInfo> types, IReadOnlyList<ExternAliasInfo> externAliases)
         {
             Name = name;
@@ -26,7 +26,7 @@
 
         public string FullName() => ContainingNamespace is null or CodeUnit ? Name : $"{ContainingNamespace.FullName()}.{Name}";
 
-        public IReadOnlyList<UsingDirective> UsingDirectives { get; }
+        public IReadOnlyList<UsingDirectiveInfo> UsingDirectives { get; }
 
         public IReadOnlyList<NamespaceInfo> Namespaces { get; }
 

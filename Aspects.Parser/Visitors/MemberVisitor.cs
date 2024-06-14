@@ -1,7 +1,9 @@
 ﻿
+using Aspects.Parsers.CSharp.Generated;
+
 namespace Aspects.Parsers.CSharp.Visitors
 {
-    internal class MemberVisitor
+    internal class MemberVisitor : CSharpParserBaseVisitor<MemberInfo>
     {
     }
 }

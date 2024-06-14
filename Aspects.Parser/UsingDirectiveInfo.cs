@@ -4,10 +4,11 @@
     {
         Namespace,
         Static,
-        Alias
+        Alias,
+        TupleDefinition
     }
 
-    public abstract class UsingDirective(string value)
+    public abstract class UsingDirectiveInfo(string value)
     {
         public NamespaceInfo? ContainingNamespace { get; internal set; }
 

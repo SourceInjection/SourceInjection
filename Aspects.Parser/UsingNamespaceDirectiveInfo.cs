@@ -1,7 +1,7 @@
 ﻿namespace Aspects.Parsers.CSharp
 {
-    public class UsingNamespaceDirective(string value, string nameSpace)
-        : UsingDirective(value)
+    public class UsingNamespaceDirectiveInfo(string value, string nameSpace)
+        : UsingDirectiveInfo(value)
     {
         public string Namespace => nameSpace;
 
