@@ -28,15 +28,16 @@ namespace Aspects.Parsers.CSharp.Visitors
                 return GetInterface(context.interface_definition(), attributeGroups, allModifiers);
             if (context.class_definition() is not null)
                 return GetClass(context.interface_definition(), attributeGroups, allModifiers);
-            if (context.enum_definition() is not null)
-                return GetEnum(context.enum_definition(), attributeGroups, allModifiers);
             if(context.struct_definition() is not null)
                 return GetStruct(context.struct_definition(), attributeGroups, allModifiers);
+            if (context.enum_definition() is not null)
+                return GetEnum(context.enum_definition(), attributeGroups, allModifiers);
             if (context.delegate_definition() is not null)
                 return GetDelegate(context.delegate_definition(), attributeGroups, allModifiers);
 
-            // TODO make fancy errors
-            throw new MalformedCodeException("malformed type declaration");
+            var line = context.Start.Line;
+            var col = context.Start.Column;
+            throw new MalformedCodeException($"Syntax error at line {line} column {col}: malformed type definition.");
         }
 
         private static DelegateDefinition GetDelegate(Delegate_definitionContext context, List<AttributeGroup> attributeGroups, string[] allModifiers)
