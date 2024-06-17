@@ -1,7 +1,7 @@
 ﻿namespace Aspects.Parsers.CSharp
 {
-    public class UsingStaticDirectiveInfo(string value, string classFullName)
-        : UsingDirectiveInfo(value)
+    public class UsingStaticDirectiveDefinition(string value, string classFullName)
+        : UsingDirectiveDefinition(value)
     {
         public string ClassFullName => classFullName;
 

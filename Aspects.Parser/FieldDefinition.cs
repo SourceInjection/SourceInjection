@@ -1,9 +1,9 @@
 ﻿namespace Aspects.Parsers.CSharp
 {
-    public class FieldInfo(string name, AccessModifier accessModifier,
+    public class FieldDefinition(string name, AccessModifier accessModifier, bool hasNewModifier,
         string type, bool isStatic, bool isReadonly, bool isNew)
 
-        : MemberInfo(name, accessModifier)
+        : MemberDefinition(name, accessModifier, hasNewModifier)
     {
         public override MemberKind MemberKind { get; } = MemberKind.Field;
 

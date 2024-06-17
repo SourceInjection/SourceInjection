@@ -8,9 +8,9 @@
         TupleDefinition
     }
 
-    public abstract class UsingDirectiveInfo(string value)
+    public abstract class UsingDirectiveDefinition(string value)
     {
-        public NamespaceInfo? ContainingNamespace { get; internal set; }
+        public NamespaceDefinition? ContainingNamespace { get; internal set; }
 
         public string Value => value;
 

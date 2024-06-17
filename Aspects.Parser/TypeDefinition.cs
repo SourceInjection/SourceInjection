@@ -11,13 +11,20 @@
         Tuple 
     }
 
-    public abstract class TypeInfo(string name, AccessModifier? accessModifier) : MemberInfo(name, accessModifier)
+    public abstract class TypeDefinition(
+        string name, AccessModifier? accessModifier, bool hasNewModifier, IReadOnlyList<AttributeGroup> attributeGroups) 
+        
+        : MemberDefinition(name, accessModifier, hasNewModifier)
     {
         public abstract TypeKind TypeKind { get; }
 
         public override MemberKind MemberKind { get; } = MemberKind.Type;
 
-        public NamespaceInfo? ContainingNamespace { get; internal set; }
+        public NamespaceDefinition? ContainingNamespace { get; internal set; }
+
+        public IReadOnlyList<AttributeGroup> AttributeGroups => attributeGroups;
+
+        public IReadOnlyList<AttributeUsage> Attributes { get; } = attributeGroups.SelectMany(g => g.Attributes).ToArray();
 
         public string FullName()
         {

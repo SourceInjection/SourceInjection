@@ -5,11 +5,11 @@ using Aspects.Parsers.CSharp.Visitors;
 
 namespace Aspects.Parsers.CSharp
 {
-    public class CodeUnit: NamespaceInfo
+    public class CodeUnit: NamespaceDefinition
     {
         private CodeUnit(string projectDefaultNamespace,
-            IReadOnlyList<UsingDirectiveInfo> directives, IReadOnlyList<NamespaceInfo> namespaces,
-            IReadOnlyList<TypeInfo> types, IReadOnlyList<ExternAliasInfo> externAliases)
+            IReadOnlyList<UsingDirectiveDefinition> directives, IReadOnlyList<NamespaceDefinition> namespaces,
+            IReadOnlyList<TypeDefinition> types, IReadOnlyList<ExternAliasDefinition> externAliases)
 
             : base(projectDefaultNamespace, directives, namespaces, types, externAliases)
         { }

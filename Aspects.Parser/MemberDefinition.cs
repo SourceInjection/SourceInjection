@@ -19,15 +19,17 @@
         Public
     }
 
-    public abstract class MemberInfo(string name, AccessModifier? modifier)
+    public abstract class MemberDefinition(string name, AccessModifier? modifier, bool hasNewModifier)
     {
         public abstract MemberKind MemberKind { get; }
 
         public abstract AccessModifier DefaultAccessability { get; }
 
-        public TypeInfo? ContainingType { get; internal set; }
+        public TypeDefinition? ContainingType { get; internal set; }
 
         public string Name => name;
+
+        public bool HasNewModifer => hasNewModifier;
 
         public AccessModifier? AccessModifier => modifier;
 

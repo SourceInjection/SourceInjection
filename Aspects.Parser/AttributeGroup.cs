@@ -1,9 +1,9 @@
 ﻿
 namespace Aspects.Parsers.CSharp
 {
-    public class AttributeGroupInfo
+    public class AttributeGroup
     {
-        public AttributeGroupInfo(string? attributeTarget, IReadOnlyList<AttributeInfo> attributes)
+        public AttributeGroup(string? attributeTarget, IReadOnlyList<AttributeUsage> attributes)
         {
             foreach (var attribute in attributes)
                 attribute.ContainingSection = this;
@@ -13,6 +13,6 @@ namespace Aspects.Parsers.CSharp
 
         public string? AttributeTarget { get; } 
 
-        public IReadOnlyList<AttributeInfo> Attributes { get; }
+        public IReadOnlyList<AttributeUsage> Attributes { get; }
     }
 }

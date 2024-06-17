@@ -1,6 +1,6 @@
 ﻿namespace Aspects.Parsers.CSharp
 {
-    public class ConstraintClauseInfo
+    public class ConstraintDefinition
     {
         // TODO
     }

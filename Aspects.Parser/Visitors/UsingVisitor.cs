@@ -3,26 +3,30 @@ using Aspects.Parsers.CSharp.Generated;
 
 namespace Aspects.Parsers.CSharp.Visitors
 {
-    internal class UsingVisitor : CSharpParserBaseVisitor<UsingDirectiveInfo>
+    internal class UsingVisitor : CSharpParserBaseVisitor<UsingDirectiveDefinition>
     {
-        public override UsingDirectiveInfo VisitUsingAliasDirective([NotNull] CSharpParser.UsingAliasDirectiveContext context)
+        public override UsingDirectiveDefinition VisitUsingAliasDirective([NotNull] CSharpParser.UsingAliasDirectiveContext context)
         {
-            return new UsingAliasDirectiveInfo(context.GetText(), context.identifier().GetText(), context.namespace_or_type_name().GetText());
+            VisitChildren(context);
+            return new UsingAliasDirectiveDefinition(context.GetText(), context.identifier().GetText(), context.namespace_or_type_name().GetText());
         }
 
-        public override UsingDirectiveInfo VisitUsingNamespaceDirective([NotNull] CSharpParser.UsingNamespaceDirectiveContext context)
+        public override UsingDirectiveDefinition VisitUsingNamespaceDirective([NotNull] CSharpParser.UsingNamespaceDirectiveContext context)
         {
-            return new UsingNamespaceDirectiveInfo(context.GetText(), context.namespace_or_type_name().GetText());
+            VisitChildren(context);
+            return new UsingNamespaceDirectiveDefinition(context.GetText(), context.namespace_or_type_name().GetText());
         }
 
-        public override UsingDirectiveInfo VisitUsingStaticDirective([NotNull] CSharpParser.UsingStaticDirectiveContext context)
+        public override UsingDirectiveDefinition VisitUsingStaticDirective([NotNull] CSharpParser.UsingStaticDirectiveContext context)
         {
-            return new UsingStaticDirectiveInfo(context.GetText(), context.namespace_or_type_name().GetText());
+            VisitChildren(context);
+            return new UsingStaticDirectiveDefinition(context.GetText(), context.namespace_or_type_name().GetText());
         }
 
-        public override UsingDirectiveInfo VisitUsingTupleTypeDefinition([NotNull] CSharpParser.UsingTupleTypeDefinitionContext context)
+        public override UsingDirectiveDefinition VisitUsingTupleTypeDefinition([NotNull] CSharpParser.UsingTupleTypeDefinitionContext context)
         {
-            return new UsingTupleTypeDefinitionInfo(context.GetText(), (TupleInfo)new TypeVisitor().VisitTuple_type(context.tuple_type()));
+            VisitChildren(context);
+            return new UsingTupleDefinition(context.GetText(), (TupleDefinition)new TypeVisitor().VisitTuple_type(context.tuple_type()));
         }
     }
 }

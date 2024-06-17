@@ -3,7 +3,7 @@ using Aspects.Parsers.CSharp.Generated;
 
 namespace Aspects.Parsers.CSharp.Visitors
 {
-    internal class MemberVisitor : CSharpParserBaseVisitor<MemberInfo>
+    internal class MemberVisitor : CSharpParserBaseVisitor<MemberDefinition>
     {
     }
 }

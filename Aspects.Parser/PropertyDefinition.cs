@@ -1,10 +1,10 @@
 ﻿namespace Aspects.Parsers.CSharp
 {
-    public class PropertyInfo(string name, string type, AccessModifier accessModifier,
-        bool isAbstract, bool isVirtual, bool isOverride, bool isNew,
+    public class PropertyDefinition(string name, AccessModifier accessModifier, bool hasNewModifier,
+        string type, bool isAbstract, bool isVirtual, bool isOverride,
         string? getter = null, string? setter = null, string? initialization = null)
 
-        : MemberInfo(name, accessModifier)
+        : MemberDefinition(name, accessModifier, hasNewModifier)
     {
         public override MemberKind MemberKind { get; } = MemberKind.Property;
 
@@ -23,7 +23,5 @@
         public bool IsVirtual => isVirtual;
 
         public bool IsOverride => isOverride;
-
-        public bool IsNew => isNew;
     }
 }

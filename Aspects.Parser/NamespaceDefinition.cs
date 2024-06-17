@@ -1,9 +1,9 @@
 ﻿namespace Aspects.Parsers.CSharp
 {
-    public class NamespaceInfo
+    public class NamespaceDefinition
     {
-        public NamespaceInfo(string name, IReadOnlyList<UsingDirectiveInfo> directives,
-            IReadOnlyList<NamespaceInfo> namespaces, IReadOnlyList<TypeInfo> types, IReadOnlyList<ExternAliasInfo> externAliases)
+        public NamespaceDefinition(string name, IReadOnlyList<UsingDirectiveDefinition> directives,
+            IReadOnlyList<NamespaceDefinition> namespaces, IReadOnlyList<TypeDefinition> types, IReadOnlyList<ExternAliasDefinition> externAliases)
         {
             Name = name;
             foreach (var ns in namespaces)
@@ -20,18 +20,18 @@
             ExternAliases = externAliases;
         }
 
-        public NamespaceInfo? ContainingNamespace { get; internal set; }
+        public NamespaceDefinition? ContainingNamespace { get; internal set; }
 
         public string Name { get; }
 
         public string FullName() => ContainingNamespace is null or CodeUnit ? Name : $"{ContainingNamespace.FullName()}.{Name}";
 
-        public IReadOnlyList<UsingDirectiveInfo> UsingDirectives { get; }
+        public IReadOnlyList<UsingDirectiveDefinition> UsingDirectives { get; }
 
-        public IReadOnlyList<NamespaceInfo> Namespaces { get; }
+        public IReadOnlyList<NamespaceDefinition> Namespaces { get; }
 
-        public IReadOnlyList<TypeInfo> Types { get; }
+        public IReadOnlyList<TypeDefinition> Types { get; }
 
-        public IReadOnlyList<ExternAliasInfo> ExternAliases { get; }
+        public IReadOnlyList<ExternAliasDefinition> ExternAliases { get; }
     }
 }

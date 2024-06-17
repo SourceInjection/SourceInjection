@@ -1,7 +1,7 @@
 ﻿namespace Aspects.Parsers.CSharp
 {
-    public class UsingAliasDirectiveInfo(string value, string newName, string oldName)
-        : UsingDirectiveInfo(value)
+    public class UsingAliasDirectiveDefinition(string value, string newName, string oldName)
+        : UsingDirectiveDefinition(value)
     {
         public string NewName => newName;
 

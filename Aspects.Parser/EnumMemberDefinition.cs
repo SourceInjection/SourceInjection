@@ -1,8 +1,8 @@
 ﻿namespace Aspects.Parsers.CSharp
 {
-    internal class EnumMemberInfo(string name, string? value)
+    internal class EnumMemberDefinition(string name, string? value)
     {
-        public EnumInfo ContainingType { get; internal set; } = null!;
+        public EnumDefinition ContainingType { get; internal set; } = null!;
 
         public string Name => name;
 
