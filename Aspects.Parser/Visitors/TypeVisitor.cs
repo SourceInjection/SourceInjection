@@ -10,8 +10,6 @@ namespace Aspects.Parsers.CSharp.Visitors
     {
         public override TypeDefinition VisitTuple_type([NotNull] Tuple_typeContext context)
         {
-            VisitChildren(context);
-
             return new TupleDefinition(context.tuple_element()
                 .Select(c => new TupleMemberDefinitinon(c.type_().GetText(), c.identifier()?.GetText()))
                 .ToArray());
@@ -19,8 +17,6 @@ namespace Aspects.Parsers.CSharp.Visitors
 
         public override TypeDefinition VisitType_declaration([NotNull] Type_declarationContext context)
         {
-            VisitChildren(context);
-
             var attributeGroups = AttributeGroups.FromContext(context.attributes());
             var allModifiers = GetAllMemberModifiers(context);
 

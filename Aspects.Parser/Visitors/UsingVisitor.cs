@@ -7,25 +7,21 @@ namespace Aspects.Parsers.CSharp.Visitors
     {
         public override UsingDirectiveDefinition VisitUsingAliasDirective([NotNull] CSharpParser.UsingAliasDirectiveContext context)
         {
-            VisitChildren(context);
             return new UsingAliasDirectiveDefinition(context.GetText(), context.identifier().GetText(), context.namespace_or_type_name().GetText());
         }
 
         public override UsingDirectiveDefinition VisitUsingNamespaceDirective([NotNull] CSharpParser.UsingNamespaceDirectiveContext context)
         {
-            VisitChildren(context);
             return new UsingNamespaceDirectiveDefinition(context.GetText(), context.namespace_or_type_name().GetText());
         }
 
         public override UsingDirectiveDefinition VisitUsingStaticDirective([NotNull] CSharpParser.UsingStaticDirectiveContext context)
         {
-            VisitChildren(context);
             return new UsingStaticDirectiveDefinition(context.GetText(), context.namespace_or_type_name().GetText());
         }
 
         public override UsingDirectiveDefinition VisitUsingTupleTypeDefinition([NotNull] CSharpParser.UsingTupleTypeDefinitionContext context)
         {
-            VisitChildren(context);
             return new UsingTupleDefinition(context.GetText(), (TupleDefinition)new TypeVisitor().VisitTuple_type(context.tuple_type()));
         }
     }
