@@ -1,5 +1,6 @@
 ﻿grammar CSharpParser;
 @parser::header {#pragma warning disable 3021}
+@lexer::header {#pragma warning disable 3021}
 
 // Source: §7.8.1 General
 namespace_name
@@ -218,15 +219,15 @@ primary_no_array_creation_expression
     | simple_name
     | parenthesized_expression
     | tuple_expression
-    | member_access
-    | null_conditional_member_access
-    | invocation_expression
-    | element_access
-    | null_conditional_element_access
+    //| member_access
+    //| null_conditional_member_access
+    //| invocation_expression
+    //| element_access
+    //| null_conditional_element_access
     | this_access
     | base_access
-    | post_increment_expression
-    | post_decrement_expression
+    //| post_increment_expression
+    //| post_decrement_expression
     | object_creation_expression
     | delegate_creation_expression
     | anonymous_object_creation_expression
@@ -237,8 +238,8 @@ primary_no_array_creation_expression
     | default_value_expression
     | nameof_expression    
     | anonymous_method_expression
-    | pointer_member_access     // unsafe code support
-    | pointer_element_access    // unsafe code support
+    //| pointer_member_access      // unsafe code support
+    //| pointer_element_access     // unsafe code support
     | stackalloc_expression
     ;
 
