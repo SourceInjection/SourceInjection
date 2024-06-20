@@ -29,7 +29,7 @@
         public static (AccessModifier? AccessModifier, bool IsReadonly, bool HasNewModifier)
             OfStruct(IEnumerable<string> modifiers)
         {
-            var isRecord = false;
+            var isReadonly = false;
             var hasNewModifier = false;
             var accessModifiers = new List<AccessModifier>();
 
@@ -41,7 +41,7 @@
                     hasNewModifier = true;
                 else MayAddModifier(accessModifiers, modifier);
             }
-            return (MergeModifiers(accessModifiers), isRecord, hasNewModifier);
+            return (MergeModifiers(accessModifiers), isReadonly, hasNewModifier);
         }
 
         public static (AccessModifier? AccessModifier, bool HasNewModifier) OfEnum(IEnumerable<string> modifiers) => OfType(modifiers);

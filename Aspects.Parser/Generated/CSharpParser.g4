@@ -1,5 +1,6 @@
-﻿grammar CSharpParser;
-@parser::header {#pragma warning disable 3021}
+﻿// Eclipse Public License - v 1.0, http://www.eclipse.org/legal/epl-v10.html
+// Copyright (c) 2013, Christian Wulf (chwchw@gmx.de)
+// Copyright (c) 2016-2017, Ivan Kochurkin (kvanttt@gmail.com), Positive Technologies.
 
 // $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
 // $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
@@ -143,94 +144,77 @@ conditional_and_expression
     : inclusive_or_expression (OP_AND inclusive_or_expression)*
     ;
 
-Interpolated_Regular_String_Start
-    : '$"'
+inclusive_or_expression
+    : exclusive_or_expression ('|' exclusive_or_expression)*
     ;
 
-// the following three lexical rules are context sensitive, see details below
-
-Interpolated_Regular_String_Mid
-    : Interpolated_Regular_String_Element+
+exclusive_or_expression
+    : and_expression ('^' and_expression)*
     ;
 
-Regular_Interpolation_Format
-    : ':' Interpolated_Regular_String_Element+
+and_expression
+    : equality_expression ('&' equality_expression)*
     ;
 
-Interpolated_Regular_String_End
-    : '"'
+equality_expression
+    : relational_expression ((OP_EQ | OP_NE) relational_expression)*
     ;
 
-fragment Interpolated_Regular_String_Element
-    : Interpolated_Regular_String_Character
-    | Simple_Escape_Sequence
-    | Hexadecimal_Escape_Sequence
-    | Unicode_Escape_Sequence
-    | Open_Brace_Escape_Sequence
-    | Close_Brace_Escape_Sequence
+relational_expression
+    : shift_expression (relational_operator shift_expression | IS primary_pattern | AS type_)*
     ;
 
-fragment Interpolated_Regular_String_Character
-    // Any character except " (U+0022), \\ (U+005C),
-    // { (U+007B), } (U+007D), and New_Line_Character.
-    : ~["\\{}\u000D\u000A\u0085\u2028\u2029]
+relational_operator
+    : '<' | '>' | '<=' | '>='
     ;
 
-// interpolated verbatim string expressions
-
-interpolated_verbatim_string_expression
-    : Interpolated_Verbatim_String_Start Interpolated_Verbatim_String_Mid?
-      ('{' verbatim_interpolation '}' Interpolated_Verbatim_String_Mid?)*
-      Interpolated_Verbatim_String_End
+primary_pattern
+    : parenthesized_pattern
+    | type_pattern
+    | relational_pattern
     ;
 
 parenthesized_pattern
     : '(' pattern ')'
     ;
 
-Interpolated_Verbatim_String_Start
-    : '$@"'
-    | '@$"'
+pattern
+    : disjunctive_pattern
     ;
 
-// the following three lexical rules are context sensitive, see details below
-
-Interpolated_Verbatim_String_Mid
-    : Interpolated_Verbatim_String_Element+
+disjunctive_pattern
+    : disjunctive_pattern 'or' conjunctive_pattern
+    | conjunctive_pattern
     ;
 
-Verbatim_Interpolation_Format
-    : ':' Interpolated_Verbatim_String_Element+
+conjunctive_pattern
+    : conjunctive_pattern 'and' negated_pattern
+    | negated_pattern
     ;
 
-Interpolated_Verbatim_String_End
-    : '"'
+negated_pattern
+    : 'not' negated_pattern
+    | primary_pattern
     ;
 
-fragment Interpolated_Verbatim_String_Element
-    : Interpolated_Verbatim_String_Character
-    | Quote_Escape_Sequence
-    | Open_Brace_Escape_Sequence
-    | Close_Brace_Escape_Sequence
+relational_pattern
+    : relational_operator relational_expression
     ;
 
-fragment Interpolated_Verbatim_String_Character
-    : ~["{}]    // Any character except " (U+0022), { (U+007B) and } (U+007D)
+type_pattern
+    : isType
     ;
 
-// lexical fragments used by both regular and verbatim interpolated strings
-
-fragment Open_Brace_Escape_Sequence
-    : '{{'
+shift_expression
+    : additive_expression (('<<' | right_shift) additive_expression)*
     ;
 
-fragment Close_Brace_Escape_Sequence
-    : '}}'
+additive_expression
+    : multiplicative_expression (('+' | '-') multiplicative_expression)*
     ;
 
-// Source: §12.8.4 Simple names
-simple_name
-    : identifier type_argument_list?
+multiplicative_expression
+    : switch_expression (('*' | '/' | '%') switch_expression)*
     ;
 
 switch_expression
@@ -270,79 +254,83 @@ cast_expression
     : OPEN_PARENS type_ CLOSE_PARENS unary_expression
     ;
 
-// Source: §12.8.7.1 General
-member_access
-    : primary_expression '.' identifier type_argument_list?
-    | predefined_type '.' identifier type_argument_list?
-    | qualified_alias_member '.' identifier type_argument_list?
+primary_expression // Null-conditional operators C# 6: https://msdn.microsoft.com/en-us/library/dn986595.aspx
+    : pe = primary_expression_start '!'? bracket_expression* '!'? (
+        (member_access | method_invocation | '++' | '--' | '->' identifier) '!'? bracket_expression* '!'?
+    )*
     ;
 
-predefined_type
-    : 'bool' | 'byte' | 'char' | 'decimal' | 'double' | 'float' | 'int'
-    | 'long' | 'object' | 'sbyte' | 'short' | 'string' | 'uint' | 'ulong'
-    | 'ushort'
+primary_expression_start
+    : literal                                                             # literalExpression
+    | identifier type_argument_list?                                      # simpleNameExpression
+    | OPEN_PARENS expression CLOSE_PARENS                                 # parenthesisExpressions
+    | predefined_type                                                     # memberAccessExpression
+    | qualified_alias_member                                              # memberAccessExpression
+    | LITERAL_ACCESS                                                      # literalAccessExpression
+    | THIS                                                                # thisReferenceExpression
+    | BASE ('.' identifier type_argument_list? | '[' expression_list ']') # baseAccessExpression
+    | NEW (
+        type_ (
+            object_creation_expression
+            | object_or_collection_initializer
+            | '[' expression_list ']' rank_specifier* array_initializer?
+            | rank_specifier+ array_initializer
+        )
+        | anonymous_object_initializer
+        | rank_specifier array_initializer
+    )                                                                                               # objectCreationExpression
+    | OPEN_PARENS argument ( ',' argument)+ CLOSE_PARENS                                            # tupleExpression
+    | TYPEOF OPEN_PARENS (unbound_type_name | type_ | VOID) CLOSE_PARENS                            # typeofExpression
+    | CHECKED OPEN_PARENS expression CLOSE_PARENS                                                   # checkedExpression
+    | UNCHECKED OPEN_PARENS expression CLOSE_PARENS                                                 # uncheckedExpression
+    | DEFAULT (OPEN_PARENS type_ CLOSE_PARENS)?                                                     # defaultValueExpression
+    | ASYNC? DELEGATE (OPEN_PARENS explicit_anonymous_function_parameter_list? CLOSE_PARENS)? block # anonymousMethodExpression
+    | SIZEOF OPEN_PARENS type_ CLOSE_PARENS                                                         # sizeofExpression
+    // C# 6: https://msdn.microsoft.com/en-us/library/dn986596.aspx
+    | NAMEOF OPEN_PARENS (identifier '.')* identifier CLOSE_PARENS # nameofExpression
     ;
 
-// Source: §12.8.8 Null Conditional Member Access
-null_conditional_member_access
-    : primary_expression '?' '.' identifier type_argument_list?
-      dependent_access*
+throwable_expression
+    : expression
+    | throw_expression
     ;
-    
-dependent_access
-    : '.' identifier type_argument_list?    // member access
-    | '[' argument_list ']'                 // element access
-    | '(' argument_list? ')'                // invocation
+
+throw_expression
+    : THROW expression
     ;
 
 member_access
     : '?'? '.' identifier type_argument_list?
     ;
 
-// Source: §12.8.9.1 General
-invocation_expression
-    : primary_expression '(' argument_list? ')'
+bracket_expression
+    : '?'? '[' indexer_argument (',' indexer_argument)* ']'
     ;
 
-// Source: §12.8.10 Null Conditional Invocation Expression
-null_conditional_invocation_expression
-    : null_conditional_member_access '(' argument_list? ')'
-    | null_conditional_element_access '(' argument_list? ')'
+indexer_argument
+    : (identifier ':')? expression
     ;
 
-// Source: §12.8.11.1 General
-element_access
-    : primary_no_array_creation_expression '[' argument_list ']'
+predefined_type
+    : BOOL
+    | BYTE
+    | CHAR
+    | DECIMAL
+    | DOUBLE
+    | FLOAT
+    | INT
+    | LONG
+    | OBJECT
+    | SBYTE
+    | SHORT
+    | STRING
+    | UINT
+    | ULONG
+    | USHORT
     ;
 
 expression_list
     : expression (',' expression)*
-    ;
-
-// Source: §12.8.13 This access
-this_access
-    : 'this'
-    ;
-
-// Source: §12.8.14 Base access
-base_access
-    : 'base' '.' identifier type_argument_list?
-    | 'base' '[' argument_list ']'
-    ;
-
-// Source: §12.8.15 Postfix increment and decrement operators
-post_increment_expression
-    : primary_expression '++'
-    ;
-
-post_decrement_expression
-    : primary_expression '--'
-    ;
-
-// Source: §12.8.16.2 Object creation expressions
-object_creation_expression
-    : 'new' type '(' argument_list? ')' object_or_collection_initializer?
-    | 'new' type object_or_collection_initializer
     ;
 
 object_or_collection_initializer
@@ -411,191 +399,6 @@ isTypePatternArm
     : identifier ':' expression
     ;
 
-unchecked_expression
-    : 'unchecked' '(' expression ')'
-    ;
-
-// Source: §12.8.20 Default value expressions
-default_value_expression
-    : explictly_typed_default
-    | default_literal
-    ;
-
-explictly_typed_default
-    : 'default' '(' type ')'
-    ;
-
-default_literal
-    : 'default'
-    ;
-
-// Source: §12.8.21 Stack allocation
-stackalloc_expression
-    : 'stackalloc' unmanaged_type '[' expression ']'
-    | 'stackalloc' unmanaged_type? '[' constant_expression? ']'
-      stackalloc_initializer
-    ;
-
-stackalloc_initializer
-     : '{' stackalloc_initializer_element_list '}'
-     ;
-
-stackalloc_initializer_element_list
-     : stackalloc_element_initializer (',' stackalloc_element_initializer)* ','?
-     ;
-    
-stackalloc_element_initializer
-    : expression
-    ;
-
-// Source: §12.8.22 The nameof operator
-nameof_expression
-    : 'nameof' '(' named_entity ')'
-    ;
-    
-named_entity
-    : named_entity_target ('.' identifier type_argument_list?)*
-    ;
-    
-named_entity_target
-    : simple_name
-    | 'this'
-    | 'base'
-    | predefined_type 
-    | qualified_alias_member
-    ;
-
-// Source: §12.9.1 General
-unary_expression
-    : primary_expression
-    | '+' unary_expression
-    | '-' unary_expression
-    | '!' unary_expression
-    | '~' unary_expression
-    | pre_increment_expression
-    | pre_decrement_expression
-    | cast_expression
-    | await_expression
-    | pointer_indirection_expression    // unsafe code support
-    | addressof_expression              // unsafe code support
-    ;
-
-// Source: §12.9.6 Prefix increment and decrement operators
-pre_increment_expression
-    : '++' unary_expression
-    ;
-
-pre_decrement_expression
-    : '--' unary_expression
-    ;
-
-// Source: §12.9.7 Cast expressions
-cast_expression
-    : '(' type ')' unary_expression
-    ;
-
-// Source: §12.9.8.1 General
-await_expression
-    : 'await' unary_expression
-    ;
-
-// Source: §12.10.1 General
-multiplicative_expression
-    : unary_expression
-    | multiplicative_expression '*' unary_expression
-    | multiplicative_expression '/' unary_expression
-    | multiplicative_expression '%' unary_expression
-    ;
-
-additive_expression
-    : multiplicative_expression
-    | additive_expression '+' multiplicative_expression
-    | additive_expression '-' multiplicative_expression
-    ;
-
-// Source: §12.11 Shift operators
-shift_expression
-    : additive_expression
-    | shift_expression '<<' additive_expression
-    | shift_expression right_shift additive_expression
-    ;
-
-// Source: §12.12.1 General
-relational_expression
-    : shift_expression
-    | relational_expression '<' shift_expression
-    | relational_expression '>' shift_expression
-    | relational_expression '<=' shift_expression
-    | relational_expression '>=' shift_expression
-    | relational_expression 'is' type
-    | relational_expression 'is' pattern
-    | relational_expression 'as' type
-    ;
-
-equality_expression
-    : relational_expression
-    | equality_expression '==' relational_expression
-    | equality_expression '!=' relational_expression
-    ;
-
-// Source: §12.13.1 General
-and_expression
-    : equality_expression
-    | and_expression '&' equality_expression
-    ;
-
-exclusive_or_expression
-    : and_expression
-    | exclusive_or_expression '^' and_expression
-    ;
-
-inclusive_or_expression
-    : exclusive_or_expression
-    | inclusive_or_expression '|' exclusive_or_expression
-    ;
-
-// Source: §12.14.1 General
-conditional_and_expression
-    : inclusive_or_expression
-    | conditional_and_expression '&&' inclusive_or_expression
-    ;
-
-conditional_or_expression
-    : conditional_and_expression
-    | conditional_or_expression '||' conditional_and_expression
-    ;
-
-// Source: §12.15 The null coalescing operator
-null_coalescing_expression
-    : conditional_or_expression
-    | conditional_or_expression '??' null_coalescing_expression
-    | throw_expression
-    ;
-
-// Source: §12.16 The throw expression operator
-throw_expression
-    : 'throw' null_coalescing_expression
-    ;
-
-// Source: §12.17 Declaration expressions
-declaration_expression
-    : local_variable_type identifier
-    ;
-
-local_variable_type
-    : type
-    | 'var'
-    ;
-
-// Source: §12.18 Conditional operator
-conditional_expression
-    : null_coalescing_expression
-    | null_coalescing_expression '?' expression ':' expression
-    | null_coalescing_expression '?' 'ref' variable_reference ':'
-      'ref' variable_reference
-    ;
-
-// Source: §12.19.1 General
 lambda_expression
     : ASYNC? anonymous_function_signature right_arrow anonymous_function_body
     ;
@@ -779,50 +582,6 @@ local_constant_declaration
 if_body
     : block
     | simple_embedded_statement
-    ;
-
-ref_local_function_body
-    : block
-    | '=>' 'ref' variable_reference ';'
-    ;
-
-// Source: §13.7 Expression statements
-expression_statement
-    : statement_expression ';'
-    ;
-
-statement_expression
-    : null_conditional_invocation_expression
-    | invocation_expression
-    | object_creation_expression
-    | assignment
-    | post_increment_expression
-    | post_decrement_expression
-    | pre_increment_expression
-    | pre_decrement_expression
-    | await_expression
-    ;
-
-// Source: §13.8.1 General
-selection_statement
-    : if_statement
-    | switch_statement
-    ;
-
-// Source: §13.8.2 The if statement
-if_statement
-    : 'if' '(' boolean_expression ')' embedded_statement
-    | 'if' '(' boolean_expression ')' embedded_statement
-      'else' embedded_statement
-    ;
-
-// Source: §13.8.3 The switch statement
-switch_statement
-    : 'switch' '(' expression ')' switch_block
-    ;
-
-switch_block
-    : '{' switch_section* '}'
     ;
 
 switch_section
@@ -1291,164 +1050,9 @@ attribute_list
     ;
 
 attribute
-    : attribute_name attribute_arguments?
-    ;
-
-attribute_name
-    : type_name
-    ;
-
-attribute_arguments
-    : '(' positional_argument_list? ')'
-    | '(' positional_argument_list ',' named_argument_list ')'
-    | '(' named_argument_list ')'
-    ;
-
-positional_argument_list
-    : positional_argument (',' positional_argument)*
-    ;
-
-positional_argument
-    : argument_name? attribute_argument_expression
-    ;
-
-named_argument_list
-    : named_argument (','  named_argument)*
-    ;
-
-named_argument
-    : identifier '=' attribute_argument_expression
-    ;
-
-attribute_argument_expression
-    : expression
-    ;
-
-// ###################################################################################
-// Lexer
-// ###################################################################################
-
-
-// Source: §6.3.1 General
-DEFAULT  : 'default' ;
-NULL     : 'null' ;
-TRUE     : 'true' ;
-FALSE    : 'false' ;
-ASTERISK : '*' ;
-SLASH    : '/' ;
-
-// Source: §6.3.1 General
-input
-    : input_section?
-    ;
-
-input_section
-    : input_section_part+
-    ;
-
-input_section_part
-    : input_element* New_Line
-    | PP_Directive
-    ;
-
-input_element
-    : Whitespace
-    | Comment
-    | token
-    ;
-
-// Source: §6.3.2 Line terminators
-New_Line
-    : New_Line_Character
-    | '\u000D\u000A'    // carriage return, line feed 
-    ;
-
-// Source: §6.3.3 Comments
-Comment
-    : Single_Line_Comment
-    | Delimited_Comment
-    ;
-
-fragment Single_Line_Comment
-    : '//' Input_Character*
-    ;
-
-fragment Input_Character
-    // anything but New_Line_Character
-    : ~('\u000D' | '\u000A'   | '\u0085' | '\u2028' | '\u2029')
-    ;
-    
-fragment New_Line_Character
-    : '\u000D'  // carriage return
-    | '\u000A'  // line feed
-    | '\u0085'  // next line
-    | '\u2028'  // line separator
-    | '\u2029'  // paragraph separator
-    ;
-    
-fragment Delimited_Comment
-    : '/*' Delimited_Comment_Section* ASTERISK+ '/'
-    ;
-    
-fragment Delimited_Comment_Section
-    : SLASH
-    | ASTERISK* Not_Slash_Or_Asterisk
-    ;
-
-fragment Not_Slash_Or_Asterisk
-    : ~('/' | '*')    // Any except SLASH or ASTERISK
-    ;
-
-// Source: §6.3.4 White space
-Whitespace
-    : [\p{Zs}]  // any character with Unicode class Zs
-    | '\u0009'  // horizontal tab
-    | '\u000B'  // vertical tab
-    | '\u000C'  // form feed
-    ;
-
-// Source: §6.4.1 General
-token
-    : identifier
-    | keyword
-    | Integer_Literal
-    | Real_Literal
-    | Character_Literal
-    | String_Literal
-    | operator_or_punctuator
-    ;
-
-// Source: §6.4.2 Unicode character escape sequences
-fragment Unicode_Escape_Sequence
-    : '\\u' Hex_Digit Hex_Digit Hex_Digit Hex_Digit
-    | '\\U' Hex_Digit Hex_Digit Hex_Digit Hex_Digit
-            Hex_Digit Hex_Digit Hex_Digit Hex_Digit
-    ;
-
-// Source: §6.4.3 Identifiers
-identifier
-    : Simple_Identifier
-    | contextual_keyword
-    ;
-
-Simple_Identifier
-    : Available_Identifier
-    | Escaped_Identifier
-    ;
-
-fragment Available_Identifier
-    // excluding keywords or contextual keywords, see note below
-    : Basic_Identifier
-    ;
-
-fragment Escaped_Identifier
-    // Includes keywords and contextual keywords prefixed by '@'.
-    // See note below.
-    : '@' Basic_Identifier 
-    ;
-
-fragment Basic_Identifier
-    : Identifier_Start_Character Identifier_Part_Character*
+    : namespace_or_type_name (
+        OPEN_PARENS (attribute_argument (',' attribute_argument)*)? CLOSE_PARENS
+    )?
     ;
 
 attribute_argument
@@ -1465,340 +1069,50 @@ fixed_pointer_declarators
     : fixed_pointer_declarator (',' fixed_pointer_declarator)*
     ;
 
-fragment Letter_Character
-    // Category Letter, all subcategories; category Number, subcategory letter.
-    : [\p{L}\p{Nl}]
-    // Only escapes for categories L & Nl allowed. See note below.
-    | Unicode_Escape_Sequence
+fixed_pointer_declarator
+    : identifier '=' fixed_pointer_initializer
     ;
 
-fragment Combining_Character
-    // Category Mark, subcategories non-spacing and spacing combining.
-    : [\p{Mn}\p{Mc}]
-    // Only escapes for categories Mn & Mc allowed. See note below.
-    | Unicode_Escape_Sequence
+fixed_pointer_initializer
+    : '&'? expression
+    | stackalloc_initializer
     ;
 
-fragment Decimal_Digit_Character
-    // Category Number, subcategory decimal digit.
-    : [\p{Nd}]
-    // Only escapes for category Nd allowed. See note below.
-    | Unicode_Escape_Sequence
+fixed_size_buffer_declarator
+    : identifier '[' expression ']'
     ;
 
-fragment Connecting_Character
-    // Category Punctuation, subcategory connector.
-    : [\p{Pc}]
-    // Only escapes for category Pc allowed. See note below.
-    | Unicode_Escape_Sequence
+stackalloc_initializer
+    : STACKALLOC type_ '[' expression ']'
+    | STACKALLOC type_? '[' expression? ']' OPEN_BRACE expression (',' expression)* ','? CLOSE_BRACE
     ;
 
-fragment Formatting_Character
-    // Category Other, subcategory format.
-    : [\p{Cf}]
-    // Only escapes for category Cf allowed, see note below.
-    | Unicode_Escape_Sequence
-    ;
-
-// Source: §6.4.4 Keywords
-keyword
-    : 'abstract' | 'as'       | 'base'       | 'bool'      | 'break'
-    | 'byte'     | 'case'     | 'catch'      | 'char'      | 'checked'
-    | 'class'    | 'const'    | 'continue'   | 'decimal'   | DEFAULT
-    | 'delegate' | 'do'       | 'double'     | 'else'      | 'enum'
-    | 'event'    | 'explicit' | 'extern'     | FALSE       | 'finally'
-    | 'fixed'    | 'float'    | 'for'        | 'foreach'   | 'goto'
-    | 'if'       | 'implicit' | 'in'         | 'int'       | 'interface'
-    | 'internal' | 'is'       | 'lock'       | 'long'      | 'namespace'
-    | 'new'      | NULL       | 'object'     | 'operator'  | 'out'
-    | 'override' | 'params'   | 'private'    | 'protected' | 'public'
-    | 'readonly' | 'ref'      | 'return'     | 'sbyte'     | 'sealed'
-    | 'short'    | 'sizeof'   | 'stackalloc' | 'static'    | 'string'
-    | 'struct'   | 'switch'   | 'this'       | 'throw'     | TRUE
-    | 'try'      | 'typeof'   | 'uint'       | 'ulong'     | 'unchecked'
-    | 'unsafe'   | 'ushort'   | 'using'      | 'virtual'   | 'void'
-    | 'volatile' | 'while'
-    ;
-
-// Source: §6.4.4 Keywords
-contextual_keyword
-    : 'add'    | 'alias'      | 'ascending' | 'async'     | 'await'
-    | 'by'     | 'descending' | 'dynamic'   | 'equals'    | 'from'
-    | 'get'    | 'global'     | 'group'     | 'into'      | 'join'
-    | 'let'    | 'nameof'     | 'on'        | 'orderby'   | 'partial'
-    | 'remove' | 'select'     | 'set'       | 'unmanaged' | 'value'
-    | 'var'    | 'when'       | 'where'     | 'yield'
-    ;
-
-// Source: §6.4.5.1 General
-literal
-    : boolean_literal
-    | Integer_Literal
-    | Real_Literal
-    | Character_Literal
-    | String_Literal
-    | null_literal
-    ;
-
-// Source: §6.4.5.2 Boolean literals
-boolean_literal
-    : TRUE
-    | FALSE
-    ;
-
-// Source: §6.4.5.3 Integer literals
-Integer_Literal
-    : Decimal_Integer_Literal
-    | Hexadecimal_Integer_Literal
-    | Binary_Integer_Literal
-    ;
-
-fragment Decimal_Integer_Literal
-    : Decimal_Digit Decorated_Decimal_Digit* Integer_Type_Suffix?
-    ;
-
-fragment Decorated_Decimal_Digit
-    : '_'* Decimal_Digit
-    ;
-       
-fragment Decimal_Digit
-    : '0'..'9'
-    ;
-    
-fragment Integer_Type_Suffix
-    : 'U' | 'u' | 'L' | 'l' |
-      'UL' | 'Ul' | 'uL' | 'ul' | 'LU' | 'Lu' | 'lU' | 'lu'
-    ;
-    
-fragment Hexadecimal_Integer_Literal
-    : ('0x' | '0X') Decorated_Hex_Digit+ Integer_Type_Suffix?
-    ;
-
-fragment Decorated_Hex_Digit
-    : '_'* Hex_Digit
-    ;
-       
-fragment Hex_Digit
-    : '0'..'9' | 'A'..'F' | 'a'..'f'
-    ;
-   
-fragment Binary_Integer_Literal
-    : ('0b' | '0B') Decorated_Binary_Digit+ Integer_Type_Suffix?
-    ;
-
-fragment Decorated_Binary_Digit
-    : '_'* Binary_Digit
-    ;
-       
-fragment Binary_Digit
-    : '0' | '1'
-    ;
-
-// Source: §6.4.5.4 Real literals
-Real_Literal
-    : Decimal_Digit Decorated_Decimal_Digit* '.'
-      Decimal_Digit Decorated_Decimal_Digit* Exponent_Part? Real_Type_Suffix?
-    | '.' Decimal_Digit Decorated_Decimal_Digit* Exponent_Part? Real_Type_Suffix?
-    | Decimal_Digit Decorated_Decimal_Digit* Exponent_Part Real_Type_Suffix?
-    | Decimal_Digit Decorated_Decimal_Digit* Real_Type_Suffix
-    ;
-
-fragment Exponent_Part
-    : ('e' | 'E') Sign? Decimal_Digit Decorated_Decimal_Digit*
-    ;
-
-fragment Sign
-    : '+' | '-'
-    ;
-
-fragment Real_Type_Suffix
-    : 'F' | 'f' | 'D' | 'd' | 'M' | 'm'
-    ;
-
-// Source: §6.4.5.5 Character literals
-Character_Literal
-    : '\'' Character '\''
-    ;
-    
-fragment Character
-    : Single_Character
-    | Simple_Escape_Sequence
-    | Hexadecimal_Escape_Sequence
-    | Unicode_Escape_Sequence
-    ;
-    
-fragment Single_Character
-    // anything but ', \, and New_Line_Character
-    : ~['\\\u000D\u000A\u0085\u2028\u2029]
-    ;
-    
-fragment Simple_Escape_Sequence
-    : '\\\'' | '\\"' | '\\\\' | '\\0' | '\\a' | '\\b' |
-      '\\f' | '\\n' | '\\r' | '\\t' | '\\v'
-    ;
-    
-fragment Hexadecimal_Escape_Sequence
-    : '\\x' Hex_Digit Hex_Digit? Hex_Digit? Hex_Digit?
-    ;
-
-// Source: §6.4.5.6 String literals
-String_Literal
-    : Regular_String_Literal
-    | Verbatim_String_Literal
-    ;
-    
-fragment Regular_String_Literal
-    : '"' Regular_String_Literal_Character* '"'
-    ;
-    
-fragment Regular_String_Literal_Character
-    : Single_Regular_String_Literal_Character
-    | Simple_Escape_Sequence
-    | Hexadecimal_Escape_Sequence
-    | Unicode_Escape_Sequence
-    ;
-
-fragment Single_Regular_String_Literal_Character
-    // anything but ", \, and New_Line_Character
-    : ~["\\\u000D\u000A\u0085\u2028\u2029]
-    ;
-
-fragment Verbatim_String_Literal
-    : '@"' Verbatim_String_Literal_Character* '"'
-    ;
-    
-fragment Verbatim_String_Literal_Character
-    : Single_Verbatim_String_Literal_Character
-    | Quote_Escape_Sequence
-    ;
-    
-fragment Single_Verbatim_String_Literal_Character
-    : ~["]     // anything but quotation mark (U+0022)
-    ;
-    
-fragment Quote_Escape_Sequence
-    : '""'
-    ;
-
-// Source: §6.4.5.7 The null literal
-null_literal
-    : NULL
-    ;
-
-// Source: §6.4.6 Operators and punctuators
-operator_or_punctuator
-    : '{'  | '}'  | '['  | ']'  | '('   | ')'  | '.'  | ','  | ':'  | ';'
-    | '+'  | '-'  | ASTERISK    | SLASH | '%'  | '&'  | '|'  | '^'  | '!' | '~'
-    | '='  | '<'  | '>'  | '?'  | '??'  | '::' | '++' | '--' | '&&' | '||'
-    | '->' | '==' | '!=' | '<=' | '>='  | '+=' | '-=' | '*=' | '/=' | '%='
-    | '&=' | '|=' | '^=' | '<<' | '<<=' | '=>'
+right_arrow
+    : first = '=' second = '>' {$first.index + 1 == $second.index}? // Nothing between the tokens?
     ;
 
 right_shift
-    : '>'  '>'
+    : first = '>' second = '>' {$first.index + 1 == $second.index}? // Nothing between the tokens?
     ;
 
 right_shift_assignment
-    : '>' '>='
+    : first = '>' second = '>=' {$first.index + 1 == $second.index}? // Nothing between the tokens?
     ;
 
-// Source: §6.5.1 General
-PP_Directive
-    : PP_Start PP_Kind PP_New_Line
+literal
+    : boolean_literal
+    | string_literal
+    | INTEGER_LITERAL
+    | HEX_INTEGER_LITERAL
+    | BIN_INTEGER_LITERAL
+    | REAL_LITERAL
+    | CHARACTER_LITERAL
+    | NULL_
     ;
 
-fragment PP_Kind
-    : PP_Declaration
-    | PP_Conditional
-    | PP_Line
-    | PP_Diagnostic
-    | PP_Region
-    | PP_Pragma
-    ;
-
-// Only recognised at the beginning of a line
-fragment PP_Start
-    // See note below.
-    : { getCharPositionInLine() == 0 }? PP_Whitespace? '#' PP_Whitespace?
-    ;
-
-fragment PP_Whitespace
-    : ( [\p{Zs}]  // any character with Unicode class Zs
-      | '\u0009'  // horizontal tab
-      | '\u000B'  // vertical tab
-      | '\u000C'  // form feed
-      )+
-    ;
-
-fragment PP_New_Line
-    : PP_Whitespace? Single_Line_Comment? New_Line
-    ;
-
-// Source: §6.5.2 Conditional compilation symbols
-fragment PP_Conditional_Symbol
-    // Must not be equal to tokens TRUE or FALSE. See note below.
-    : Basic_Identifier
-    ;
-
-// Source: §6.5.3 Pre-processing expressions
-fragment PP_Expression
-    : PP_Whitespace? PP_Or_Expression PP_Whitespace?
-    ;
-    
-fragment PP_Or_Expression
-    : PP_And_Expression (PP_Whitespace? '||' PP_Whitespace? PP_And_Expression)*
-    ;
-    
-fragment PP_And_Expression
-    : PP_Equality_Expression (PP_Whitespace? '&&' PP_Whitespace?
-      PP_Equality_Expression)*
-    ;
-
-fragment PP_Equality_Expression
-    : PP_Unary_Expression (PP_Whitespace? ('==' | '!=') PP_Whitespace?
-      PP_Unary_Expression)*
-    ;
-    
-fragment PP_Unary_Expression
-    : PP_Primary_Expression
-    | '!' PP_Whitespace? PP_Unary_Expression
-    ;
-    
-fragment PP_Primary_Expression
+boolean_literal
     : TRUE
     | FALSE
-    | PP_Conditional_Symbol
-    | '(' PP_Whitespace? PP_Expression PP_Whitespace? ')'
-    ;
-
-// Source: §6.5.4 Definition directives
-fragment PP_Declaration
-    : 'define' PP_Whitespace PP_Conditional_Symbol
-    | 'undef' PP_Whitespace PP_Conditional_Symbol
-    ;
-
-// Source: §6.5.5 Conditional compilation directives
-fragment PP_Conditional
-    : PP_If_Section
-    | PP_Elif_Section
-    | PP_Else_Section
-    | PP_Endif
-    ;
-
-fragment PP_If_Section
-    : 'if' PP_Whitespace PP_Expression
-    ;
-    
-fragment PP_Elif_Section
-    : 'elif' PP_Whitespace PP_Expression
-    ;
-    
-fragment PP_Else_Section
-    : 'else'
-    ;
-    
-fragment PP_Endif
-    : 'endif'
     ;
 
 string_literal
@@ -1934,85 +1248,110 @@ interface_definition
     : INTERFACE identifier variant_type_parameter_list? interface_base? type_parameter_constraints_clauses? class_body ';'?
     ;
 
-// ###################################################################################
-// Unsafe context
-// ###################################################################################
-
-// Source: §23.2 Unsafe contexts
-unsafe_modifier
-    : 'unsafe'
+enum_definition
+    : ENUM identifier enum_base? enum_body ';'?
     ;
 
-unsafe_statement
-    : 'unsafe' block
+delegate_definition
+    : DELEGATE return_type identifier variant_type_parameter_list? OPEN_PARENS formal_parameter_list? CLOSE_PARENS type_parameter_constraints_clauses?
+        ';'
     ;
 
-// Source: §23.3 Pointer types
-pointer_type
-    : value_type ('*')+
-    | 'void' ('*')+
+event_declaration
+    : EVENT type_ (
+        variable_declarators ';'
+        | member_name OPEN_BRACE event_accessor_declarations CLOSE_BRACE
+    )
     ;
 
-// Source: §23.6.2 Pointer indirection
-pointer_indirection_expression
-    : '*' unary_expression
+field_declaration
+    : variable_declarators ';'
     ;
 
-// Source: §23.6.3 Pointer member access
-pointer_member_access
-    : primary_expression '->' identifier type_argument_list?
+property_declaration // Property initializer & lambda in properties C# 6
+    : member_name (
+        OPEN_BRACE accessor_declarations CLOSE_BRACE ('=' variable_initializer ';')?
+        | right_arrow throwable_expression ';'
+    )
     ;
 
-// Source: §23.6.4 Pointer element access
-pointer_element_access
-    : primary_no_array_creation_expression '[' expression ']'
+constant_declaration
+    : CONST type_ constant_declarators ';'
     ;
 
-// Source: §23.6.5 The address-of operator
-addressof_expression
-    : '&' unary_expression
+indexer_declaration // lamdas from C# 6
+    : THIS '[' formal_parameter_list ']' (
+        OPEN_BRACE accessor_declarations CLOSE_BRACE
+        | right_arrow throwable_expression ';'
+    )
     ;
 
-// Source: §23.7 The fixed statement
-fixed_statement
-    : 'fixed' '(' pointer_type fixed_pointer_declarators ')' embedded_statement
+destructor_definition
+    : '~' identifier OPEN_PARENS CLOSE_PARENS body
     ;
 
-fixed_pointer_declarators
-    : fixed_pointer_declarator (','  fixed_pointer_declarator)*
+constructor_declaration
+    : identifier OPEN_PARENS formal_parameter_list? CLOSE_PARENS constructor_initializer? body
     ;
 
-fixed_pointer_declarator
-    : identifier '=' fixed_pointer_initializer
+method_declaration // lamdas from C# 6
+    : method_member_name type_parameter_list? OPEN_PARENS formal_parameter_list? CLOSE_PARENS type_parameter_constraints_clauses? (
+        method_body
+        | right_arrow throwable_expression ';'
+    )
     ;
 
-fixed_pointer_initializer
-    : '&' variable_reference
-    | expression
+method_member_name
+    : (identifier | identifier '::' identifier) (type_argument_list? '.' identifier)*
     ;
 
-// Source: §23.8.2 Fixed-size buffer declarations
-fixed_size_buffer_declaration
-    : attributes? fixed_size_buffer_modifier* 'fixed' buffer_element_type
-      fixed_size_buffer_declarators ';'
+operator_declaration // lamdas form C# 6
+    : OPERATOR overloadable_operator OPEN_PARENS IN? arg_declaration (',' IN? arg_declaration)? CLOSE_PARENS (
+        body
+        | right_arrow throwable_expression ';'
+    )
     ;
 
-fixed_size_buffer_modifier
-    : 'new'
-    | 'public'
-    | 'internal'
-    | 'private'
-    | 'unsafe'
+arg_declaration
+    : type_ identifier ('=' expression)?
     ;
 
-buffer_element_type
-    : type
+method_invocation
+    : OPEN_PARENS argument_list? CLOSE_PARENS
     ;
 
-fixed_size_buffer_declarators
-    : fixed_size_buffer_declarator (',' fixed_size_buffer_declarator)*
+object_creation_expression
+    : OPEN_PARENS argument_list? CLOSE_PARENS object_or_collection_initializer?
     ;
 
-fixed_size_buffer_declarator
-    : identifier '[' constant_expression ']'
+identifier
+    : IDENTIFIER
+    | ADD
+    | ALIAS
+    | ARGLIST
+    | ASCENDING
+    | ASYNC
+    | AWAIT
+    | BY
+    | DESCENDING
+    | DYNAMIC
+    | EQUALS
+    | FROM
+    | GET
+    | GROUP
+    | INTO
+    | JOIN
+    | LET
+    | NAMEOF
+    | ON
+    | ORDERBY
+    | PARTIAL
+    | REMOVE
+    | SELECT
+    | SET
+    | UNMANAGED
+    | VAR
+    | WHEN
+    | WHERE
+    | YIELD
     ;
