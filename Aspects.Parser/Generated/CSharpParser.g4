@@ -207,42 +207,6 @@ argument_value
     | 'out' variable_reference
     ;
 
-// Source: §12.8.1 General
-primary_expression
-    : primary_no_array_creation_expression
-    | array_creation_expression
-    ;
-
-primary_no_array_creation_expression
-    : literal
-    | interpolated_string_expression
-    | simple_name
-    | parenthesized_expression
-    | tuple_expression
-    //| member_access
-    //| null_conditional_member_access
-    //| invocation_expression
-    //| element_access
-    //| null_conditional_element_access
-    | this_access
-    | base_access
-    //| post_increment_expression
-    //| post_decrement_expression
-    | object_creation_expression
-    | delegate_creation_expression
-    | anonymous_object_creation_expression
-    | typeof_expression
-    | sizeof_expression
-    | checked_expression
-    | unchecked_expression
-    | default_value_expression
-    | nameof_expression    
-    | anonymous_method_expression
-    //| pointer_member_access      // unsafe code support
-    //| pointer_element_access     // unsafe code support
-    | stackalloc_expression
-    ;
-
 // Source: §12.8.3 Interpolated string expressions
 interpolated_string_expression
     : interpolated_regular_string_expression
@@ -312,23 +276,10 @@ deconstruction_element
     | identifier
     ;
 
-// Source: §12.8.7.1 General
-member_access
-    : primary_expression '.' identifier type_argument_list?
-    | predefined_type '.' identifier type_argument_list?
-    | qualified_alias_member '.' identifier type_argument_list?
-    ;
-
 predefined_type
     : 'bool' | 'byte' | 'char' | 'decimal' | 'double' | 'float' | 'int'
     | 'long' | 'object' | 'sbyte' | 'short' | 'string' | 'uint' | 'ulong'
     | 'ushort'
-    ;
-
-// Source: §12.8.8 Null Conditional Member Access
-null_conditional_member_access
-    : primary_expression '?' '.' identifier type_argument_list?
-      dependent_access*
     ;
     
 dependent_access
@@ -341,21 +292,12 @@ null_conditional_projection_initializer
     : primary_expression '?' '.' identifier type_argument_list?
     ;
 
-// Source: §12.8.9.1 General
-invocation_expression
-    : primary_expression '(' argument_list? ')'
-    ;
-
 // Source: §12.8.10 Null Conditional Invocation Expression
 null_conditional_invocation_expression
     : null_conditional_member_access '(' argument_list? ')'
     | null_conditional_element_access '(' argument_list? ')'
     ;
 
-// Source: §12.8.11.1 General
-element_access
-    : primary_no_array_creation_expression '[' argument_list ']'
-    ;
 
 // Source: §12.8.12 Null Conditional Element Access
 null_conditional_element_access
@@ -372,15 +314,6 @@ this_access
 base_access
     : 'base' '.' identifier type_argument_list?
     | 'base' '[' argument_list ']'
-    ;
-
-// Source: §12.8.15 Postfix increment and decrement operators
-post_increment_expression
-    : primary_expression '++'
-    ;
-
-post_decrement_expression
-    : primary_expression '--'
     ;
 
 // Source: §12.8.16.2 Object creation expressions
@@ -573,6 +506,58 @@ unary_expression
     | pointer_indirection_expression    // unsafe code support
     | addressof_expression              // unsafe code support
     ;
+
+// Source: §12.8.1 General
+primary_expression
+    : primary_expression_start primary_expression_appendix *
+    ;
+	
+primary_expression_start
+	: primary_no_array_creation_expression
+	| array_creation_expression
+	| predefined_type
+	| qualified_alias_member
+	;
+
+primary_expression_appendix
+	: '(' argument_list? ')'				                    #invocation
+	| '++'									                    #post_increment
+	| '--'                                                      #post_decrement
+	| '->' identifier type_argument_list?                       #pointer_dereferemce
+	| '.' identifier type_argument_list?                        #access
+	| '?' '.' identifier type_argument_list? dependent_access*  #null_conditional_access
+	;
+	
+primary_no_array_creation_expression
+	: primary_no_array_creation_expression_start primary_no_array_creation_expression_appendix*
+	;
+	
+primary_no_array_creation_expression_start
+    : literal
+    | interpolated_string_expression
+    | simple_name
+    | parenthesized_expression
+    | tuple_expression
+    | this_access
+    | base_access
+    | object_creation_expression
+    | delegate_creation_expression
+    | anonymous_object_creation_expression
+    | typeof_expression
+    | sizeof_expression
+    | checked_expression
+    | unchecked_expression
+    | default_value_expression
+    | nameof_expression    
+    | anonymous_method_expression
+    | stackalloc_expression
+	;
+	
+primary_no_array_creation_expression_appendix
+	: '?' '[' argument_list ']' dependent_access*   #null_conditional_index_access
+	| '[' argument_list ']'                         #index_access
+	| '[' expression ']'                            #pointer_index_access
+	;
 
 // Source: §12.9.6 Prefix increment and decrement operators
 pre_increment_expression
@@ -1018,6 +1003,30 @@ statement_expression
     | pre_increment_expression
     | pre_decrement_expression
     | await_expression
+    ;
+
+invocation_expression
+    : primary_expression '(' argument_list? ')'
+    ;
+
+member_access
+    : primary_expression '.' identifier type_argument_list?
+    | predefined_type '.' identifier type_argument_list?
+    | qualified_alias_member '.' identifier type_argument_list?
+    ;
+
+ // Source: §12.8.8 Null Conditional Member Access
+null_conditional_member_access
+    : primary_expression '?' '.' identifier type_argument_list? dependent_access*
+    ;
+
+// Source: §12.8.15 Postfix increment and decrement operators
+post_increment_expression
+    : primary_expression '++'
+    ;
+
+post_decrement_expression
+    : primary_expression '--'
     ;
 
 // Source: §13.8.1 General
@@ -2185,16 +2194,6 @@ pointer_type
 // Source: §23.6.2 Pointer indirection
 pointer_indirection_expression
     : '*' unary_expression
-    ;
-
-// Source: §23.6.3 Pointer member access
-pointer_member_access
-    : primary_expression '->' identifier type_argument_list?
-    ;
-
-// Source: §23.6.4 Pointer element access
-pointer_element_access
-    : primary_no_array_creation_expression '[' expression ']'
     ;
 
 // Source: §23.6.5 The address-of operator
