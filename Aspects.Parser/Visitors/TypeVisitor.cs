@@ -23,7 +23,7 @@ namespace Aspects.Parsers.CSharp.Visitors
             if(context.interface_definition() is not null)
                 return GetInterface(context.interface_definition(), attributeGroups, allModifiers);
             if (context.class_definition() is not null)
-                return GetClass(context.interface_definition(), attributeGroups, allModifiers);
+                return GetClass(context.class_definition(), attributeGroups, allModifiers);
             if(context.struct_definition() is not null)
                 return GetStruct(context.struct_definition(), attributeGroups, allModifiers);
             if (context.enum_definition() is not null)
@@ -53,6 +53,8 @@ namespace Aspects.Parsers.CSharp.Visitors
         private static StructDefinition GetStruct(Struct_definitionContext context, List<AttributeGroup> attributeGroups, string[] allModifiers)
         {
             var modifiers = Modifiers.OfStruct(allModifiers);
+            var isRecord = context.RECORD() is not null;
+
             return new StructDefinition(
                 name:                 context.identifier().GetText(),
                 accessModifier:       modifiers.AccessModifier,
@@ -61,7 +63,7 @@ namespace Aspects.Parsers.CSharp.Visitors
                 members:              Members.FromContext(context.struct_body()),
                 genericTypeArguments: GenericTypeArguments.FromContext(context.type_parameter_list()),
                 constraints:          Constraints.FromContext(context.type_parameter_constraints_clauses()),
-                isRecord:             modifiers.IsRecord,
+                isRecord:             isRecord,
                 isReadonly:           modifiers.IsReadonly);
         }
 
@@ -77,18 +79,20 @@ namespace Aspects.Parsers.CSharp.Visitors
                 intType:         context.enum_base()?.type_()?.GetText());
         }
 
-        private static ClassDefinition GetClass(Interface_definitionContext context, List<AttributeGroup> attributeGroups, string[] allModifiers)
+        private static ClassDefinition GetClass(Class_definitionContext context, List<AttributeGroup> attributeGroups, string[] allModifiers)
         {
             var modifiers = Modifiers.OfClass(allModifiers);
+            var isRecord = context.RECORD() is not null;
+
             return new ClassDefinition(
                 name:                 context.identifier().GetText(),
                 accessModifier:       modifiers.AccessModifier,
                 hasNewModifier:       modifiers.HasNewModifier,
                 attributeGroups:      attributeGroups,
                 members:              Members.FromContext(context.class_body()),
-                genericTypeArguments: GenericTypeArguments.FromContext(context.variant_type_parameter_list()),
+                genericTypeArguments: GenericTypeArguments.FromContext(context.type_parameter_list()),
                 constraints:          Constraints.FromContext(context.type_parameter_constraints_clauses()),
-                isRecord:             modifiers.IsRecord,
+                isRecord:             isRecord,
                 isStatic:             modifiers.IsStatic,
                 isSealed:             modifiers.IsSealed,
                 isAbstract:           modifiers.IsAbstract);
@@ -106,8 +110,6 @@ namespace Aspects.Parsers.CSharp.Visitors
                 genericTypeArguments: GenericTypeArguments.FromContext(context.variant_type_parameter_list()),
                 constraints:          Constraints.FromContext(context.type_parameter_constraints_clauses()));
         }
-
-
         private static string[] GetAllMemberModifiers([NotNull] Type_declarationContext context)
         {
             if (context.all_member_modifiers() is null)

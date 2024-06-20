@@ -2,10 +2,9 @@
 {
     internal static class Modifiers
     {
-        public static (AccessModifier? AccessModifier, bool IsRecord, bool IsStatic, bool IsSealed, bool IsAbstract, bool HasNewModifier) 
+        public static (AccessModifier? AccessModifier, bool IsStatic, bool IsSealed, bool IsAbstract, bool HasNewModifier) 
             OfClass(IEnumerable<string> modifiers)
         {
-            var isRecord = false;
             var isStatic = false;
             var isSealed = false;
             var isAbstract = false;
@@ -14,9 +13,7 @@
 
             foreach (var modifier in modifiers )
             {
-                if (modifier == "record")
-                    isRecord = true;
-                else if (modifier == "static")
+                if (modifier == "static")
                     isStatic = true;
                 else if (modifier == "sealed")
                     isSealed = true;
@@ -26,28 +23,25 @@
                     hasNewModifier = true;
                 else MayAddModifier(accessModifiers, modifier);
             }
-            return (MergeModifiers(accessModifiers), isRecord, isStatic, isSealed, isAbstract, hasNewModifier);
+            return (MergeModifiers(accessModifiers), isStatic, isSealed, isAbstract, hasNewModifier);
         }
 
-        public static (AccessModifier? AccessModifier, bool IsRecord, bool IsReadonly, bool HasNewModifier)
+        public static (AccessModifier? AccessModifier, bool IsReadonly, bool HasNewModifier)
             OfStruct(IEnumerable<string> modifiers)
         {
             var isRecord = false;
-            var isReadonly = false;
             var hasNewModifier = false;
             var accessModifiers = new List<AccessModifier>();
 
             foreach (var modifier in modifiers)
             {
-                if (modifier == "record")
-                    isRecord = true;
-                else if (modifier == "readonly")
+                if (modifier == "readonly")
                     isReadonly = true;
                 else if (modifier == "new")
                     hasNewModifier = true;
                 else MayAddModifier(accessModifiers, modifier);
             }
-            return (MergeModifiers(accessModifiers), isRecord, isReadonly, hasNewModifier);
+            return (MergeModifiers(accessModifiers), isRecord, hasNewModifier);
         }
 
         public static (AccessModifier? AccessModifier, bool HasNewModifier) OfEnum(IEnumerable<string> modifiers) => OfType(modifiers);
