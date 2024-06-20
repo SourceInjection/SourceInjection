@@ -19,19 +19,26 @@
         Public
     }
 
-    public abstract class MemberDefinition(string name, AccessModifier? modifier, bool hasNewModifier)
+    public abstract class MemberDefinition
     {
+        public MemberDefinition(string name, AccessModifier? modifier, bool hasNewModifier)
+        {
+            Name = name;
+            AccessModifier = modifier;
+            HasNewModifer = hasNewModifier;
+        }
+
         public abstract MemberKind MemberKind { get; }
 
         public abstract AccessModifier DefaultAccessability { get; }
 
         public TypeDefinition? ContainingType { get; internal set; }
 
-        public string Name => name;
+        public string Name { get; }
 
-        public bool HasNewModifer => hasNewModifier;
+        public bool HasNewModifer { get; }
 
-        public AccessModifier? AccessModifier => modifier;
+        public AccessModifier? AccessModifier { get; }
 
         public bool IsKind(MemberKind kind) => MemberKind == kind;
 

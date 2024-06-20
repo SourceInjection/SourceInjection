@@ -3,8 +3,12 @@ using Aspects.Parsers.CSharp.Generated;
 
 namespace Aspects.Parsers.CSharp.Base
 {
-    public abstract class CSharpParserBase(ITokenStream input) : Parser(input)
+    public abstract class CSharpParserBase : Parser
     {
+        public CSharpParserBase(ITokenStream input)
+            : base(input)
+        { }
+
         protected bool IsLocalVariableDeclaration()
         {
             if (Context is not CSharpParser.Local_variable_declarationContext localVarDecl)

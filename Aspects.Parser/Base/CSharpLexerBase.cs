@@ -3,8 +3,12 @@ using Aspects.Parsers.CSharp.Generated;
 
 namespace Aspects.Parsers.CSharp.Base
 {
-    public abstract class CSharpLexerBase(ICharStream input) : Lexer(input)
+    public abstract class CSharpLexerBase : Lexer
     {
+        protected CSharpLexerBase(ICharStream input)
+            : base(input) 
+        { }
+
         protected int interpolatedStringLevel;
         protected Stack<bool> interpolatedVerbatiums = new();
         protected Stack<int> curlyLevels = new();

@@ -1,29 +1,41 @@
 ﻿namespace Aspects.Parsers.CSharp
 {
-    public class MethodDefinition(string name, AccessModifier accessModifier, bool hasNewModifier,
-        IReadOnlyList<string> genericTypeArguments, IReadOnlyList<ParameterDefinition> parameters,
-        string returnType, string body, bool isAbstract, bool isVirtual, bool isOverride, bool isNew)
-
-        : MemberDefinition(name, accessModifier, hasNewModifier)
+    public class MethodDefinition: MemberDefinition
     {
+        public MethodDefinition(string name, AccessModifier accessModifier, bool hasNewModifier,
+            IReadOnlyList<string> genericTypeArguments, IReadOnlyList<ParameterDefinition> parameters,
+            string returnType, bool isAbstract, bool isVirtual, bool isOverride, bool isNew, bool isSealed)
+
+            : base(name, accessModifier, hasNewModifier)
+        {
+            GenericTypeArguments = genericTypeArguments;
+            Parameters = parameters;
+            ReturnType = returnType;
+            IsAbstract = isAbstract;
+            IsVirtual = isVirtual;
+            IsOverride = isOverride;
+            IsNew = isNew;
+            IsSealed = isSealed;
+        }
+
         public override MemberKind MemberKind { get; } = MemberKind.Method;
 
         public override AccessModifier DefaultAccessability { get; } = CSharp.AccessModifier.Private;
 
-        public string Body => body;
+        public string ReturnType { get; }
 
-        public string ReturnType => returnType;
+        public IReadOnlyList<ParameterDefinition> Parameters { get; }
 
-        public IReadOnlyList<ParameterDefinition> Parameters => parameters;
+        public IReadOnlyList<string> GenericTypeArguments { get; }
 
-        public IReadOnlyList<string> GenericTypeArguments => genericTypeArguments;
+        public bool IsAbstract { get; }
 
-        public bool IsAbstract => isAbstract;
+        public bool IsVirtual { get; }
 
-        public bool IsVirtual => isVirtual;
+        public bool IsOverride { get; }
 
-        public bool IsOverride => isOverride;
+        public bool IsNew { get; }
 
-        public bool IsNew => isNew;
+        public bool IsSealed { get; }
     }
 }

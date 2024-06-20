@@ -1,27 +1,29 @@
 ﻿namespace Aspects.Parsers.CSharp
 {
-    public class PropertyDefinition(string name, AccessModifier accessModifier, bool hasNewModifier,
-        string type, bool isAbstract, bool isVirtual, bool isOverride,
-        string? getter = null, string? setter = null, string? initialization = null)
-
-        : MemberDefinition(name, accessModifier, hasNewModifier)
+    public class PropertyDefinition: MemberDefinition
     {
+        public PropertyDefinition(
+            string name, AccessModifier accessModifier, bool hasNewModifier,
+            string type, bool isAbstract, bool isVirtual, bool isOverride)
+
+            : base(name, accessModifier, hasNewModifier)
+        {
+            Type = type;
+            IsAbstract = isAbstract;
+            IsVirtual = isVirtual;
+            IsOverride = isOverride;
+        }
+
         public override MemberKind MemberKind { get; } = MemberKind.Property;
 
         public override AccessModifier DefaultAccessability { get; } = CSharp.AccessModifier.Private;
 
-        public string Type => type;
+        public string Type { get; }
 
-        public string? Getter => getter;
+        public bool IsAbstract { get; }
 
-        public string? Setter => setter;
+        public bool IsVirtual { get; }
 
-        public string? Initialization => initialization;
-
-        public bool IsAbstract => isAbstract;
-
-        public bool IsVirtual => isVirtual;
-
-        public bool IsOverride => isOverride;
+        public bool IsOverride { get; }
     }
 }

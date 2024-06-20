@@ -11,20 +11,29 @@
         Tuple 
     }
 
-    public abstract class TypeDefinition(
-        string name, AccessModifier? accessModifier, bool hasNewModifier, IReadOnlyList<AttributeGroup> attributeGroups) 
-        
-        : MemberDefinition(name, accessModifier, hasNewModifier)
+    public abstract class TypeDefinition: MemberDefinition
     {
+        public TypeDefinition(
+            string name, 
+            AccessModifier? accessModifier, 
+            bool hasNewModifier, 
+            IReadOnlyList<AttributeGroup> attributeGroups)
+
+            : base(name, accessModifier, hasNewModifier)
+        {
+            AttributeGroups = attributeGroups;
+            Attributes = attributeGroups.SelectMany(g => g.Attributes).ToArray();
+        }
+
         public abstract TypeKind TypeKind { get; }
 
         public override MemberKind MemberKind { get; } = MemberKind.Type;
 
         public NamespaceDefinition? ContainingNamespace { get; internal set; }
 
-        public IReadOnlyList<AttributeGroup> AttributeGroups => attributeGroups;
+        public IReadOnlyList<AttributeGroup> AttributeGroups { get; }
 
-        public IReadOnlyList<AttributeUsage> Attributes { get; } = attributeGroups.SelectMany(g => g.Attributes).ToArray();
+        public IReadOnlyList<AttributeUsage> Attributes { get; }
 
         public string FullName()
         {

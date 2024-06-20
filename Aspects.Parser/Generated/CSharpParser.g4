@@ -666,7 +666,6 @@ using_directive
     | USING namespace_or_type_name ';'                # usingNamespaceDirective
     // C# 6: https://msdn.microsoft.com/en-us/library/ms228593.aspx
     | USING STATIC namespace_or_type_name ';' # usingStaticDirective
-    | USING identifier '=' tuple_type ';' #usingTupleTypeDefinition
     ;
 
 namespace_member_declarations

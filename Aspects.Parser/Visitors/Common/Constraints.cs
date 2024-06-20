@@ -7,7 +7,7 @@ namespace Aspects.Parsers.CSharp.Visitors.Common
         public static List<ConstraintDefinition> FromContext(Type_parameter_constraints_clausesContext? context)
         {
             if (context is null)
-                return [];
+                return new List<ConstraintDefinition>();
 
             return context.type_parameter_constraints_clause()
                 .Select(c => new ConstraintDefinition(
@@ -18,10 +18,10 @@ namespace Aspects.Parsers.CSharp.Visitors.Common
 
         private static List<ConstraintClause> GetClauses(Type_parameter_constraintsContext? context)
         {
-            if (context is null)
-                return [];
-
             var clauses = new List<ConstraintClause>();
+            if (context is null)
+                return clauses;
+
             var primary = GetPrimaryConstraint(context.primary_constraint());
             if (primary is not null)
                 clauses.Add(primary);

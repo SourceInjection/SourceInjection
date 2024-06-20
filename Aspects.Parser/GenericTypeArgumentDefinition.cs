@@ -2,12 +2,19 @@
 {
     public enum Variance { In, Out }
 
-    public class GenericTypeArgumentDefinition(string name, Variance? variance, IReadOnlyList<AttributeGroup> attributeGroups)
+    public class GenericTypeArgumentDefinition
     {
-        public string Name => name;
+        public GenericTypeArgumentDefinition(string name, Variance? variance, IReadOnlyList<AttributeGroup> attributeGroups)
+        {
+            Name = name;
+            Variance = variance;
+            AttributeGroups = attributeGroups;
+        }
 
-        public Variance? Variance = variance;
+        public string Name { get; }
 
-        public IReadOnlyList<AttributeGroup> AttributeGroups => attributeGroups;
+        public Variance? Variance { get; }
+
+        public IReadOnlyList<AttributeGroup> AttributeGroups { get; }
     }
 }

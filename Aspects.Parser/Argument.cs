@@ -1,9 +1,15 @@
 ﻿namespace Aspects.Parsers.CSharp
 {
-    public class Argument(string expression, string? label = null)
+    public class Argument
     {
-        public string Expression => expression;
+        public Argument(string expression, string? label = null)
+        {
+            Expression = expression;
+            Label = label;
+        }
 
-        public string? Label => label;
+        public string Expression { get; }
+
+        public string? Label { get; }
     }
 }

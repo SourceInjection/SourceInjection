@@ -1,7 +1,6 @@
 ﻿
 namespace Aspects.Parsers.CSharp
 {
-
     public enum ConstraintKind 
     { 
         Constructor, 
@@ -14,11 +13,17 @@ namespace Aspects.Parsers.CSharp
         Default 
     }
 
-    public class ConstraintClause(ConstraintKind ckind, string? value = null)
+    public class ConstraintClause
     {
-        public ConstraintKind Kind => ckind;
+        public ConstraintClause(ConstraintKind kind, string? value = null)
+        {
+            Kind = kind;
+            Value = value;
+        }
 
-        public string? Value => value;
+        public ConstraintKind Kind { get; }
+
+        public string? Value { get; }
 
         public bool IsKind(ConstraintKind kind) => Kind == kind;
     }

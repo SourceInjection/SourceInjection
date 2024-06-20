@@ -1,9 +1,14 @@
 ﻿namespace Aspects.Parsers.CSharp
 {
-    public class ExternAliasDefinition(string name)
+    public class ExternAliasDefinition
     {
+        public ExternAliasDefinition(string name)
+        {
+            Name = name;
+        }
+
         public NamespaceDefinition? ContainingNamespace { get; internal set; }
 
-        public string Name => name;
+        public string Name { get; }
     }
 }

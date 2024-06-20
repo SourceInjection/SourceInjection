@@ -6,10 +6,10 @@ namespace Aspects.Parsers.CSharp.Visitors.Common
     {
         public static List<AttributeGroup> FromContext(AttributesContext? context)
         {
-            if (context?.attribute_section() is null)
-                return [];
-
             var sections = new List<AttributeGroup>();
+            if (context?.attribute_section() is null)
+                return sections;
+
             foreach (var sectionContext in context.attribute_section())
             {
                 var attributeTarget = sectionContext.attribute_target()?.GetText();

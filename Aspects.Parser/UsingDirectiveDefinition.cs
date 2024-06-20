@@ -8,11 +8,16 @@
         TupleDefinition
     }
 
-    public abstract class UsingDirectiveDefinition(string value)
+    public abstract class UsingDirectiveDefinition
     {
+        public UsingDirectiveDefinition(string value)
+        {
+            Value = value;
+        }
+
         public NamespaceDefinition? ContainingNamespace { get; internal set; }
 
-        public string Value => value;
+        public string Value { get; }
 
         public abstract UsingDirectiveKind Kind { get; }
 

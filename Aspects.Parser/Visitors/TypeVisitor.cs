@@ -8,13 +8,6 @@ namespace Aspects.Parsers.CSharp.Visitors
 {
     internal class TypeVisitor : CSharpParserBaseVisitor<TypeDefinition>
     {
-        public override TypeDefinition VisitTuple_type([NotNull] Tuple_typeContext context)
-        {
-            return new TupleDefinition(context.tuple_element()
-                .Select(c => new TupleMemberDefinitinon(c.type_().GetText(), c.identifier()?.GetText()))
-                .ToArray());
-        }
-
         public override TypeDefinition VisitType_declaration([NotNull] Type_declarationContext context)
         {
             var attributeGroups = AttributeGroups.FromContext(context.attributes());
@@ -113,7 +106,7 @@ namespace Aspects.Parsers.CSharp.Visitors
         private static string[] GetAllMemberModifiers([NotNull] Type_declarationContext context)
         {
             if (context.all_member_modifiers() is null)
-                return [];
+                return Array.Empty<string>();
 
             return context.all_member_modifiers().all_member_modifier().Select(c => c.GetText()).ToArray();            
         }

@@ -6,10 +6,10 @@ namespace Aspects.Parsers.CSharp.Visitors.Common
     {
         public static List<MemberDefinition> FromContext(Struct_bodyContext? context)
         {
-            if (context is null)
-                return [];
-
             var members = new List<MemberDefinition>();
+            if (context is null)
+                return members;
+
             var visitor = new MemberVisitor();
             foreach (var c in context.struct_member_declaration())
             {
@@ -22,10 +22,10 @@ namespace Aspects.Parsers.CSharp.Visitors.Common
 
         public static List<MemberDefinition> FromContext(Class_bodyContext? context)
         {
-            if (context is null)
-                return [];
-
             var members = new List<MemberDefinition>();
+            if (context is null)
+                return members;
+
             var visitor = new MemberVisitor();
             foreach (var c in context.class_member_declarations().class_member_declaration())
             {
@@ -39,7 +39,7 @@ namespace Aspects.Parsers.CSharp.Visitors.Common
         public static List<EnumMemberDefinition> FromContext(Enum_bodyContext? context)
         {
             if(context is null)
-                return [];
+                return new List<EnumMemberDefinition>();
 
             return context.enum_member_declaration()
                 .Select(c => new EnumMemberDefinition(

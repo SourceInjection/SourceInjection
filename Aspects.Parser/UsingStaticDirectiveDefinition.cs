@@ -1,9 +1,14 @@
 ﻿namespace Aspects.Parsers.CSharp
 {
-    public class UsingStaticDirectiveDefinition(string value, string classFullName)
-        : UsingDirectiveDefinition(value)
+    public class UsingStaticDirectiveDefinition: UsingDirectiveDefinition
     {
-        public string ClassFullName => classFullName;
+        public UsingStaticDirectiveDefinition(string value, string classFullName)
+            : base(value)
+        {
+            ClassFullName = classFullName;
+        }
+
+        public string ClassFullName { get; }
 
         public override UsingDirectiveKind Kind { get; } = UsingDirectiveKind.Static;
     }

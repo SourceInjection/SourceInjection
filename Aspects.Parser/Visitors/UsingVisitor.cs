@@ -19,10 +19,5 @@ namespace Aspects.Parsers.CSharp.Visitors
         {
             return new UsingStaticDirectiveDefinition(context.GetText(), context.namespace_or_type_name().GetText());
         }
-
-        public override UsingDirectiveDefinition VisitUsingTupleTypeDefinition([NotNull] CSharpParser.UsingTupleTypeDefinitionContext context)
-        {
-            return new UsingTupleDefinition(context.GetText(), (TupleDefinition)new TypeVisitor().VisitTuple_type(context.tuple_type()));
-        }
     }
 }

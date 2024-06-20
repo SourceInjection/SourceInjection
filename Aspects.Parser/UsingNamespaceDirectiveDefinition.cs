@@ -1,9 +1,14 @@
 ﻿namespace Aspects.Parsers.CSharp
 {
-    public class UsingNamespaceDirectiveDefinition(string value, string nameSpace)
-        : UsingDirectiveDefinition(value)
+    public class UsingNamespaceDirectiveDefinition: UsingDirectiveDefinition
     {
-        public string Namespace => nameSpace;
+        public UsingNamespaceDirectiveDefinition(string value, string @namespace)
+            : base(value)
+        {
+            Namespace = @namespace;
+        }
+
+        public string Namespace { get; }
 
         public override UsingDirectiveKind Kind { get; } = UsingDirectiveKind.Namespace;
     }

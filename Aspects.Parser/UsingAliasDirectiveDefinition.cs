@@ -1,11 +1,17 @@
 ﻿namespace Aspects.Parsers.CSharp
 {
-    public class UsingAliasDirectiveDefinition(string value, string newName, string oldName)
-        : UsingDirectiveDefinition(value)
+    public class UsingAliasDirectiveDefinition : UsingDirectiveDefinition
     {
-        public string NewName => newName;
+        public UsingAliasDirectiveDefinition(string value, string newName, string oldName)
+            : base(value)
+        {
+            NewName = newName;
+            OldName = oldName;
+        }
 
-        public string OldName => oldName;
+        public string NewName { get; }
+
+        public string OldName { get; }
 
         public override UsingDirectiveKind Kind { get; } = UsingDirectiveKind.Alias;
     }

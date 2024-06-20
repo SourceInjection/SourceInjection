@@ -1,6 +1,6 @@
 ﻿namespace Aspects.Parsers.CSharp
 {
-    internal class EnumDefinition : TypeDefinition
+    public class EnumDefinition : TypeDefinition
     {
         public EnumDefinition(
             string name, 

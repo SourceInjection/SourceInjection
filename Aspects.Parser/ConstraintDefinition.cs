@@ -1,9 +1,15 @@
 ﻿namespace Aspects.Parsers.CSharp
 {
-    public class ConstraintDefinition(string targetedTypeArgument, IReadOnlyList<ConstraintClause> clauses )
+    public class ConstraintDefinition
     {
-        public string TargetedTypeArgument => targetedTypeArgument;
+        public ConstraintDefinition(string targetedTypeArgument, IReadOnlyList<ConstraintClause> clauses)
+        {
+            TargetedTypeArgument = targetedTypeArgument;
+            Clauses = clauses;
+        }
 
-        public IReadOnlyList<ConstraintClause> Clauses => clauses;
+        public string TargetedTypeArgument { get; }
+
+        public IReadOnlyList<ConstraintClause> Clauses { get; }
     }
 }

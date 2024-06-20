@@ -7,10 +7,10 @@ namespace Aspects.Parsers.CSharp.Visitors.Common
     {
         public static List<GenericTypeArgumentDefinition> FromContext(Variant_type_parameter_listContext? context)
         {
-            if (context is null)
-                return [];
-
             var args = new List<GenericTypeArgumentDefinition>();
+            if (context is null)
+                return args;
+
             foreach (var argContext in context.variant_type_parameter())
             {
                 args.Add(new GenericTypeArgumentDefinition(
@@ -23,10 +23,10 @@ namespace Aspects.Parsers.CSharp.Visitors.Common
 
         public static List<GenericTypeArgumentDefinition> FromContext(Type_parameter_listContext? context)
         {
-            if (context is null)
-                return [];
-
             var args = new List<GenericTypeArgumentDefinition>();
+            if (context is null)
+                return args;
+
             foreach (var argContext in context.type_parameter())
             {
                 args.Add(new GenericTypeArgumentDefinition(

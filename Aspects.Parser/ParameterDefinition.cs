@@ -1,15 +1,24 @@
 ﻿namespace Aspects.Parsers.CSharp
 {
-    public class ParameterDefinition(string type, string name, bool isParamsArray = false, string? defaultValue = null)
+    public class ParameterDefinition
     {
-        public string Type => type;
+        public ParameterDefinition(string type, string name, bool isParamsArray = false, string? defaultValue = null)
+        {
+            Type = type;
+            Name = name;
+            IsParamsArray = isParamsArray;
+            DefaultValue = defaultValue;
+            IsOptional = defaultValue != null;
+        }
 
-        public string Name => name;
+        public string Type { get; }
 
-        public string? DefaultValue => defaultValue;
+        public string Name { get; }
 
-        public bool IsParamsArray => isParamsArray;
+        public string? DefaultValue { get; }
 
-        public bool IsOptional { get; } = defaultValue is not null;
+        public bool IsParamsArray { get; }
+
+        public bool IsOptional { get; }
     }
 }
