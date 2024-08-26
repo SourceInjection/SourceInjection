@@ -105,21 +105,18 @@ $@"protected virtual void {PropertyChangingNotifyMethod}(string propertyName)
             sb.Append(PropertyCode(fields.First(), typeInfo.HasNullableEnabled));
             foreach(var field in fields.Skip(1))
             {
-                sb.AppendLine(); 
-                sb.AppendLine();
+                sb.AppendLines(2);
                 sb.Append(PropertyCode(field, typeInfo.HasNullableEnabled));
             }
 
             if (MustAddRaiseMethod<INotifyPropertyChangingAttribute>(typeInfo, PropertyChangingNotifyMethod))
             {
-                sb.AppendLine(); 
-                sb.AppendLine();
+                sb.AppendLines(2);
                 sb.Append(ChangingRaiseMethod);
             }
             if (MustAddRaiseMethod<INotifyPropertyChangedAttribute>(typeInfo, PropertyChangedNotifyMethod))
             {
-                sb.AppendLine(); 
-                sb.AppendLine();
+                sb.AppendLines(2);
                 sb.Append(ChangedRaiseMethod);
             }
 

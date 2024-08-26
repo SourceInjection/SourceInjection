@@ -1,5 +1,4 @@
-﻿using Aspects.Attributes.Base;
-using Aspects.Attributes.Interfaces;
+﻿using Aspects.Attributes.Interfaces;
 using System;
 
 namespace Aspects.Attributes
@@ -13,7 +12,7 @@ namespace Aspects.Attributes
     /// <include file="Comments.xml" path="doc/members/member[@name='Properties:PropertySyntax']/*"/>
     /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, Inherited = false, AllowMultiple = false)]
-    public class AutoToStringAttribute : BasicMethodConfigAttribute, IToStringConfigAttribute
+    public class AutoToStringAttribute : Attribute, IToStringConfigAttribute
     {
         /// <summary>
         /// Creates an instance of <see cref="ToStringAttribute"/>.
@@ -27,7 +26,15 @@ namespace Aspects.Attributes
         /// Linked fields can only be detected when the property fullfilles the following grammar:
         /// <include file="Comments.xml" path="doc/members/member[@name='Properties:PropertySyntax']/*"/>
         /// </param>
-        public AutoToStringAttribute(DataMemberKind dataMemberKind = DataMemberKind.DataMember) : base(dataMemberKind) { }
+        public AutoToStringAttribute(DataMemberKind dataMemberKind = DataMemberKind.DataMember) 
+        { 
+            DataMemberKind = dataMemberKind;
+        }
+
+        /// <summary>
+        /// Defines which data members are used to generate <see cref="object.ToString"/>.<br/>
+        /// </summary>
+        public DataMemberKind DataMemberKind { get; }
     }
 
     /// <summary>

@@ -169,7 +169,7 @@ namespace Aspects.SourceGenerators.Common
             if (!type.IsReferenceType || !nullSafe)
                 return $"{nameA}.{nameof(Equals)}({nameB})";
 
-            return $"{nameA} == null && {nameB} == null || {nameA}?.{nameof(Equals)}({nameB}) is true";
+            return $"{nameA} == null && {nameB} == null || {nameA}?.{nameof(Equals)}({nameB}) == true";
         }
     }
 }

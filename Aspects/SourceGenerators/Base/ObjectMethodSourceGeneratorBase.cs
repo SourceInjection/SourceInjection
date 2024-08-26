@@ -1,5 +1,4 @@
 ﻿using Aspects.Attributes;
-using Aspects.Attributes.Interfaces;
 using Aspects.SourceGenerators.Common;
 using Aspects.SourceGenerators.Queries;
 using Aspects.SyntaxReceivers;
@@ -14,7 +13,6 @@ namespace Aspects.SourceGenerators.Base
 {
     internal abstract class ObjectMethodSourceGeneratorBase<TConfigAttribute, TAttribute, TExcludeAttribute>
         : TypeSourceGeneratorBase
-        where TConfigAttribute : IObjectMethodConfigAttribute
     {
         protected enum DataMemberPriority { Field, Property };
 
@@ -57,15 +55,17 @@ namespace Aspects.SourceGenerators.Base
         private bool TryGetDataMemberKind(TypeInfo typeInfo, out DataMemberKind kind)
         {
             if (AttributeFactory.TryCreate<TConfigAttribute>(
-                typeInfo.Symbol.AttributesOfType<TConfigAttribute>().FirstOrDefault(), out var att))
+                typeInfo.Symbol.AttributesOfType<TConfigAttribute>().FirstOrDefault(), out var attr))
             {
-                kind = att.DataMemberKind;
+                kind = DataMemberKindFromAttribute(attr);
                 return true;
             }
 
             kind = DataMemberKind.DataMember;
             return false;
         }
+
+        protected abstract DataMemberKind DataMemberKindFromAttribute(TConfigAttribute attr);
 
         private IEnumerable<ISymbol> GetDataMembers(TypeInfo typeInfo, IEnumerable<ISymbol> members)
         {

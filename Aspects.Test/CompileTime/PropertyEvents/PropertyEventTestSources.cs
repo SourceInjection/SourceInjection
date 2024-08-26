@@ -1,11 +1,11 @@
-﻿using Aspects.Attributes.Interfaces;
+﻿using Aspects.Attributes;
+using Aspects.Attributes.Interfaces;
 using System.Reflection;
 
 namespace Aspects.Test.CompileTime.PropertyEvents
 {
     internal static class PropertyEventTestSources
     {
-
         private static IEnumerable<FieldInfo> GetFieldsWith<T>()
         {
             var name = typeof(T).FullName;
@@ -20,9 +20,9 @@ namespace Aspects.Test.CompileTime.PropertyEvents
             = GetFieldsWith<INotifyPropertyChangingAttribute>().ToArray();
 
         public static FieldInfo[] AllAttributedFields
-            = GetFieldsWith<IPropertyEventGenerationAttribute>().ToArray();
+            = GetFieldsWith<IGeneratesPropertyFromFieldAttribute>().ToArray();
 
         public static FieldInfo[] FieldsWithBothAttributes
-            = GetFieldsWith<INotifyPropertyEventsAttribute>().ToArray();
+            = GetFieldsWith<NotifyPropertyEventsAttribute>().ToArray();
     }
 }

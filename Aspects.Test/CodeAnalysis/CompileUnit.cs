@@ -1,9 +1,9 @@
 ﻿using Aspects.SourceGenerators.Base;
-using CodeUnits.CSharp;
+using CompileUnits.CSharp;
 
 namespace Aspects.Test.CodeAnalysis
 {
-    internal class CodeUnit
+    internal class CompileUnit
     {
         private static readonly string _projectDir = new DirectoryInfo(Environment.CurrentDirectory)
             .Parent?.Parent?.Parent?.FullName ?? string.Empty;
@@ -17,14 +17,15 @@ namespace Aspects.Test.CodeAnalysis
             + $"\\net8.0\\generated\\{nameof(Aspects)}";
 
 
-        public static ICodeUnit FromGeneratedCode<TGenerator, TType>() 
+        public static ICompileUnit FromGeneratedCode<TGenerator, TType>() 
             where TGenerator : TypeSourceGeneratorBase, new()
         {
             var filePath = $"{_generatedDir}\\{typeof(TGenerator).FullName}\\" +
                 $"{typeof(TType).FullName}-{new TGenerator().Name}.g.cs";
-            
-            
-            return CodeUnits.CSharp.CodeUnit.FromStream(File.OpenRead(filePath));
+
+            var fs = File.OpenRead(filePath);
+
+            return CompileUnits.CSharp.CompileUnit.FromStream(fs);
         }
     }
 }

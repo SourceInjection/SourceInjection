@@ -1,4 +1,0 @@
-﻿
-
-
-Console.WriteLine(Environment.CurrentDirectory);

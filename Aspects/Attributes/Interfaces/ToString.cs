@@ -1,6 +1,9 @@
 ﻿namespace Aspects.Attributes.Interfaces
 {
-    public interface IToStringConfigAttribute : IObjectMethodConfigAttribute { }
+    public interface IToStringConfigAttribute 
+    {
+        DataMemberKind DataMemberKind { get; }
+    }
 
     public interface IToStringAttribute { }
 

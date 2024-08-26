@@ -1,4 +1,5 @@
-﻿using Aspects.Attributes.Interfaces;
+﻿using Aspects.Attributes;
+using Aspects.Attributes.Interfaces;
 using Aspects.SourceGenerators.Base;
 using Aspects.SourceGenerators.Common;
 using Aspects.Util;
@@ -17,17 +18,29 @@ namespace Aspects.SourceGenerators
 
         protected override DataMemberPriority Priority { get; } = DataMemberPriority.Field;
 
+        protected override DataMemberKind DataMemberKindFromAttribute(IHashCodeConfigAttribute attr)
+        {
+            return attr.DataMemberKind;
+        }
+
         protected override string ClassBody(TypeInfo typeInfo)
         {
             const int hashCodeCombineMaxArgs = 8;
 
+            var config = GetConfigAttribute(typeInfo);
+
             var sb = new StringBuilder();
+
+            sb.AppendLine();
+            sb.Append("//");
+            sb.AppendLine(string.Join("\r\n//", typeInfo.SyntaxNode.GetLeadingTrivia().Select(t => t.ToFullString())));
+            sb.AppendLine();
 
             sb.AppendLine($"public override int {Name}()");
             sb.AppendLine("{");
 
             var symbols = GetLocalTargetedSymbols(typeInfo).ToArray();
-            var includeBase = ShouldIncludeBase(typeInfo);
+            var includeBase = ShouldIncludeBase(typeInfo, config);
             var length = symbols.Length + (includeBase ? 1 : 0);
 
             if (length <= hashCodeCombineMaxArgs)
@@ -88,14 +101,11 @@ namespace Aspects.SourceGenerators
             return CodeSnippets.CombinedHashCodeMethod(symbol.Name);
         }
 
-        private bool ShouldIncludeBase(TypeInfo typeInfo)
+        private bool ShouldIncludeBase(TypeInfo typeInfo, IHashCodeConfigAttribute config)
         {
-            return typeInfo.Symbol.BaseType is ITypeSymbol syBase && (
-                syBase.HasAttributeOfType<IHashCodeConfigAttribute>()
-                || syBase.OverridesGetHashCode()
-                || syBase.Inheritance().Any(
-                    sy => sy.HasAttributeOfType<IHashCodeConfigAttribute>()
-                    || sy.GetMembers().Any(m => m.HasAttributeOfType<IHashCodeAttribute>())));
+            return config.ForceIncludeBase || typeInfo.Symbol.IsReferenceType
+                && typeInfo.Symbol.BaseType is ITypeSymbol syBase 
+                && (syBase.HasAttributeOfType<IHashCodeConfigAttribute>() || syBase.OverridesGetHashCode());
         }
 
         private bool MustUseCombinedHashCode(ISymbol symbol)
@@ -108,6 +118,14 @@ namespace Aspects.SourceGenerators
             else return false;
 
             return type.IsEnumerable() && !type.OverridesGetHashCode();
+        }
+
+        private static IHashCodeConfigAttribute GetConfigAttribute(TypeInfo typeInfo)
+        {
+            var attData = typeInfo.Symbol.AttributesOfType<IHashCodeConfigAttribute>().FirstOrDefault();
+            if (attData is null || !AttributeFactory.TryCreate<IHashCodeConfigAttribute>(attData, out var config))
+                return new AutoHashCodeAttribute();
+            return config;
         }
     }
 }

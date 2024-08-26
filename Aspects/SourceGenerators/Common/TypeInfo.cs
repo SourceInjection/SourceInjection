@@ -14,13 +14,15 @@ namespace Aspects.SourceGenerators.Common
         private readonly Lazy<string> _name;
         private readonly Lazy<List<INamedTypeSymbol>> _inheritanceFromBottomToTop;
         private readonly Lazy<List<PropertyInfo>> _localPropertyInfos;
+        private readonly Lazy<bool> _hasNullableEnabled;
 
         public TypeInfo(GeneratorSyntaxContext context, TypeDeclarationSyntax syntaxNode, INamedTypeSymbol typeSymbol)
         {
             SyntaxNode = syntaxNode;
             Symbol = typeSymbol;
-            HasNullableEnabled = context.SemanticModel.GetNullableContext(0).AnnotationsEnabled();
 
+            _hasNullableEnabled = new Lazy<bool>(() => context.SemanticModel.GetNullableContext(0).AnnotationsEnabled() 
+                && !syntaxNode.HasNullableDisabledDirective());
             _hasPartialModifier = new Lazy<bool>(() => syntaxNode.HasPartialModifier());
             _declaration = new Lazy<string>(() => syntaxNode.Declaration());
             _name = new Lazy<string>(() => syntaxNode.NameWithGenericParameters());
@@ -38,7 +40,7 @@ namespace Aspects.SourceGenerators.Common
 
         public string Name => _name.Value;
 
-        public bool HasNullableEnabled { get; }
+        public bool HasNullableEnabled => _hasNullableEnabled.Value;
 
         public IEnumerable<PropertyInfo> LocalPropertyInfos => _localPropertyInfos.Value;
 

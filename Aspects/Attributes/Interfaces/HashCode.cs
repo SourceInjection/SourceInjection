@@ -1,6 +1,11 @@
 ﻿namespace Aspects.Attributes.Interfaces
 {
-    public interface IHashCodeConfigAttribute : IObjectMethodConfigAttribute { }
+    public interface IHashCodeConfigAttribute 
+    {
+        DataMemberKind DataMemberKind { get; }
+
+        bool ForceIncludeBase { get; }
+    }
 
     public interface IHashCodeAttribute { }
 

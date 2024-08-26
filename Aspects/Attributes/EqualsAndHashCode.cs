@@ -1,5 +1,4 @@
-﻿using Aspects.Attributes.Base;
-using Aspects.Attributes.Interfaces;
+﻿using Aspects.Attributes.Interfaces;
 using System;
 
 namespace Aspects.Attributes
@@ -8,13 +7,13 @@ namespace Aspects.Attributes
     /// Combines attributes <see cref="AutoEqualsAttribute"/> and <see cref="AutoHashCodeAttribute"/>.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, Inherited = false, AllowMultiple = false)]
-    public class AutoEqualsAndHashCodeAttribute : BasicMethodConfigAttribute, IEqualsConfigAttribute, IHashCodeConfigAttribute
+    public class AutoEqualsAndHashCodeAttribute : Attribute, IEqualsConfigAttribute, IHashCodeConfigAttribute
     {
         /// <summary>
         /// Creates an instance of <see cref="AutoEqualsAndHashCodeAttribute"/>.
         /// </summary>
-        /// <param name="dataMemberKind">
-        /// Defines which data members are used to generate <see cref="object.Equals(object)"/> and <see cref="object.GetHashCode"/>.<br/>
+        /// <param name="equalsDataMemberKind">
+        /// Defines which data members are used to generate <see cref="object.Equals(object)"/>.<br/>
         /// With <see cref="DataMemberKind.Field"/> only fields are used.<br/>
         /// With <see cref="DataMemberKind.Property"/> only properties are used.<br/>
         /// The default value is <see cref="DataMemberKind.DataMember"/> 
@@ -22,7 +21,60 @@ namespace Aspects.Attributes
         /// Linked fields can only be detected when the property fullfilles the following grammar:
         /// <include file="Comments.xml" path="doc/members/member[@name='Properties:PropertySyntax']/*"/>
         /// </param>
-        public AutoEqualsAndHashCodeAttribute(DataMemberKind dataMemberKind = DataMemberKind.DataMember) : base(dataMemberKind) { }
+        /// <param name="hashCodeDataMemberKind">
+        /// Defines which data members are used to generate <see cref="object.GetHashCode()"/>.<br/>
+        /// With <see cref="DataMemberKind.Field"/> only fields are used.<br/>
+        /// With <see cref="DataMemberKind.Property"/> only properties are used.<br/>
+        /// The default value is <see cref="DataMemberKind.DataMember"/> 
+        /// which includes fields and properties and automaticly merges linked fields in properties by scanning the getter code.
+        /// Linked fields can only be detected when the property fullfilles the following grammar:
+        /// <include file="Comments.xml" path="doc/members/member[@name='Properties:PropertySyntax']/*"/>
+        /// </param>
+        /// <param name="fordeIncludeBaseEquals">
+        /// Determines if <see langword="base"/>.Equals() is forced to be called.
+        /// </param>
+        /// <param name="forceIncludeBaseGetHashCode">
+        /// Determines if <see langword="base"/>.GetHashCode() is forced to be called.
+        /// </param>
+        public AutoEqualsAndHashCodeAttribute(
+            DataMemberKind equalsDataMemberKind = DataMemberKind.DataMember, 
+            DataMemberKind hashCodeDataMemberKind = DataMemberKind.DataMember,
+            bool fordeIncludeBaseEquals = false, 
+            bool forceIncludeBaseGetHashCode = false)
+        { 
+            EqualsDataMemberKind = equalsDataMemberKind;
+            HashCodeDataMemberKind = hashCodeDataMemberKind;
+            ForceIncludeBaseEquals = fordeIncludeBaseEquals;
+            ForceIncludeBaseGetHashCode = forceIncludeBaseGetHashCode;
+        }
+
+        /// <summary>
+        /// Determines the <see cref="DataMemberKind"/> of the <see cref="object.Equals(object)"/> method generation.
+        /// </summary>
+        public DataMemberKind EqualsDataMemberKind { get; }
+
+        /// <summary>
+        /// Determines the <see cref="DataMemberKind"/> of the <see cref="object.GetHashCode()"/> method generation.
+        /// </summary>
+        public DataMemberKind HashCodeDataMemberKind { get; }
+
+        /// <summary>
+        /// Determines if <see langword="base"/>.Equals() is forced to be called.
+        /// </summary>
+        public bool ForceIncludeBaseEquals { get; }
+
+        /// <summary>
+        /// Determines if <see langword="base"/>.GetHashCode() is forced to be called.
+        /// </summary>
+        public bool ForceIncludeBaseGetHashCode { get; }
+
+        DataMemberKind IEqualsConfigAttribute.DataMemberKind => EqualsDataMemberKind;
+
+        DataMemberKind IHashCodeConfigAttribute.DataMemberKind => HashCodeDataMemberKind;
+
+        bool IEqualsConfigAttribute.ForceIncludeBase => ForceIncludeBaseEquals;
+
+        bool IHashCodeConfigAttribute.ForceIncludeBase => ForceIncludeBaseGetHashCode;
     }
 
     /// <summary>

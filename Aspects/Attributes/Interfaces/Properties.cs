@@ -1,15 +1,19 @@
-﻿namespace Aspects.Attributes.Interfaces
-{
-    public interface IGeneratesPropertyFromFieldAttribute { }
+﻿using Microsoft.CodeAnalysis;
 
-    public interface IPropertyEventGenerationAttribute : IGeneratesPropertyFromFieldAttribute 
+namespace Aspects.Attributes.Interfaces
+{
+    public interface IGeneratesPropertyFromFieldAttribute 
+    {
+        string PropertyName(IFieldSymbol field);
+    }
+
+    public interface INotifyPropertyChangedAttribute : IGeneratesPropertyFromFieldAttribute
     {
         bool EqualityCheck { get; }
     }
 
-    public interface INotifyPropertyChangedAttribute : IPropertyEventGenerationAttribute { }
-
-    public interface INotifyPropertyChangingAttribute : IPropertyEventGenerationAttribute { }
-
-    public interface INotifyPropertyEventsAttribute : INotifyPropertyChangedAttribute, INotifyPropertyChangingAttribute { }
+    public interface INotifyPropertyChangingAttribute : IGeneratesPropertyFromFieldAttribute
+    {
+        bool EqualityCheck { get; }
+    }
 }

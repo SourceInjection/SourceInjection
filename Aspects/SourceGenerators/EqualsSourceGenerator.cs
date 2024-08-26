@@ -1,4 +1,5 @@
-﻿using Aspects.Attributes.Interfaces;
+﻿using Aspects.Attributes;
+using Aspects.Attributes.Interfaces;
 using Aspects.SourceGenerators.Base;
 using Aspects.SourceGenerators.Common;
 using Aspects.Util;
@@ -21,8 +22,15 @@ namespace Aspects.SourceGenerators
 
         protected override DataMemberPriority Priority { get; } = DataMemberPriority.Field;
 
+        protected override DataMemberKind DataMemberKindFromAttribute(IEqualsConfigAttribute attr)
+        {
+            return attr.DataMemberKind;
+        }
+
         protected override string ClassBody(TypeInfo typeInfo)
         {
+            var config = GetConfigAttribute(typeInfo);
+
             var sb = new StringBuilder();
 
             if(typeInfo.HasNullableEnabled)
@@ -43,7 +51,7 @@ namespace Aspects.SourceGenerators
             if (symbols.Any())
                 sb.Append($" {otherName}");
 
-            if (ShouldIncludeBase(typeInfo))
+            if (ShouldIncludeBase(typeInfo, config))
             {
                 sb.AppendLine();
                 sb.Append(CodeSnippets.Indent($"&& base.{Name}({argName})", 2));
@@ -57,20 +65,20 @@ namespace Aspects.SourceGenerators
             
             sb.AppendLine(";");
 
-            sb.AppendLine("}");
-            if(typeInfo.HasNullableEnabled)
+            sb.Append("}");
+            if (typeInfo.HasNullableEnabled)
+            {
+                sb.AppendLine();
                 sb.Append("#nullable restore");
+            }
             return sb.ToString();
         }
 
-        private bool ShouldIncludeBase(TypeInfo typeInfo)
+        private bool ShouldIncludeBase(TypeInfo typeInfo, IEqualsConfigAttribute configAttribute)
         {
-            return typeInfo.Symbol.BaseType is ITypeSymbol syBase && (
-                syBase.HasAttributeOfType<IEqualsConfigAttribute>()
-                || syBase.OverridesEquals()
-                || syBase.Inheritance().Any(
-                    sy => sy.HasAttributeOfType<IEqualsConfigAttribute>()
-                    || sy.GetMembers().Any(m => m.HasAttributeOfType<IEqualsAttribute>())));
+            return configAttribute.ForceIncludeBase || typeInfo.Symbol.IsReferenceType 
+                && typeInfo.Symbol.BaseType is ITypeSymbol syBase 
+                && (syBase.HasAttributeOfType<IEqualsConfigAttribute>() || syBase.OverridesEquals());
         }
 
         private string MemberEquals(ISymbol symbol, bool nullableEnabled)
@@ -95,6 +103,14 @@ namespace Aspects.SourceGenerators
             return snippet.Contains("||")
                 ? $"({snippet})"
                 : snippet;
+        }
+
+        private static IEqualsConfigAttribute GetConfigAttribute(TypeInfo typeInfo)
+        {
+            var attData = typeInfo.Symbol.AttributesOfType<IEqualsConfigAttribute>().FirstOrDefault();
+            if (attData is null || !AttributeFactory.TryCreate<IEqualsConfigAttribute>(attData, out var config))
+                return new AutoEqualsAttribute();
+            return config;
         }
     }
 }

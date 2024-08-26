@@ -6,6 +6,7 @@ using TypeInfo = Aspects.SourceGenerators.Common.TypeInfo;
 using Aspects.Attributes.Interfaces;
 using Aspects.Util;
 using Aspects.SourceGenerators.Common;
+using Aspects.Attributes;
 
 namespace Aspects.SourceGenerators
 {
@@ -16,6 +17,11 @@ namespace Aspects.SourceGenerators
         protected internal override string Name { get; } = nameof(ToString);
 
         protected override DataMemberPriority Priority { get; } = DataMemberPriority.Property;
+
+        protected override DataMemberKind DataMemberKindFromAttribute(IToStringConfigAttribute attr)
+        {
+            return attr.DataMemberKind;
+        }
 
         protected override string ClassBody(TypeInfo typeInfo)
         {

@@ -34,10 +34,27 @@ namespace Aspects.Util
             var nodeText = node.GetText().ToString();
             nodeText = nodeText.Substring(0, nodeText.IndexOf('{'));
             nodeText = RemoveAttributes(nodeText).Trim();
+            nodeText = RemoveCompilerDirectives(nodeText).Trim();
 
             if (nodeText.Contains('>'))
                 return nodeText.Substring(0, nodeText.IndexOf('>') + 1);
             return nodeText.Substring(0, nodeText.IndexOf(node.Identifier.Text) + node.Identifier.Text.Length);
+        }
+
+        /// <summary>
+        /// Checks if the type declaration has defined #nullable disable
+        /// </summary>
+        /// <param name="node">The node to be checked.</param>
+        /// <returns><see langword="true"/> if the node has a #nullable disable restriction else <see langword="false"/></returns>
+        public static bool HasNullableDisabledDirective(this TypeDeclarationSyntax node)
+        {
+            var nodeText = node.GetText().ToString();
+            nodeText = nodeText.Substring(0, nodeText.IndexOf(node.Identifier.Text));
+            nodeText = RemoveAttributes(nodeText);
+
+            return nodeText.Split('\n')
+                .Select(l => l.TrimStart())
+                .Any(l => l.StartsWith("#nullable") && l.Contains("disable"));
         }
 
         /// <summary>
@@ -140,6 +157,21 @@ namespace Aspects.Util
                 length++;
 
             return (idx, length);
+        }
+
+        private static string RemoveCompilerDirectives(string code)
+        {
+            var start = code.IndexOf('#');
+
+            while (start >= 0)
+            {
+                var end = code.IndexOf('\n', start + 1);
+                if (end < 0)
+                    break;
+                code = code.Substring(0, start) + code.Substring(end + 1);
+                start = code.IndexOf('#');
+            }
+            return code;
         }
 
         private static bool IsDataMember(PropertyDeclarationSyntax propertySyntax, SyntaxToken identifierToken)

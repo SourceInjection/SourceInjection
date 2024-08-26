@@ -1,5 +1,4 @@
-﻿using Aspects.Attributes.Base;
-using Aspects.Attributes.Interfaces;
+﻿using Aspects.Attributes.Interfaces;
 using System;
 
 namespace Aspects.Attributes
@@ -13,7 +12,7 @@ namespace Aspects.Attributes
     /// <include file="Comments.xml" path="doc/members/member[@name='Properties:PropertySyntax']/*"/>
     /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, Inherited = false, AllowMultiple = false)]
-    public class AutoEqualsAttribute : BasicMethodConfigAttribute, IEqualsConfigAttribute
+    public class AutoEqualsAttribute : Attribute, IEqualsConfigAttribute
     {
         /// <summary>
         /// Creates an instance of <see cref="AutoEqualsAttribute"/>.
@@ -23,11 +22,28 @@ namespace Aspects.Attributes
         /// With <see cref="DataMemberKind.Field"/> only fields are used.<br/>
         /// With <see cref="DataMemberKind.Property"/> only properties are used.<br/>
         /// The default value is <see cref="DataMemberKind.DataMember"/> 
-        /// which includes fields and properties and automaticly merges linked fields in properties by scanning the getter code.
+        /// which includes fields and properties and automaticly merges linked fields in properties by scanning the getter code.<br/>
         /// Linked fields can only be detected when the property fullfilles the following grammar:
         /// <include file="Comments.xml" path="doc/members/member[@name='Properties:PropertySyntax']/*"/>
         /// </param>
-        public AutoEqualsAttribute(DataMemberKind dataMemberKind = DataMemberKind.DataMember) : base(dataMemberKind) { }
+        /// <param name="forceIncludeBase">
+        /// Determines if <see langword="base"/>.Equals() is forced to be called.
+        /// </param>
+        public AutoEqualsAttribute(DataMemberKind dataMemberKind = DataMemberKind.DataMember, bool forceIncludeBase = false) 
+        { 
+            DataMemberKind = dataMemberKind;
+            ForceIncludeBase = forceIncludeBase;
+        }
+
+        /// <summary>
+        /// Defines which data members are used to generate <see cref="object.Equals(object)"/>.<br/>
+        /// </summary>
+        public DataMemberKind DataMemberKind { get; }
+
+        /// <summary>
+        /// Determines if <see langword="base"/>.Equals() is forced to be called.
+        /// </summary>
+        public bool ForceIncludeBase { get; }
     }
 
     /// <summary>
