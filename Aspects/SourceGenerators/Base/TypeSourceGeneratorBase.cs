@@ -46,7 +46,7 @@ namespace Aspects.SourceGenerators.Base
             return Enumerable.Empty<string>();
         }
 
-        protected abstract string ClassBody(TypeInfo typeInfo);
+        protected abstract string TypeBody(TypeInfo typeInfo);
 
         private string GeneratePartialType(TypeInfo typeInfo)
         {
@@ -70,7 +70,7 @@ namespace Aspects.SourceGenerators.Base
                 sb.AppendLine($" : {string.Join(", ", ifaces)}");
             sb.AppendLine(CodeSnippets.Indent("{"));
 
-            sb.AppendLine(ClassBody(typeInfo)
+            sb.AppendLine(TypeBody(typeInfo)
                 .Replace("\n", $"\n{CodeSnippets.Indent(tabCount: 2)}")
                 .Insert(0, CodeSnippets.Indent(tabCount: 2)));
 

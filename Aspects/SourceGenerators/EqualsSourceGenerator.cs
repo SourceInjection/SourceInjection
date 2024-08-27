@@ -13,7 +13,7 @@ namespace Aspects.SourceGenerators
 {
     [Generator]
     internal class EqualsSourceGenerator
-        : ObjectMethodSourceGeneratorBase<IEqualsConfigAttribute, IEqualsAttribute, IEqualsExcludeAttribute>
+        : ObjectMethodSourceGeneratorBase<IAutoEqualsAttribute, IEqualsAttribute, IEqualsExcludeAttribute>
     {
         private const string argName = "obj";
         private const string otherName = "other";
@@ -22,24 +22,17 @@ namespace Aspects.SourceGenerators
 
         protected override DataMemberPriority Priority { get; } = DataMemberPriority.Field;
 
-        protected override DataMemberKind DataMemberKindFromAttribute(IEqualsConfigAttribute attr)
+        protected override DataMemberKind DataMemberKindFromAttribute(IAutoEqualsAttribute attr)
         {
             return attr.DataMemberKind;
         }
 
-        protected override string ClassBody(TypeInfo typeInfo)
+        protected override string TypeBody(TypeInfo typeInfo)
         {
             var config = GetConfigAttribute(typeInfo);
 
             var sb = new StringBuilder();
-
-            if(typeInfo.HasNullableEnabled)
-                sb.AppendLine("#nullable enable");
-            sb.Append($"public override bool {Name}(object");
-            if (typeInfo.HasNullableEnabled)
-                sb.Append('?');
-            sb.AppendLine($" {argName})");
-            sb.AppendLine("{");
+            AppendMethodStart(typeInfo, sb);
 
             sb.Append(CodeSnippets.Indent("return"));
             if (typeInfo.Symbol.IsReferenceType)
@@ -59,36 +52,71 @@ namespace Aspects.SourceGenerators
 
             foreach (var symbol in symbols)
             {
-                sb.AppendLine();
-                sb.Append(CodeSnippets.Indent($"&& {MemberEquals(symbol, typeInfo.HasNullableEnabled)}", 2));
+                var memberEquals = MemberEquals(
+                    symbol,
+                    typeInfo.HasNullableEnabled,
+                    GetNullSafety(symbol, config));
+
+                sb.AppendLine().Append(CodeSnippets.Indent($"&& {memberEquals}", 2));
             }
-            
+
             sb.AppendLine(";");
 
-            sb.Append("}");
-            if (typeInfo.HasNullableEnabled)
-            {
-                sb.AppendLine();
-                sb.Append("#nullable restore");
-            }
+            AppendMethodEnd(typeInfo, sb);
             return sb.ToString();
         }
 
-        private bool ShouldIncludeBase(TypeInfo typeInfo, IEqualsConfigAttribute configAttribute)
+        private void AppendMethodStart(TypeInfo typeInfo, StringBuilder sb)
         {
-            return configAttribute.ForceIncludeBase || typeInfo.Symbol.IsReferenceType 
-                && typeInfo.Symbol.BaseType is ITypeSymbol syBase 
-                && (syBase.HasAttributeOfType<IEqualsConfigAttribute>() || syBase.OverridesEquals());
+            if (typeInfo.HasNullableEnabled)
+                sb.AppendLine("#nullable enable");
+            sb.Append($"public override bool {Name}(object");
+            if (typeInfo.HasNullableEnabled)
+                sb.Append('?');
+            sb.AppendLine($" {argName})");
+            sb.AppendLine("{");
         }
 
-        private string MemberEquals(ISymbol symbol, bool nullableEnabled)
+        private static void AppendMethodEnd(TypeInfo typeInfo, StringBuilder sb)
+        {
+            sb.Append("}");
+            if (typeInfo.HasNullableEnabled)
+                sb.AppendLine().Append("#nullable restore");
+        }
+
+        private static bool ShouldIncludeBase(TypeInfo typeInfo, IAutoEqualsAttribute configAttribute)
+        {
+            return typeInfo.Symbol.IsReferenceType && (
+                configAttribute.BaseCall == BaseCall.On || configAttribute.BaseCall == BaseCall.Auto 
+                    && typeInfo.Symbol.BaseType is ITypeSymbol syBase && (
+                        syBase.HasAttributeOfType<IAutoEqualsAttribute>() 
+                        || syBase.OverridesEquals() 
+                        || syBase.GetMembers().Any(m => m.HasAttributeOfType<IEqualsAttribute>())));
+        }
+
+        private static NullSafety GetNullSafety(ISymbol symbol, IAutoEqualsAttribute config)
+        {
+            var memberAttribute = GetMemberAttribute(symbol);
+
+            if (memberAttribute.NullSafety != NullSafety.Auto)
+                return memberAttribute.NullSafety;
+            if (symbol.HasNotNullAttribute())
+                return NullSafety.Off;
+            if(symbol.HasMaybeNullAttribute())
+                return NullSafety.On;
+            return config.NullSafety;
+        }
+
+        private static string MemberEquals(ISymbol symbol, bool nullableEnabled, NullSafety nullSafety)
         {
             var type = GetType(symbol);
-            var nullSafe = !nullableEnabled || type.HasNullableAnnotation();
+            var nullSafe = nullSafety == NullSafety.On ||
+                nullSafety == NullSafety.Auto && (!nullableEnabled || type.HasNullableAnnotation());
+
             return Comparison(type, symbol.Name, nullSafe);
         }
 
-        private ITypeSymbol GetType(ISymbol symbol)
+        private static ITypeSymbol GetType(ISymbol symbol)
         {
             if (symbol is IFieldSymbol field)
                 return field.Type;
@@ -97,7 +125,7 @@ namespace Aspects.SourceGenerators
             throw new NotImplementedException();
         }
 
-        private string Comparison(ITypeSymbol type, string memberName, bool nullSafe)
+        private static string Comparison(ITypeSymbol type, string memberName, bool nullSafe)
         {
             var snippet = CodeSnippets.EqualityCheck(type, memberName, $"{otherName}.{memberName}", nullSafe);
             return snippet.Contains("||")
@@ -105,11 +133,21 @@ namespace Aspects.SourceGenerators
                 : snippet;
         }
 
-        private static IEqualsConfigAttribute GetConfigAttribute(TypeInfo typeInfo)
+        private static IEqualsAttribute GetMemberAttribute(ISymbol symbol)
         {
-            var attData = typeInfo.Symbol.AttributesOfType<IEqualsConfigAttribute>().FirstOrDefault();
-            if (attData is null || !AttributeFactory.TryCreate<IEqualsConfigAttribute>(attData, out var config))
-                return new AutoEqualsAttribute();
+            return GetAttribute<IEqualsAttribute>(symbol, new EqualsAttribute());
+        }
+
+        private static IAutoEqualsAttribute GetConfigAttribute(TypeInfo typeInfo)
+        {
+            return GetAttribute<IAutoEqualsAttribute>(typeInfo.Symbol, new AutoEqualsAttribute());
+        }
+
+        private static T GetAttribute<T>(ISymbol symbol, T defaultValue)
+        {
+            var attData = symbol.AttributesOfType<T>().FirstOrDefault();
+            if (attData is null || !AttributeFactory.TryCreate<T>(attData, out var config))
+                return defaultValue;
             return config;
         }
     }

@@ -12,18 +12,18 @@ namespace Aspects.SourceGenerators
 {
     [Generator]
     internal class HashCodeSourceGenerator 
-        : ObjectMethodSourceGeneratorBase<IHashCodeConfigAttribute, IHashCodeAttribute, IHashCodeExcludeAttribute>
+        : ObjectMethodSourceGeneratorBase<IAutoHashCodeAttribute, IHashCodeAttribute, IHashCodeExcludeAttribute>
     {
         protected internal override string Name { get; } = nameof(GetHashCode);
 
         protected override DataMemberPriority Priority { get; } = DataMemberPriority.Field;
 
-        protected override DataMemberKind DataMemberKindFromAttribute(IHashCodeConfigAttribute attr)
+        protected override DataMemberKind DataMemberKindFromAttribute(IAutoHashCodeAttribute attr)
         {
             return attr.DataMemberKind;
         }
 
-        protected override string ClassBody(TypeInfo typeInfo)
+        protected override string TypeBody(TypeInfo typeInfo)
         {
             const int hashCodeCombineMaxArgs = 8;
 
@@ -94,21 +94,24 @@ namespace Aspects.SourceGenerators
             return sb.ToString();
         }
 
-        private string MemberHash(ISymbol symbol)
+        private static string MemberHash(ISymbol symbol)
         {
             if (!MustUseCombinedHashCode(symbol))
                 return symbol.Name;
             return CodeSnippets.CombinedHashCodeMethod(symbol.Name);
         }
 
-        private bool ShouldIncludeBase(TypeInfo typeInfo, IHashCodeConfigAttribute config)
+        private static bool ShouldIncludeBase(TypeInfo typeInfo, IAutoHashCodeAttribute config)
         {
-            return config.ForceIncludeBase || typeInfo.Symbol.IsReferenceType
-                && typeInfo.Symbol.BaseType is ITypeSymbol syBase 
-                && (syBase.HasAttributeOfType<IHashCodeConfigAttribute>() || syBase.OverridesGetHashCode());
+            return typeInfo.Symbol.IsReferenceType && ( 
+                config.BaseCall == BaseCall.On || config.BaseCall == BaseCall.Auto 
+                    && typeInfo.Symbol.BaseType is ITypeSymbol syBase && (
+                        syBase.HasAttributeOfType<IAutoHashCodeAttribute>() 
+                        || syBase.OverridesGetHashCode() 
+                        || syBase.GetMembers().Any(m => m.HasAttributeOfType<IHashCodeAttribute>())));
         }
 
-        private bool MustUseCombinedHashCode(ISymbol symbol)
+        private static bool MustUseCombinedHashCode(ISymbol symbol)
         {
             ITypeSymbol type;
             if (symbol is IPropertySymbol p)
@@ -120,10 +123,10 @@ namespace Aspects.SourceGenerators
             return type.IsEnumerable() && !type.OverridesGetHashCode();
         }
 
-        private static IHashCodeConfigAttribute GetConfigAttribute(TypeInfo typeInfo)
+        private static IAutoHashCodeAttribute GetConfigAttribute(TypeInfo typeInfo)
         {
-            var attData = typeInfo.Symbol.AttributesOfType<IHashCodeConfigAttribute>().FirstOrDefault();
-            if (attData is null || !AttributeFactory.TryCreate<IHashCodeConfigAttribute>(attData, out var config))
+            var attData = typeInfo.Symbol.AttributesOfType<IAutoHashCodeAttribute>().FirstOrDefault();
+            if (attData is null || !AttributeFactory.TryCreate<IAutoHashCodeAttribute>(attData, out var config))
                 return new AutoHashCodeAttribute();
             return config;
         }

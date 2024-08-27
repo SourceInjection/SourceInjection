@@ -12,7 +12,7 @@ namespace Aspects.Attributes
     /// <include file="Comments.xml" path="doc/members/member[@name='Properties:PropertySyntax']/*"/>
     /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, Inherited = false, AllowMultiple = false)]
-    public class AutoHashCodeAttribute : Attribute, IHashCodeConfigAttribute
+    public class AutoHashCodeAttribute : Attribute, IAutoHashCodeAttribute
     {
         /// <summary>
         /// Creates an instance of <see cref="AutoHashCodeAttribute"/>.
@@ -26,12 +26,12 @@ namespace Aspects.Attributes
         /// Linked fields can only be detected when the property fullfilles the following grammar:
         /// <include file="Comments.xml" path="doc/members/member[@name='Properties:PropertySyntax']/*"/>
         /// </param>
-        /// <param name="forceIncludeBase">
-        /// Determines if <see langword="base"/>.GetHashCode() is forced to be called.
+        /// <param name="baseCall">
+        /// Determines if <see langword="base"/>.GetHashCode() is called.
         /// </param>
-        public AutoHashCodeAttribute(DataMemberKind dataMemberKind = DataMemberKind.DataMember, bool forceIncludeBase = false)
-        { 
-            ForceIncludeBase = forceIncludeBase;
+        public AutoHashCodeAttribute(DataMemberKind dataMemberKind = DataMemberKind.DataMember, BaseCall baseCall = BaseCall.Auto)
+        {
+            BaseCall = baseCall;
             DataMemberKind = dataMemberKind;
         }
 
@@ -41,9 +41,9 @@ namespace Aspects.Attributes
         public DataMemberKind DataMemberKind { get; }
 
         /// <summary>
-        /// Determines if <see langword="base"/>.GetHashCode() is forced to be called.
+        /// Determines if <see langword="base"/>.GetHashCode() is called.
         /// </summary>
-        public bool ForceIncludeBase { get; }
+        public BaseCall BaseCall { get; }
     }
 
     /// <summary>

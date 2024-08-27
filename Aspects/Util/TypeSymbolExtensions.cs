@@ -56,18 +56,18 @@ namespace Aspects.Util
         }
 
         /// <summary>
-        /// Checks if the <see cref="ITypeSymbol"/> overrides <see cref="object.Equals(object)"/> itself or in any base class.
+        /// Checks if the <see cref="ITypeSymbol"/> overrides <see cref="object.Equals(object)"/>.
         /// </summary>
         /// <param name="symbol">the <see cref="ITypeSymbol"/> which is checked to override <see cref="object.Equals(object)"/>.</param>
         /// <returns><see langword="true"/> if the <see cref="object.Equals(object)"/> method is overridden else <see langword="false"/>.</returns>
         public static bool OverridesEquals(this ITypeSymbol symbol)
         {
-            return symbol.Inheritance().Any(cl => cl.GetMembers().OfType<IMethodSymbol>().Any(m =>
-                m.Name == nameof(Equals)
-                && m.IsOverride
-                && m.ReturnType.IsBoolean()
-                && m.Parameters.Length == 1
-                && m.Parameters[0].Type.IsObject(true)));
+            return symbol.GetMembers().OfType<IMethodSymbol>().Any(
+                m => m.Name == nameof(Equals)
+                    && m.IsOverride
+                    && m.ReturnType.IsBoolean()
+                    && m.Parameters.Length == 1
+                    && m.Parameters[0].Type.IsObject(true));
         }
 
         /// <summary>

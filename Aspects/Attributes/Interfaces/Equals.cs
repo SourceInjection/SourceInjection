@@ -1,13 +1,18 @@
 ﻿namespace Aspects.Attributes.Interfaces
 {
-    public interface IEqualsConfigAttribute 
+    public interface IAutoEqualsAttribute 
     {
         DataMemberKind DataMemberKind { get; }
 
-        bool ForceIncludeBase { get; }
+        BaseCall BaseCall { get; }
+
+        NullSafety NullSafety { get; }
     }
 
-    public interface IEqualsAttribute { }
+    public interface IEqualsAttribute 
+    { 
+        NullSafety NullSafety { get; }
+    }
 
     public interface IEqualsExcludeAttribute { }
 }

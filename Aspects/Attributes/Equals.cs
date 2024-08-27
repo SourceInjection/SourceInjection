@@ -12,7 +12,7 @@ namespace Aspects.Attributes
     /// <include file="Comments.xml" path="doc/members/member[@name='Properties:PropertySyntax']/*"/>
     /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, Inherited = false, AllowMultiple = false)]
-    public class AutoEqualsAttribute : Attribute, IEqualsConfigAttribute
+    public class AutoEqualsAttribute : Attribute, IAutoEqualsAttribute
     {
         /// <summary>
         /// Creates an instance of <see cref="AutoEqualsAttribute"/>.
@@ -26,13 +26,20 @@ namespace Aspects.Attributes
         /// Linked fields can only be detected when the property fullfilles the following grammar:
         /// <include file="Comments.xml" path="doc/members/member[@name='Properties:PropertySyntax']/*"/>
         /// </param>
-        /// <param name="forceIncludeBase">
-        /// Determines if <see langword="base"/>.Equals() is forced to be called.
+        /// <param name="baseCall">
+        /// Determines if <see langword="base"/>.Equals() is called.
         /// </param>
-        public AutoEqualsAttribute(DataMemberKind dataMemberKind = DataMemberKind.DataMember, bool forceIncludeBase = false) 
+        /// <param name="nullSafety">
+        /// Determines if the equalization is generated null safe.
+        /// </param>
+        public AutoEqualsAttribute(
+            DataMemberKind dataMemberKind = DataMemberKind.DataMember, 
+            BaseCall baseCall = BaseCall.Auto, 
+            NullSafety nullSafety = NullSafety.Auto) 
         { 
             DataMemberKind = dataMemberKind;
-            ForceIncludeBase = forceIncludeBase;
+            BaseCall = baseCall;
+            NullSafety = nullSafety;
         }
 
         /// <summary>
@@ -41,9 +48,14 @@ namespace Aspects.Attributes
         public DataMemberKind DataMemberKind { get; }
 
         /// <summary>
-        /// Determines if <see langword="base"/>.Equals() is forced to be called.
+        /// Determines if <see langword="base"/>.Equals() is called.
         /// </summary>
-        public bool ForceIncludeBase { get; }
+        public BaseCall BaseCall { get; }
+
+        /// <summary>
+        /// Determines if null safe operations are used.
+        /// </summary>
+        public NullSafety NullSafety { get; }
     }
 
     /// <summary>
@@ -52,7 +64,22 @@ namespace Aspects.Attributes
     /// If used in combination with <see cref="AutoEqualsAttribute"/> this attribute includes members that are normally excluded.
     /// </summary>
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, Inherited = true, AllowMultiple = false)]
-    public class EqualsAttribute : Attribute, IEqualsAttribute { }
+    public class EqualsAttribute : Attribute, IEqualsAttribute 
+    { 
+        /// <summary>
+        /// Creates an instance of <see cref="EqualsAttribute"/>.
+        /// </summary>
+        /// <param name="nullSafety">Determines if null safe equalizations are used.</param>
+        public EqualsAttribute(NullSafety nullSafety = NullSafety.Auto)
+        {
+            NullSafety = nullSafety;
+        }
+
+        /// <summary>
+        /// Determines if null safe operations are used.
+        /// </summary>
+        public NullSafety NullSafety { get; }
+    }
 
     /// <summary>
     /// Must be used in combination with <see cref="AutoEqualsAttribute"/>.

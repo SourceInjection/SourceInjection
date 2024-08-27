@@ -12,18 +12,18 @@ namespace Aspects.SourceGenerators
 {
     [Generator]
     internal class ToStringSourceGenerator 
-        : ObjectMethodSourceGeneratorBase<IToStringConfigAttribute, IToStringAttribute, IToStringExcludeAttribute>
+        : ObjectMethodSourceGeneratorBase<IAutoToStringAttribute, IToStringAttribute, IToStringExcludeAttribute>
     {
         protected internal override string Name { get; } = nameof(ToString);
 
         protected override DataMemberPriority Priority { get; } = DataMemberPriority.Property;
 
-        protected override DataMemberKind DataMemberKindFromAttribute(IToStringConfigAttribute attr)
+        protected override DataMemberKind DataMemberKindFromAttribute(IAutoToStringAttribute attr)
         {
             return attr.DataMemberKind;
         }
 
-        protected override string ClassBody(TypeInfo typeInfo)
+        protected override string TypeBody(TypeInfo typeInfo)
         {
             var sb = new StringBuilder();
             sb.AppendLine($"public override string {Name}()");

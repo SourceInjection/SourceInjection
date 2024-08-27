@@ -86,7 +86,7 @@ $@"protected virtual void {PropertyChangingNotifyMethod}(string propertyName)
                 && method.Parameters[0].Type.Name == nameof(String);
         }
 
-        protected override string ClassBody(TypeInfo typeInfo)
+        protected override string TypeBody(TypeInfo typeInfo)
         {
             var sb = new StringBuilder();
             var fields = GetFields(typeInfo);

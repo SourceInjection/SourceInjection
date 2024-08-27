@@ -1,10 +1,10 @@
 ﻿namespace Aspects.Attributes.Interfaces
 {
-    public interface IHashCodeConfigAttribute 
+    public interface IAutoHashCodeAttribute 
     {
         DataMemberKind DataMemberKind { get; }
 
-        bool ForceIncludeBase { get; }
+        BaseCall BaseCall { get; }
     }
 
     public interface IHashCodeAttribute { }

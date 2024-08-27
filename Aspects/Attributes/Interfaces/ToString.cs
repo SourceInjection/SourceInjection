@@ -1,6 +1,6 @@
 ﻿namespace Aspects.Attributes.Interfaces
 {
-    public interface IToStringConfigAttribute 
+    public interface IAutoToStringAttribute 
     {
         DataMemberKind DataMemberKind { get; }
     }

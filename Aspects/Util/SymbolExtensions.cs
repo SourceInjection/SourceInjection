@@ -57,5 +57,39 @@ namespace Aspects.Util
             return symbol is IFieldSymbol field
                 && field.DeclaredAccessibility == Accessibility.Public;
         }
+
+        /// <summary>
+        /// Checks if the given <see cref="ISymbol"/> has a System.Diagnostic.Analysis.NotNull attribute.
+        /// </summary>
+        /// <param name="symbol">The <see cref="ISymbol"/> to be checked.</param>
+        /// <returns><see langword="true"/> if the <see cref="ISymbol"/> has a System.Diagnostic.Analysis.NotNull attribute else <see langword="false"/>.</returns>
+        public static bool HasNotNullAttribute(this ISymbol symbol)
+        {
+            return symbol.GetAttributes()
+                .Any(a => IsNotNullAttribute(a.AttributeClass.ToDisplayString()));
+        }
+
+        /// <summary>
+        /// Checks if the given <see cref="ISymbol"/> has a System.Diagnostic.Analysis.MaybeNull attribute.
+        /// </summary>
+        /// <param name="symbol">The <see cref="ISymbol"/> to be checked.</param>
+        /// <returns><see langword="true"/> if the <see cref="ISymbol"/> has a System.Diagnostic.Analysis.MaybeNull attribute else <see langword="false"/>.</returns>
+        public static bool HasMaybeNullAttribute(this ISymbol symbol)
+        {
+            return symbol.GetAttributes()
+                .Any(a => IsMaybeNullAttribute(a.AttributeClass.ToDisplayString()));
+        }
+
+        private static bool IsNotNullAttribute(string attributeName)
+        {
+            const string notNullAttribute = "System.Diagnostics.CodeAnalysis.NotNullAttribute";
+            return attributeName == notNullAttribute;
+        }
+
+        private static bool IsMaybeNullAttribute(string attributeName)
+        {
+            const string maybeNullAttribute = "System.Diagnostics.CodeAnalysis.MaybeNullAttribute";
+            return attributeName == maybeNullAttribute;
+        }
     }
 }

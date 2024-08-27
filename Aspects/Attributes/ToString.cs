@@ -12,7 +12,7 @@ namespace Aspects.Attributes
     /// <include file="Comments.xml" path="doc/members/member[@name='Properties:PropertySyntax']/*"/>
     /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, Inherited = false, AllowMultiple = false)]
-    public class AutoToStringAttribute : Attribute, IToStringConfigAttribute
+    public class AutoToStringAttribute : Attribute, IAutoToStringAttribute
     {
         /// <summary>
         /// Creates an instance of <see cref="ToStringAttribute"/>.

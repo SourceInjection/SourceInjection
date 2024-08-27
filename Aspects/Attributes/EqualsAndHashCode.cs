@@ -7,7 +7,7 @@ namespace Aspects.Attributes
     /// Combines attributes <see cref="AutoEqualsAttribute"/> and <see cref="AutoHashCodeAttribute"/>.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, Inherited = false, AllowMultiple = false)]
-    public class AutoEqualsAndHashCodeAttribute : Attribute, IEqualsConfigAttribute, IHashCodeConfigAttribute
+    public class AutoEqualsAndHashCodeAttribute : Attribute, IAutoEqualsAttribute, IAutoHashCodeAttribute
     {
         /// <summary>
         /// Creates an instance of <see cref="AutoEqualsAndHashCodeAttribute"/>.
@@ -30,22 +30,27 @@ namespace Aspects.Attributes
         /// Linked fields can only be detected when the property fullfilles the following grammar:
         /// <include file="Comments.xml" path="doc/members/member[@name='Properties:PropertySyntax']/*"/>
         /// </param>
-        /// <param name="fordeIncludeBaseEquals">
-        /// Determines if <see langword="base"/>.Equals() is forced to be called.
+        /// <param name="equalsBaseCall">
+        /// Determines if <see langword="base"/>.Equals() is called.
         /// </param>
-        /// <param name="forceIncludeBaseGetHashCode">
-        /// Determines if <see langword="base"/>.GetHashCode() is forced to be called.
+        /// <param name="hashCodeBaseCall">
+        /// Determines if <see langword="base"/>.GetHashCode() is called.
+        /// </param>
+        /// <param name="equalsNullSafety">
+        /// Determines if the equals check is generated null safe.
         /// </param>
         public AutoEqualsAndHashCodeAttribute(
-            DataMemberKind equalsDataMemberKind = DataMemberKind.DataMember, 
+            DataMemberKind equalsDataMemberKind = DataMemberKind.DataMember,
+            BaseCall equalsBaseCall = BaseCall.Auto,
+            NullSafety equalsNullSafety = NullSafety.Auto,
             DataMemberKind hashCodeDataMemberKind = DataMemberKind.DataMember,
-            bool fordeIncludeBaseEquals = false, 
-            bool forceIncludeBaseGetHashCode = false)
+            BaseCall hashCodeBaseCall = BaseCall.Auto)
         { 
             EqualsDataMemberKind = equalsDataMemberKind;
+            EqualsBaseCall = equalsBaseCall;
+            EqualsNullSafety = equalsNullSafety;
             HashCodeDataMemberKind = hashCodeDataMemberKind;
-            ForceIncludeBaseEquals = fordeIncludeBaseEquals;
-            ForceIncludeBaseGetHashCode = forceIncludeBaseGetHashCode;
+            HashCodeBaseCall = hashCodeBaseCall;
         }
 
         /// <summary>
@@ -59,29 +64,53 @@ namespace Aspects.Attributes
         public DataMemberKind HashCodeDataMemberKind { get; }
 
         /// <summary>
-        /// Determines if <see langword="base"/>.Equals() is forced to be called.
+        /// Determines if <see langword="base"/>.Equals() is called.
         /// </summary>
-        public bool ForceIncludeBaseEquals { get; }
+        public BaseCall EqualsBaseCall { get; }
 
         /// <summary>
-        /// Determines if <see langword="base"/>.GetHashCode() is forced to be called.
+        /// Determines if <see langword="base"/>.GetHashCode() is called.
         /// </summary>
-        public bool ForceIncludeBaseGetHashCode { get; }
+        public BaseCall HashCodeBaseCall { get; }
 
-        DataMemberKind IEqualsConfigAttribute.DataMemberKind => EqualsDataMemberKind;
+        /// <summary>
+        /// Determines if the equalization is generated nullsafe.
+        /// </summary>
+        public NullSafety EqualsNullSafety { get; }
 
-        DataMemberKind IHashCodeConfigAttribute.DataMemberKind => HashCodeDataMemberKind;
+        DataMemberKind IAutoEqualsAttribute.DataMemberKind => EqualsDataMemberKind;
 
-        bool IEqualsConfigAttribute.ForceIncludeBase => ForceIncludeBaseEquals;
+        DataMemberKind IAutoHashCodeAttribute.DataMemberKind => HashCodeDataMemberKind;
 
-        bool IHashCodeConfigAttribute.ForceIncludeBase => ForceIncludeBaseGetHashCode;
+        BaseCall IAutoEqualsAttribute.BaseCall => EqualsBaseCall;
+
+        BaseCall IAutoHashCodeAttribute.BaseCall => HashCodeBaseCall;
+
+        NullSafety IAutoEqualsAttribute.NullSafety => EqualsNullSafety;
     }
 
     /// <summary>
     /// Combines attributes <see cref="EqualsAttribute"/> and <see cref="HashCodeAttribute"/>.
     /// </summary>
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, Inherited = true, AllowMultiple = false)]
-    public class EqualsAndHashCodeAttribute : Attribute, IEqualsAttribute, IHashCodeAttribute { }
+    public class EqualsAndHashCodeAttribute : Attribute, IEqualsAttribute, IHashCodeAttribute 
+    { 
+        /// <summary>
+        /// Creates an instance of <see cref="EqualsAndHashCodeAttribute"/>.
+        /// </summary>
+        /// <param name="equalsNullSafety">Determines if the equalization is generated null safe.</param>
+        public EqualsAndHashCodeAttribute(NullSafety equalsNullSafety = NullSafety.Auto) 
+        {
+            EqualsNullSafety = equalsNullSafety;
+        }
+
+        /// <summary>
+        /// Determines if the equalization is generated nullsafe.
+        /// </summary>
+        public NullSafety EqualsNullSafety { get; }
+
+        NullSafety IEqualsAttribute.NullSafety => EqualsNullSafety;
+    }
 
     /// <summary>
     /// Combines attributes <see cref="EqualsExcludeAttribute"/> and <see cref="HashCodeExcludeAttribute"/>.
