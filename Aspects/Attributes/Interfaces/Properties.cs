@@ -2,17 +2,17 @@
 
 namespace Aspects.Attributes.Interfaces
 {
-    public interface IGeneratesPropertyFromFieldAttribute 
+    public interface IGeneratesPublicPropertyFromFieldAttribute 
     {
         string PropertyName(IFieldSymbol field);
     }
 
-    public interface INotifyPropertyChangedAttribute : IGeneratesPropertyFromFieldAttribute
+    public interface INotifyPropertyChangedAttribute : IGeneratesPublicPropertyFromFieldAttribute
     {
         bool EqualityCheck { get; }
     }
 
-    public interface INotifyPropertyChangingAttribute : IGeneratesPropertyFromFieldAttribute
+    public interface INotifyPropertyChangingAttribute : IGeneratesPublicPropertyFromFieldAttribute
     {
         bool EqualityCheck { get; }
     }

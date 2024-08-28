@@ -1,6 +1,8 @@
 ﻿using Aspects.Attributes;
 using System.Diagnostics.CodeAnalysis;
 
+#pragma warning disable CS0659
+
 namespace Aspects.Test.CompileTime.Equals.Code
 {
     public partial class ReferenceTypeEmpty_NoAttribute { }
@@ -65,9 +67,7 @@ namespace Aspects.Test.CompileTime.Equals.Code
         public ReferenceTypeEmpty Property { get; } = null!;
     }
 
-#pragma warning disable CS0659 // Type overrides Object.Equals(object o) but does not override Object.GetHashCode()
     public partial class ReferenceTypeWithEqualsOverride
-#pragma warning restore CS0659 // Type overrides Object.Equals(object o) but does not override Object.GetHashCode()
     {
         public override bool Equals(object? obj)
         {
@@ -129,3 +129,5 @@ namespace Aspects.Test.CompileTime.Equals.Code
         public En Enum { get; }
     }
 }
+
+#pragma warning restore CS0659

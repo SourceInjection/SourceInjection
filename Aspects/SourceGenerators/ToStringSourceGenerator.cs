@@ -31,17 +31,15 @@ namespace Aspects.SourceGenerators
 
             sb.Append(CodeSnippets.Indent($"return $\"({typeInfo.Name})"));
 
-            var symbols = GetPublicSymbols(typeInfo)
-                .Where(sy => !IsExcluded(sy));
+            var names = GetMemberNames(typeInfo);
 
-            if (symbols.Any())
+            if (names.Length > 0)
             {
                 sb.Append("{{");
-                var first = symbols.First().Name;
-                sb.Append($"{first}: {{{first}}}");
+                sb.Append($"{names[0]}: {{{names[0]}}}");
 
-                foreach (var name in symbols.Skip(1).Select(s => s.Name))
-                    sb.Append($", {name}: {{{name}}}");
+                for(int i = 1; i < names.Length; i++)
+                    sb.Append($", {names[i]}: {{{names[i]}}}");
                 sb.Append("}}");
             }
             sb.AppendLine("\";");
@@ -50,11 +48,32 @@ namespace Aspects.SourceGenerators
             return sb.ToString();
         }
 
+        private string[] GetMemberNames(TypeInfo typeInfo)
+        {
+            return GetPublicSymbols(typeInfo)
+                .Where(sy => !IsExcluded(sy))
+                .Select(sy => sy.Name)
+                .Concat(typeInfo.Symbol.GetMembers()
+                    .OfType<IFieldSymbol>()
+                    .SelectMany(f => f.AttributesOfType<IGeneratesPublicPropertyFromFieldAttribute>()
+                        .Select(a => GetAttribute(a)?.PropertyName(f))
+                        .Where(s => !string.IsNullOrEmpty(s))))
+                .Distinct()
+                .ToArray();
+        }
+
+        private IGeneratesPublicPropertyFromFieldAttribute GetAttribute(AttributeData attributeData)
+        {
+            if (!AttributeFactory.TryCreate<IGeneratesPublicPropertyFromFieldAttribute>(attributeData, out var result))
+                return null;
+            return result;
+        }
+
         private static bool IsExcluded(ISymbol symbol)
         {
             return !symbol.HasAttributeOfType<IToStringAttribute>() && (
                 symbol is IPropertySymbol p && p.Type.IsEnumerable()
-                || symbol is IFieldSymbol f && f.Type.IsEnumerable());
+                || symbol is IFieldSymbol f && (f.Type.IsEnumerable() || f.HasAttributeOfType<IGeneratesPublicPropertyFromFieldAttribute>()));
         }
     }
 }

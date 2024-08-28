@@ -40,8 +40,8 @@ namespace Aspects.SourceGenerators
 
             sb.Append($" {argName} is {typeInfo.Name}");
 
-            var symbols = GetLocalTargetedSymbols(typeInfo);
-            if (symbols.Any())
+            var symbols = GetSymbols(typeInfo, config);
+            if (symbols.Length > 0)
                 sb.Append($" {otherName}");
 
             if (ShouldIncludeBase(typeInfo, config))
@@ -55,7 +55,8 @@ namespace Aspects.SourceGenerators
                 var memberEquals = MemberEquals(
                     symbol,
                     typeInfo.HasNullableEnabled,
-                    GetNullSafety(symbol, config));
+                    GetNullSafety(symbol, config),
+                    config);
 
                 sb.AppendLine().Append(CodeSnippets.Indent($"&& {memberEquals}", 2));
             }
@@ -64,6 +65,18 @@ namespace Aspects.SourceGenerators
 
             AppendMethodEnd(typeInfo, sb);
             return sb.ToString();
+        }
+
+        private ISymbol[] GetSymbols(TypeInfo typeInfo, IAutoEqualsAttribute config)
+        {
+            var symbols = GetLocalTargetedSymbols(typeInfo);
+            if (config.DataMemberKind == DataMemberKind.Property)
+            {
+                symbols = symbols.Concat(typeInfo.Symbol.GetMembers()
+                    .OfType<IFieldSymbol>()
+                    .Where(f => f.HasAttributeOfType<IGeneratesPublicPropertyFromFieldAttribute>()));
+            }
+            return symbols.ToArray();
         }
 
         private void AppendMethodStart(TypeInfo typeInfo, StringBuilder sb)
@@ -107,13 +120,36 @@ namespace Aspects.SourceGenerators
             return config.NullSafety;
         }
 
-        private static string MemberEquals(ISymbol symbol, bool nullableEnabled, NullSafety nullSafety)
+        private static string MemberEquals(ISymbol symbol, bool nullableEnabled, NullSafety nullSafety, IAutoEqualsAttribute config)
         {
             var type = GetType(symbol);
             var nullSafe = nullSafety == NullSafety.On ||
                 nullSafety == NullSafety.Auto && (!nullableEnabled || type.HasNullableAnnotation());
 
-            return Comparison(type, symbol.Name, nullSafe);
+            var memberName = GetMemberName(symbol, config);
+
+            return Comparison(type, memberName, nullSafe);
+        }
+
+        private static string GetMemberName(ISymbol symbol, IAutoEqualsAttribute config)
+        {
+            if (!MustUsePropertyInstead(symbol, config))
+                return symbol.Name;
+
+            var field = (IFieldSymbol)symbol;
+            var propName = field.AttributesOfType<IGeneratesPublicPropertyFromFieldAttribute>()
+                .Select(a => AttributeFactory.TryCreate<IGeneratesPublicPropertyFromFieldAttribute>(a, out var attr) ? attr : null)
+                .Select(a => a?.PropertyName(field))
+                .FirstOrDefault(s => !string.IsNullOrEmpty(s));
+
+            return propName ?? symbol.Name;
+        }
+
+        private static bool MustUsePropertyInstead(ISymbol symbol, IAutoEqualsAttribute config)
+        {
+            return config.DataMemberKind == DataMemberKind.Property
+                && symbol is IFieldSymbol
+                && symbol.HasAttributeOfType<IGeneratesPublicPropertyFromFieldAttribute>();
         }
 
         private static ITypeSymbol GetType(ISymbol symbol)
@@ -135,19 +171,21 @@ namespace Aspects.SourceGenerators
 
         private static IEqualsAttribute GetMemberAttribute(ISymbol symbol)
         {
-            return GetAttribute<IEqualsAttribute>(symbol, new EqualsAttribute());
+            return GetFirstOrNull<IEqualsAttribute>(symbol)
+                ?? new EqualsAttribute();
         }
 
         private static IAutoEqualsAttribute GetConfigAttribute(TypeInfo typeInfo)
         {
-            return GetAttribute<IAutoEqualsAttribute>(typeInfo.Symbol, new AutoEqualsAttribute());
+            return GetFirstOrNull<IAutoEqualsAttribute>(typeInfo.Symbol) 
+                ?? new AutoEqualsAttribute();
         }
 
-        private static T GetAttribute<T>(ISymbol symbol, T defaultValue)
+        public static T GetFirstOrNull<T>(ISymbol symbol) where T : class
         {
             var attData = symbol.AttributesOfType<T>().FirstOrDefault();
             if (attData is null || !AttributeFactory.TryCreate<T>(attData, out var config))
-                return defaultValue;
+                return null;
             return config;
         }
     }

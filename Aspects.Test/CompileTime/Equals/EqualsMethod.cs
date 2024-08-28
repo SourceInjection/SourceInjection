@@ -6,7 +6,7 @@ namespace Aspects.Test.CompileTime.Equals
 {
     internal class EqualsMethod
     {
-        public static IMethod Get<T>()
+        public static IMethod FromType<T>()
         {
             var cu = CompileUnit.FromGeneratedCode<EqualsSourceGenerator, T>();
 

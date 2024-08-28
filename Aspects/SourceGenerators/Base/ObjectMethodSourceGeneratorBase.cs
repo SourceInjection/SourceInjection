@@ -31,7 +31,8 @@ namespace Aspects.SourceGenerators.Base
 
         protected IEnumerable<ISymbol> GetPublicSymbols(TypeInfo typeInfo)
         {
-            return GetSymbols(typeInfo, typeInfo.Members(true).Where(sy => sy.IsPublicProperty() || sy.IsPublicField()));
+            return GetSymbols(typeInfo, typeInfo.Members(true)
+                .Where(sy => sy.IsPublicProperty() || sy.IsPublicField()));
         }
 
         private IEnumerable<ISymbol> GetSymbols(TypeInfo typeInfo, IEnumerable<ISymbol> members)
@@ -105,9 +106,9 @@ namespace Aspects.SourceGenerators.Base
 
         private IEnumerable<IPropertySymbol> GetProperties(IEnumerable<ISymbol> members)
         {
-            return members.OfType<IPropertySymbol>().Where(p =>
-                PropertyIsInstanceMember(p)
-                && (!p.IsOverride || p.HasAttributeOfType<TAttribute>()) && !p.HasAttributeOfType<TExcludeAttribute>());
+            return members.OfType<IPropertySymbol>()
+                .Where(p => PropertyIsInstanceMember(p) 
+                    && (!p.IsOverride || p.HasAttributeOfType<TAttribute>()) && !p.HasAttributeOfType<TExcludeAttribute>());
         }
 
         private bool PropertyIsInstanceMember(IPropertySymbol property)

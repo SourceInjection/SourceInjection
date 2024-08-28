@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections;
 using System.Linq;
 using System;
+using Aspects.SourceGenerators.Common;
 
 namespace Aspects.Util
 {

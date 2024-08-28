@@ -1,7 +1,5 @@
-﻿using Aspects.SourceGenerators;
-using CompileUnits.CSharp;
+﻿using CompileUnits.CSharp;
 using NUnit.Framework;
-using CompileUnit = Aspects.Test.CodeAnalysis.CompileUnit;
 
 namespace Aspects.Test.CompileTime.Equals.Code
 {
@@ -35,7 +33,7 @@ namespace Aspects.Test.CompileTime.Equals.Code
         [Test]
         public void ClassTypeEqualization_ContainsReferenceEqualization()
         {
-            var sut = EqualsMethod.Get<ReferenceTypeEmpty>();
+            var sut = EqualsMethod.FromType<ReferenceTypeEmpty>();
             var paramName = sut.Parameters[0].Name;
             Assert.That(sut.Body.Contains($"return {paramName} == this || {paramName} is {nameof(ReferenceTypeEmpty)}"));
         }
@@ -43,7 +41,7 @@ namespace Aspects.Test.CompileTime.Equals.Code
         [Test]
         public void StructTypeEqualization_DoesNotContainPointerEqualization_ButContainsTypeCheck()
         {
-            var sut = EqualsMethod.Get<NonReferenceTypeEmpty>();
+            var sut = EqualsMethod.FromType<NonReferenceTypeEmpty>();
             var paramName = sut.Parameters[0].Name;
             Assert.That(sut.Body.Contains($"return {paramName} is {nameof(NonReferenceTypeEmpty)}"));
         }
@@ -51,41 +49,41 @@ namespace Aspects.Test.CompileTime.Equals.Code
         [Test]
         public void NullablePropertyEqualization_IsNullSafe()
         {
-            var sut = EqualsMethod.Get<ReferenceTypeWithNullableProperty>();
+            var sut = EqualsMethod.FromType<ReferenceTypeWithNullableProperty>();
             Assert.That(IsNullSafe(sut));
         }
         [Test]
         public void PropertyEqualization_IsNotNullSafe()
         {
-            var sut = EqualsMethod.Get<ReferenceTypeWithProperty>();
+            var sut = EqualsMethod.FromType<ReferenceTypeWithProperty>();
             Assert.That(IsNotNullSafe(sut));
         }
 
         [Test]
         public void PropertyEqualization_WhenNullableFeatureDisabled_IsNullSafe()
         {
-            var sut = EqualsMethod.Get<ReferenceTypeWithProperty_NullableDisabled>();
+            var sut = EqualsMethod.FromType<ReferenceTypeWithProperty_NullableDisabled>();
             Assert.That(IsNullSafe(sut));
         }
 
         [Test]
         public void PropertyEqualization_WhenNullableFeatureDisabled_ButNullCheckIsOff_IsNotNullSafe()
         {
-            var sut = EqualsMethod.Get<ReferenceTypeWithProperty_NullableDisabled_NullSafetyOff>();
+            var sut = EqualsMethod.FromType<ReferenceTypeWithProperty_NullableDisabled_NullSafetyOff>();
             Assert.That(IsNotNullSafe(sut));
         }
 
         [Test]
         public void NullablePropertyEqualization_WhenNullCheckIsOn_IsNullSafe()
         {
-            var sut = EqualsMethod.Get<ReferenceTypeWithProperty_NullSafetyOn>();
+            var sut = EqualsMethod.FromType<ReferenceTypeWithProperty_NullSafetyOn>();
             Assert.That(IsNullSafe(sut));
         }
 
         [Test]
         public void ClassTypeEmptyEqualization_DoesNotContainVarDefinition()
         {
-            var sut = EqualsMethod.Get<ReferenceTypeEmpty>();
+            var sut = EqualsMethod.FromType<ReferenceTypeEmpty>();
             var paramName = sut!.Parameters[0].Name;
             var expectedBody = $"{{ return {paramName} == this || {paramName} is {nameof(ReferenceTypeEmpty)}; }}";
 
@@ -95,7 +93,7 @@ namespace Aspects.Test.CompileTime.Equals.Code
         [Test]
         public void StructTypeEmptyEqualization_DoesNotContainVarDefinition()
         {
-            var sut = EqualsMethod.Get<NonReferenceTypeEmpty>();
+            var sut = EqualsMethod.FromType<NonReferenceTypeEmpty>();
             var paramName = sut!.Parameters[0].Name;
             var expectedBody = $"{{ return {paramName} is {nameof(NonReferenceTypeEmpty)}; }}";
 
@@ -105,56 +103,56 @@ namespace Aspects.Test.CompileTime.Equals.Code
         [Test]
         public void ClassTypeEqualization_WithBaseThatHasAutoEquals_CallsBaseEquals()
         {
-            var sut = EqualsMethod.Get<ReferenceTypeEmptyWithBase_ThatHasAutoEquals>();
+            var sut = EqualsMethod.FromType<ReferenceTypeEmptyWithBase_ThatHasAutoEquals>();
             Assert.That(CallsBase(sut));
         }
 
         [Test]
         public void ClassTypeEqualization_WithBaseThatHasAutoEquals_WithBaseCallOff_DoesNotCallBaseEquals()
         {
-            var sut = EqualsMethod.Get<ReferenceTypeEmptyWithBase_ThatHasAutoEquals_WithBaseCallOff>();
+            var sut = EqualsMethod.FromType<ReferenceTypeEmptyWithBase_ThatHasAutoEquals_WithBaseCallOff>();
             Assert.That(DoesNotCallBase(sut));
         }
 
         [Test]
         public void ClassTypeEqualization_WithNoEqualsOverrideInSuper_WithBaseCallOn_CallsBaseEquals()
         {
-            var sut = EqualsMethod.Get<ReferenceTypeEmpty_WithBaseCallOn>();
+            var sut = EqualsMethod.FromType<ReferenceTypeEmpty_WithBaseCallOn>();
             Assert.That(CallsBase(sut));
         }
 
         [Test]
         public void StructTypeEqualization_WithBaseCallOn_DoesNotCallBase()
         {
-            var sut = EqualsMethod.Get<NonReferenceTypeEmpty_WithBaseCallOn>();
+            var sut = EqualsMethod.FromType<NonReferenceTypeEmpty_WithBaseCallOn>();
             Assert.That(DoesNotCallBase(sut));
         }
 
         [Test]
         public void ClassTypeEqualization_WithBaseThatHasEqualsAttributeOnMember_CallsBaseEquals()
         {
-            var sut = EqualsMethod.Get<ReferenceTypeWithBase_ThatHasEqualsOnMember>();
+            var sut = EqualsMethod.FromType<ReferenceTypeWithBase_ThatHasEqualsOnMember>();
             Assert.That(CallsBase(sut));
         }
 
         [Test]
         public void ClassTypeEqualization_WithBaseThatHasNoEqualsOverride_DoesNotCallBaseEquals()
         {
-            var sut = EqualsMethod.Get<ReferenceTypeWithBase_ThatHasNoEqualsOverride>();
+            var sut = EqualsMethod.FromType<ReferenceTypeWithBase_ThatHasNoEqualsOverride>();
             Assert.That(DoesNotCallBase(sut));
         }
 
         [Test]
         public void ClassTypeEqualization_WithBaseThatHasEqualsOverride_CallsBaseEquals()
         {
-            var sut = EqualsMethod.Get<ReferenceTypeWithBase_ThatHasEqualsOverride>();
+            var sut = EqualsMethod.FromType<ReferenceTypeWithBase_ThatHasEqualsOverride>();
             Assert.That(CallsBase(sut));
         }
 
         [Test]
         public void PropertyEqualization_NotNullAttribute_NullableDisabled_IsNotNullSafe()
         {
-            var sut = EqualsMethod.Get<ReferenceTypeWithProperty_ThatHasNotNullAttribute_NullableDisabled>();
+            var sut = EqualsMethod.FromType<ReferenceTypeWithProperty_ThatHasNotNullAttribute_NullableDisabled>();
             Assert.That(IsNotNullSafe(sut));
         }
 
@@ -162,7 +160,7 @@ namespace Aspects.Test.CompileTime.Equals.Code
         [Test]
         public void PropertyEqualization_WithMaybeNullAttribute_IsNullSafe()
         {
-            var sut = EqualsMethod.Get<ReferenceTypeWithProperty_ThatHasMaybeNullAttribute>();
+            var sut = EqualsMethod.FromType<ReferenceTypeWithProperty_ThatHasMaybeNullAttribute>();
             Assert.That(IsNullSafe(sut));
         }
 
@@ -172,8 +170,17 @@ namespace Aspects.Test.CompileTime.Equals.Code
             nameof(ReferenceTypeWithProperties_ThatAllArePropertiesWithDefaultEqualOperators.Properties))]
         public void PropertyEqualization_WithType_ThatHasEqualOperatorByDefault_UsesEqualOperator(string propertyName)
         {
-            var sut = EqualsMethod.Get<ReferenceTypeWithProperties_ThatAllArePropertiesWithDefaultEqualOperators>();
+            var sut = EqualsMethod.FromType<ReferenceTypeWithProperties_ThatAllArePropertiesWithDefaultEqualOperators>();
             Assert.That(UsesOperatorEqualization(sut, propertyName));
+        }
+
+        [Test]
+        public void EqualizationWorksAsExpected()
+        {
+            var a = new ReferenceTypeEmpty();
+            var b = new ReferenceTypeEmpty();
+
+            Assert.That(a, Is.EqualTo(b));
         }
     }
 }
