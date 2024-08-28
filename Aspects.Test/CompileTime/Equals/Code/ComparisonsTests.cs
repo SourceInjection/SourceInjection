@@ -1,10 +1,10 @@
 ﻿using CompileUnits.CSharp;
 using NUnit.Framework;
 
-namespace Aspects.Test.CompileTime.Equals.Code
+namespace Aspects.Test.CompileTime.Equals.Comparisons
 {
     [TestFixture]
-    public class CodeTests
+    public class ComparisonsTests
     {
         private const string propertyName = "Property";
         private static readonly string Equalization = $"&& {propertyName}.Equals(#i.{propertyName})";

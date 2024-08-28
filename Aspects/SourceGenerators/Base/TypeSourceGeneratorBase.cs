@@ -7,6 +7,7 @@ using static Aspects.SourceGenerators.Diagnostics.Errors;
 using System.Collections.Generic;
 using System.Linq;
 using Aspects.SourceGenerators.Common;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Aspects.SourceGenerators.Base
 {
@@ -27,13 +28,14 @@ namespace Aspects.SourceGenerators.Base
             {
                 foreach (var typeInfo in SyntaxReceiver.IdentifiedTypes)
                 {
-                    if (!typeInfo.HasPartialModifier)
+                    if (typeInfo.SyntaxNode.Parent is TypeDeclarationSyntax)
+                        context.ReportDiagnostic(NestedClassesAreNotSupported(typeInfo.Symbol, Name));
+                    else if (!typeInfo.HasPartialModifier)
                         context.ReportDiagnostic(MissingPartialModifier(typeInfo.Symbol, Name));
                     else
                     {
                         var src = GeneratePartialType(typeInfo);
-                        context.AddSource($"{typeInfo.Symbol.ContainingNamespace.ToDisplayString()}." +
-                            $"{typeInfo.Name.Replace('<', '[').Replace('>', ']')}-{Name}.g.cs", SourceText.From(src, Encoding.UTF8));
+                        context.AddSource($"{typeInfo.FullNameWithGenericParameters.Replace('<', '[').Replace('>', ']')}-{Name}.g.cs", SourceText.From(src, Encoding.UTF8));
                     }
                 }
             }

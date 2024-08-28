@@ -3,7 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 
 #pragma warning disable CS0659
 
-namespace Aspects.Test.CompileTime.Equals.Code
+namespace Aspects.Test.CompileTime.Equals.Comparisons
 {
     public partial class ReferenceTypeEmpty_NoAttribute { }
 
@@ -105,8 +105,6 @@ namespace Aspects.Test.CompileTime.Equals.Code
     public record RecordType { }
 
     public enum En { A, B }
-
-
 
     [AutoEquals]
     public partial class ReferenceTypeWithProperties_ThatAllArePropertiesWithDefaultEqualOperators

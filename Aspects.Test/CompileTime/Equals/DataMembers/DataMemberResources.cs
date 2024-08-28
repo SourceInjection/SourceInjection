@@ -46,6 +46,20 @@ namespace Aspects.Test.CompileTime.Equals.DataMembers
         [NotifyPropertyChanged]
         private int _int;
     }
+
+    [AutoEquals(dataMemberKind: DataMemberKind.Field)]
+    public partial class ClassWithGeneratedProperty_DataMemberKind_Field
+    {
+        [NotifyPropertyChanged]
+        private int _int;
+    }
+
+    [AutoEquals]
+    public partial class ClassWithGeneratedProperty_DataMemberKind_DataMember
+    {
+        [NotifyPropertyChanged]
+        private int _int;
+    }
 }
 
 #pragma warning restore CS0659

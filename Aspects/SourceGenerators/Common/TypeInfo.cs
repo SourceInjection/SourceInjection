@@ -11,7 +11,8 @@ namespace Aspects.SourceGenerators.Common
     {
         private readonly Lazy<bool> _hasPartialModifier;
         private readonly Lazy<string> _declaration;
-        private readonly Lazy<string> _name;
+        private readonly Lazy<string> _nameWithGenericParameters;
+        private readonly Lazy<string> _fullNameWithGenericParameters;
         private readonly Lazy<List<INamedTypeSymbol>> _inheritanceFromBottomToTop;
         private readonly Lazy<List<PropertyInfo>> _localPropertyInfos;
         private readonly Lazy<bool> _hasNullableEnabled;
@@ -25,7 +26,8 @@ namespace Aspects.SourceGenerators.Common
                 && !syntaxNode.HasNullableDisabledDirective());
             _hasPartialModifier = new Lazy<bool>(() => syntaxNode.HasPartialModifier());
             _declaration = new Lazy<string>(() => syntaxNode.Declaration());
-            _name = new Lazy<string>(() => syntaxNode.NameWithGenericParameters());
+            _nameWithGenericParameters = new Lazy<string>(() => syntaxNode.NameWithGenericParameters());
+            _fullNameWithGenericParameters = new Lazy<string>(() => syntaxNode.FullNameWithGenericParameters());
             _inheritanceFromBottomToTop = new Lazy<List<INamedTypeSymbol>>(() => typeSymbol.InheritanceFromBottomToTop().ToList());
             _localPropertyInfos = new Lazy<List<PropertyInfo>>(() => LoadProperties(context));
         }
@@ -38,7 +40,9 @@ namespace Aspects.SourceGenerators.Common
 
         public string Declaration => _declaration.Value;
 
-        public string Name => _name.Value;
+        public string NameWithGenericParameters => _nameWithGenericParameters.Value;
+
+        public string FullNameWithGenericParameters => _fullNameWithGenericParameters.Value;
 
         public bool HasNullableEnabled => _hasNullableEnabled.Value;
 

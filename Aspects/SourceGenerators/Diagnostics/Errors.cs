@@ -16,5 +16,17 @@ namespace Aspects.SourceGenerators.Diagnostics
                     true), 
                 symbol.Locations.FirstOrDefault(), generatorName, symbol.ToDisplayString());
         }
+
+        public static Diagnostic NestedClassesAreNotSupported(ISymbol symbol, string generatorName)
+        {
+            return Diagnostic.Create(new DiagnosticDescriptor(
+                "ASG002",
+                Errors_en.Error_NestedTypesAreNotSupported_Title,
+                Errors_en.Error_NestedTypesAreNotSupported_Text,
+                Errors_en.Category_Codegeneration,
+                DiagnosticSeverity.Error,
+                true),
+            symbol.Locations.FirstOrDefault(), generatorName, symbol.ToDisplayString());
+        }
     }
 }

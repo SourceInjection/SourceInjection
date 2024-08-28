@@ -121,9 +121,15 @@
     <value>Code generation</value>
   </data>
   <data name="Error_MissingPartialModifier_Text" xml:space="preserve">
-    <value>Aspects '{0}' source generator requires type '{1}' to be marked as partial</value>
+    <value>Aspects '{0}' source generator requires type '{1}' to be marked as partial.</value>
   </data>
   <data name="Error_MissingPartialModifier_Title" xml:space="preserve">
     <value>Missing partial modifier</value>
+  </data>
+  <data name="Error_NestedTypesAreNotSupported_Text" xml:space="preserve">
+    <value>Aspects '{0}' source generator does not support nested types.</value>
+  </data>
+  <data name="Error_NestedTypesAreNotSupported_Title" xml:space="preserve">
+    <value>Nested Type not supported</value>
   </data>
 </root>

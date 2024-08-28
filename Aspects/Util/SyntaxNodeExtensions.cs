@@ -8,10 +8,10 @@ namespace Aspects.Util
     internal static class SyntaxNodeExtensions
     {
         /// <summary>
-        /// Extracts the name of the <see cref="TypeDeclarationSyntax"/> with generic type attributes.
+        /// Extracts the name of the <see cref="TypeDeclarationSyntax"/> with generic type parameters.
         /// </summary>
-        /// <param name="node">The <see cref="TypeDeclarationSyntax"/> for which the name and the generic type arguments are extracted.</param>
-        /// <returns>The name with generic type attributes.</returns>
+        /// <param name="node">The <see cref="TypeDeclarationSyntax"/> for which the name and the generic type parameters are extracted.</param>
+        /// <returns>The name with generic type parameters.</returns>
         public static string NameWithGenericParameters(this TypeDeclarationSyntax node)
         {
             if (node.TypeParameterList is null)
@@ -19,6 +19,31 @@ namespace Aspects.Util
 
             var typeDec = Declaration(node);
             return typeDec.Substring(typeDec.IndexOf(node.Identifier.Text)).Trim();
+        }
+
+        /// <summary>
+        /// Gets the full name of the <see cref="TypeDeclarationSyntax"/> with generic type parameters.
+        /// </summary>
+        /// <param name="node">The <see cref="TypeDeclarationSyntax"/> for which the full name and the generic type parameters are extracted.</param>
+        /// <returns>The full name with generic type parameters.</returns>
+        public static string FullNameWithGenericParameters(this TypeDeclarationSyntax node)
+        {
+            var name = node.NameWithGenericParameters();
+
+            while (node.Parent is TypeDeclarationSyntax type)
+            {
+                name = $"{type.NameWithGenericParameters()}.{name}";
+                node = type;
+            }
+
+            NamespaceDeclarationSyntax ns = node.Parent as NamespaceDeclarationSyntax;
+            while(ns != null)
+            {
+                name = $"{ns.Name}.{name}";
+                ns = ns.Parent as NamespaceDeclarationSyntax;
+            }
+
+            return name;
         }
 
         /// <summary>
@@ -37,7 +62,7 @@ namespace Aspects.Util
             nodeText = RemoveCompilerDirectives(nodeText).Trim();
 
             if (nodeText.Contains('>'))
-                return nodeText.Substring(0, nodeText.IndexOf('>') + 1);
+                return nodeText.Substring(0, nodeText.LastIndexOf('>') + 1);
             return nodeText.Substring(0, nodeText.IndexOf(node.Identifier.Text) + node.Identifier.Text.Length);
         }
 

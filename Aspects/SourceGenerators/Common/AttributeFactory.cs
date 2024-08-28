@@ -1,6 +1,4 @@
-﻿
-using Aspects.Util;
-using Microsoft.CodeAnalysis;
+﻿using Microsoft.CodeAnalysis;
 using System;
 using System.Linq;
 
