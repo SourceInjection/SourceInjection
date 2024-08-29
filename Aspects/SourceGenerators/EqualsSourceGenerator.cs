@@ -74,7 +74,7 @@ namespace Aspects.SourceGenerators
             {
                 symbols = symbols.Concat(typeInfo.Symbol.GetMembers()
                     .OfType<IFieldSymbol>()
-                    .Where(f => f.HasAttributeOfType<IGeneratesPublicPropertyFromFieldAttribute>()));
+                    .Where(f => f.HasAttributeOfType<IGeneratesPublicDataMemberPropertyFromFieldAttribute>()));
             }
             return symbols.ToArray();
         }
@@ -137,8 +137,8 @@ namespace Aspects.SourceGenerators
                 return symbol.Name;
 
             var field = (IFieldSymbol)symbol;
-            var propName = field.AttributesOfType<IGeneratesPublicPropertyFromFieldAttribute>()
-                .Select(a => AttributeFactory.TryCreate<IGeneratesPublicPropertyFromFieldAttribute>(a, out var attr) ? attr : null)
+            var propName = field.AttributesOfType<IGeneratesPublicDataMemberPropertyFromFieldAttribute>()
+                .Select(a => AttributeFactory.TryCreate<IGeneratesPublicDataMemberPropertyFromFieldAttribute>(a, out var attr) ? attr : null)
                 .Select(a => a?.PropertyName(field))
                 .FirstOrDefault(s => !string.IsNullOrEmpty(s));
 
@@ -149,7 +149,7 @@ namespace Aspects.SourceGenerators
         {
             return config.DataMemberKind == DataMemberKind.Property
                 && symbol is IFieldSymbol
-                && symbol.HasAttributeOfType<IGeneratesPublicPropertyFromFieldAttribute>();
+                && symbol.HasAttributeOfType<IGeneratesPublicDataMemberPropertyFromFieldAttribute>();
         }
 
         private static ITypeSymbol GetType(ISymbol symbol)

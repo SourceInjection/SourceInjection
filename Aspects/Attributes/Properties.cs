@@ -9,7 +9,7 @@ namespace Aspects.Attributes
     /// <summary>
     /// Abstract attribute base for <see cref="INotifyPropertyChanged.PropertyChanged"/> and / or <see cref="INotifyPropertyChanging.PropertyChanging"/> code generation.
     /// </summary>
-    public abstract class PropertyEventGenerationAttribute : Attribute, IGeneratesPublicPropertyFromFieldAttribute
+    public abstract class PropertyEventGenerationAttribute : Attribute, IGeneratesPublicDataMemberPropertyFromFieldAttribute
     {
         /// <summary>
         /// Determines if a equality check is generated.

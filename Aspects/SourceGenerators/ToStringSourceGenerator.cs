@@ -55,16 +55,16 @@ namespace Aspects.SourceGenerators
                 .Select(sy => sy.Name)
                 .Concat(typeInfo.Symbol.GetMembers()
                     .OfType<IFieldSymbol>()
-                    .SelectMany(f => f.AttributesOfType<IGeneratesPublicPropertyFromFieldAttribute>()
+                    .SelectMany(f => f.AttributesOfType<IGeneratesPublicDataMemberPropertyFromFieldAttribute>()
                         .Select(a => GetAttribute(a)?.PropertyName(f))
                         .Where(s => !string.IsNullOrEmpty(s))))
                 .Distinct()
                 .ToArray();
         }
 
-        private IGeneratesPublicPropertyFromFieldAttribute GetAttribute(AttributeData attributeData)
+        private IGeneratesPublicDataMemberPropertyFromFieldAttribute GetAttribute(AttributeData attributeData)
         {
-            if (!AttributeFactory.TryCreate<IGeneratesPublicPropertyFromFieldAttribute>(attributeData, out var result))
+            if (!AttributeFactory.TryCreate<IGeneratesPublicDataMemberPropertyFromFieldAttribute>(attributeData, out var result))
                 return null;
             return result;
         }
@@ -73,7 +73,7 @@ namespace Aspects.SourceGenerators
         {
             return !symbol.HasAttributeOfType<IToStringAttribute>() && (
                 symbol is IPropertySymbol p && p.Type.IsEnumerable()
-                || symbol is IFieldSymbol f && (f.Type.IsEnumerable() || f.HasAttributeOfType<IGeneratesPublicPropertyFromFieldAttribute>()));
+                || symbol is IFieldSymbol f && (f.Type.IsEnumerable() || f.HasAttributeOfType<IGeneratesPublicDataMemberPropertyFromFieldAttribute>()));
         }
     }
 }

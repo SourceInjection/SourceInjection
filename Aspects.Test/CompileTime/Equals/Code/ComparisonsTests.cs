@@ -7,21 +7,17 @@ namespace Aspects.Test.CompileTime.Equals.Comparisons
     public class ComparisonsTests
     {
         private const string propertyName = "Property";
-        private static readonly string Equalization = $"&& {propertyName}.Equals(#i.{propertyName})";
-        private static readonly string NullSafeEqualization = $"&& ({propertyName} == null && #i.{propertyName} == null " +
-                $"|| {propertyName}?.Equals(#i.{propertyName}) == true)";
 
 
-        private static bool IsNullSafe(IMethod m) => m.Body.Contains(NullSafeEqualization);
+        private static bool IsNullSafe(IMethod m) => m.Body.Contains(EqualsMethod.NullSafeMemberEqualization(propertyName));
 
-        private static bool IsNotNullSafe(IMethod m) => m.Body.Contains(Equalization);
+        private static bool IsNotNullSafe(IMethod m) => m.Body.Contains(EqualsMethod.MemberEqualization(propertyName));
 
         private static bool DoesNotCallBase(IMethod m) => !m.Body.Contains("base");
 
-        private static bool UsesOperatorEqualization(IMethod m, string propertyName)
-        {
-            return m.Body.Contains($"&& {propertyName} == #i.{propertyName}");
-        }
+        private static bool UsesOperatorEqualization(IMethod m, string propertyName) 
+            => m.Body.Contains(EqualsMethod.MemberOperatorEqualization(propertyName));
+
 
         private static bool CallsBase(IMethod m)
         {

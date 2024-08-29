@@ -1,5 +1,6 @@
 ﻿using Aspects.SourceGenerators;
 using CompileUnits.CSharp;
+using NUnit.Framework.Internal;
 using CompileUnit = Aspects.Test.CodeAnalysis.CompileUnit;
 
 namespace Aspects.Test.CompileTime.Equals
@@ -21,5 +22,12 @@ namespace Aspects.Test.CompileTime.Equals
                 && m.Parameters.Count == 1
                 && m.Parameters[0].Type.FormatedText is "object" or "object?";
         }
+
+        public static string MemberOperatorEqualization(string memberName) => $"&& {memberName} == #i.{memberName}";
+
+        public static string MemberEqualization(string memberName) => $"&& {memberName}.Equals(#i.{memberName})";
+
+        public static string NullSafeMemberEqualization(string memberName) => $"&& ({memberName} == null && #i.{memberName} == null " +
+                $"|| {memberName}?.Equals(#i.{memberName}) == true)";
     }
 }
