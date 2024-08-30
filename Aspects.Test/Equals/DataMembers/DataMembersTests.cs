@@ -1,8 +1,9 @@
-﻿using CompileUnits.CSharp;
+﻿using Aspects.Test.Equals;
+using CompileUnits.CSharp;
 using NUnit.Framework;
 using System.Reflection;
 
-namespace Aspects.Test.CompileTime.Equals.DataMembers
+namespace Aspects.Test.Equals.DataMembers
 {
     [TestFixture]
     internal class DataMembersTests

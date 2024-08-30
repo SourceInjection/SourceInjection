@@ -23,11 +23,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Aspects\Aspects.csproj" OutputItemType="Analyzer" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="CompileTime\TypeDetection\" />
-    <Folder Include="CompileTime\PropertyEvents\" />
-  </ItemGroup>
   <Target Name="Cleanup" AfterTargets="Clean">
     <RemoveDir Directories="$(ProjectDir)$(BaseIntermediateOutputPath)$(Configuration)\net8.0\generated\Aspects" />
   </Target>

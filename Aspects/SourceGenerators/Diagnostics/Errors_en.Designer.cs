@@ -88,7 +88,7 @@ namespace Aspects.SourceGenerators.Diagnostics {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Aspects &apos;{0}&apos; source generator does not support nested types..
+        ///   Looks up a localized string similar to Aspects &apos;{0}&apos; source generator does not support nested types yet..
         /// </summary>
         internal static string Error_NestedTypesAreNotSupported_Text {
             get {

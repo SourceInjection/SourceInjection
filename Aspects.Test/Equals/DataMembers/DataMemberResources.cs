@@ -2,7 +2,7 @@
 
 #pragma warning disable CS0659
 
-namespace Aspects.Test.CompileTime.Equals.DataMembers
+namespace Aspects.Test.Equals.DataMembers
 {
     [AutoEquals]
     public partial class ClassWithPropertyLinkedField_DataMemberKind_DataMember
