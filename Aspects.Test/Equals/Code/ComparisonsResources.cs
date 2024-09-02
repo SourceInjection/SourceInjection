@@ -1,9 +1,9 @@
 ﻿using Aspects.Attributes;
 using System.Diagnostics.CodeAnalysis;
 
-#pragma warning disable CS0659
+#pragma warning disable CS0659, S3249, S2094, S3887, CA2231
 
-namespace Aspects.Test.CompileTime.Equals.Comparisons
+namespace Aspects.Test.Equals.Code
 {
     public partial class ReferenceTypeEmpty_NoAttribute { }
 
@@ -128,4 +128,4 @@ namespace Aspects.Test.CompileTime.Equals.Comparisons
     }
 }
 
-#pragma warning restore CS0659
+#pragma warning restore CS0659, S3249, S2094, S3887, CA2231

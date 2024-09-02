@@ -1,7 +1,8 @@
-﻿using CompileUnits.CSharp;
+﻿using Aspects.Test.Equals;
+using CompileUnits.CSharp;
 using NUnit.Framework;
 
-namespace Aspects.Test.CompileTime.Equals.Comparisons
+namespace Aspects.Test.Equals.Code
 {
     [TestFixture]
     public class ComparisonsTests

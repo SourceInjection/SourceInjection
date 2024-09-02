@@ -38,7 +38,7 @@ namespace Aspects.SourceGenerators
             if (typeInfo.Symbol.IsReferenceType)
                 sb.Append($" {argName} == this ||");
 
-            sb.Append($" {argName} is {typeInfo.NameWithGenericParameters}");
+            sb.Append($" {argName} is {typeInfo.Name}");
 
             var symbols = GetSymbols(typeInfo, config);
             if (symbols.Length > 0)

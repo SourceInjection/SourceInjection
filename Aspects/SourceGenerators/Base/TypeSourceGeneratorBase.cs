@@ -35,7 +35,7 @@ namespace Aspects.SourceGenerators.Base
                     else
                     {
                         var src = GeneratePartialType(typeInfo);
-                        context.AddSource($"{typeInfo.FullNameWithGenericParameters.Replace('<', '[').Replace('>', ']')}-{Name}.g.cs", SourceText.From(src, Encoding.UTF8));
+                        context.AddSource($"{typeInfo.FullName.Replace('<', '[').Replace('>', ']').Replace('.', '/')}-{Name}.g.cs", SourceText.From(src, Encoding.UTF8));
                     }
                 }
             }

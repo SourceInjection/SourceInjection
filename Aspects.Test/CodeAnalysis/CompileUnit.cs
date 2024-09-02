@@ -3,7 +3,7 @@ using CompileUnits.CSharp;
 
 namespace Aspects.Test.CodeAnalysis
 {
-    internal class CompileUnit
+    internal static class CompileUnit
     {
         private static readonly string _projectDir = new DirectoryInfo(Environment.CurrentDirectory)
             .Parent?.Parent?.Parent?.FullName ?? string.Empty;
@@ -21,7 +21,7 @@ namespace Aspects.Test.CodeAnalysis
             where TGenerator : TypeSourceGeneratorBase, new()
         {
             var filePath = $"{_generatedDir}\\{typeof(TGenerator).FullName}\\" +
-                $"{typeof(TType).FullName}-{new TGenerator().Name}.g.cs";
+                $"{typeof(TType).FullName!.Replace('.', '\\')}-{new TGenerator().Name}.g.cs";
 
             var fs = File.OpenRead(filePath);
 

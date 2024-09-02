@@ -3,7 +3,7 @@ using CompileUnits.CSharp;
 using NUnit.Framework.Internal;
 using CompileUnit = Aspects.Test.CodeAnalysis.CompileUnit;
 
-namespace Aspects.Test.CompileTime.Equals
+namespace Aspects.Test.Equals
 {
     internal class EqualsMethod
     {

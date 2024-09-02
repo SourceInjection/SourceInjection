@@ -29,7 +29,7 @@ namespace Aspects.SourceGenerators
             sb.AppendLine($"public override string {Name}()");
             sb.AppendLine("{");
 
-            sb.Append(CodeSnippets.Indent($"return $\"({typeInfo.NameWithGenericParameters})"));
+            sb.Append(CodeSnippets.Indent($"return $\"({typeInfo.Name})"));
 
             var names = GetMemberNames(typeInfo);
 
