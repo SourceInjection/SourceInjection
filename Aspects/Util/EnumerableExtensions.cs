@@ -39,8 +39,8 @@ namespace Aspects.Util
             while(colIt.MoveNext())
             {
                 if(!otherIt.MoveNext() || 
-                    !( colIt.Current is null && otherIt.Current is null
-                    || colIt.Current?.Equals(otherIt.Current) is true
+                    !( colIt.Current == null && otherIt.Current == null
+                    || colIt.Current?.Equals(otherIt.Current) == true
                     || colIt.Current is IEnumerable a && otherIt.Current is IEnumerable b && a.DeepSequenceEqual(b)))
                 {
                     return DisposedReturn(false, colIt, otherIt);

@@ -12,7 +12,7 @@ namespace Aspects.Collections
         /// <returns>The hash code of the <see cref="IEnumerable"/>.</returns>
         public static int CombinedHashCode(IEnumerable en)
         {
-            if (en is null)
+            if (en == null)
                 return 0;
             return en.DeepCombinedHashCode();
         }
@@ -25,9 +25,9 @@ namespace Aspects.Collections
         /// <returns><see langword="true"/> if the <see cref="IEnumerable"/>s are equal else <see langword="false"/>.</returns>
         public static bool SequenceEquals(IEnumerable a, IEnumerable b)
         {
-            if (a is null && b is null)
+            if (a == null && b == null)
                 return true;
-            if (!(a is null) && !(b is null))
+            if (a != null && b != null)
                 return a.DeepSequenceEqual(b);
             return false;
         }
