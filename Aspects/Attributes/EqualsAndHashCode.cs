@@ -99,10 +99,16 @@ namespace Aspects.Attributes
         /// Creates an instance of <see cref="EqualsAndHashCodeAttribute"/>.
         /// </summary>
         /// <param name="equalsNullSafety">Determines if the equalization is generated null safe.</param>
-        public EqualsAndHashCodeAttribute(NullSafety equalsNullSafety = NullSafety.Auto) 
+        public EqualsAndHashCodeAttribute(NullSafety equalsNullSafety = NullSafety.Auto, string equalsEqualityComparer = null) 
         {
             EqualsNullSafety = equalsNullSafety;
+            EqualsEqualityComparer = equalsEqualityComparer;
         }
+
+        /// <summary>
+        /// The equality comparer which is used to compare the properties.
+        /// </summary>
+        public string EqualsEqualityComparer { get; }
 
         /// <summary>
         /// Determines if the equalization is generated nullsafe.
@@ -110,6 +116,8 @@ namespace Aspects.Attributes
         public NullSafety EqualsNullSafety { get; }
 
         NullSafety IEqualsAttribute.NullSafety => EqualsNullSafety;
+
+        string IEqualsAttribute.EqualityComparer => EqualsEqualityComparer;
     }
 
     /// <summary>

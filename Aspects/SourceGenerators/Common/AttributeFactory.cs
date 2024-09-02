@@ -1,6 +1,8 @@
 ﻿using Microsoft.CodeAnalysis;
 using System;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.InteropServices.ComTypes;
 
 namespace Aspects.SourceGenerators.Common
 {
@@ -56,6 +58,9 @@ namespace Aspects.SourceGenerators.Common
             string name = data.AttributeClass.ToDisplayString();
             var type = Type.GetType(name);
 
+            // TODO write non public constructor detection
+            var ci = 
+
             return (T)Activator.CreateInstance(type, data.ConstructorArguments
                 .Select(arg => SelectValue(arg)).ToArray());
         }
@@ -66,6 +71,8 @@ namespace Aspects.SourceGenerators.Common
                 return EnumFromConstant(constant);
             if (constant.Kind == TypedConstantKind.Array)
                 return constant.Values;
+            if (constant.Kind == TypedConstantKind.Type)
+                return (constant.Value as INamedTypeSymbol)?.ToDisplayString();
             return constant.Value;
         }
 

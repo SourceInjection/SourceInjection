@@ -1,4 +1,6 @@
 ﻿using Aspects.Attributes;
+using System.Collections;
+using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 
 #pragma warning disable CS0659, S3249, S2094, S3887, CA2231
@@ -125,6 +127,61 @@ namespace Aspects.Test.Equals.Code
         public string String { get; } = null!;
 
         public En Enum { get; }
+    }
+
+    [AutoEquals]
+    public partial class ReferenceType_WithCollectionsEquatableBySequenceEqual
+    {
+        public static readonly string[] Properties
+            = typeof(ReferenceType_WithCollectionsEquatableBySequenceEqual).GetProperties().Select(p => p.Name).ToArray();
+
+        public int[] IntArray { get; } = null!;
+
+        public IEnumerable<int> IntEnumerable { get; } = null!;
+
+        public IList<int> IntIList { get; } = null!;
+
+        public IReadOnlyDictionary<int, string> ReadOnlyDicionary { get; } = null!;
+
+        public ImmutableArray<int>.Builder Builder { get; } = null!;
+    }
+
+    [AutoEquals]
+    public partial class ReferenceType_WithCollectionsNotEquatableBySequenceEqual
+    {
+        public static readonly string[] Properties
+            = typeof(ReferenceType_WithCollectionsNotEquatableBySequenceEqual).GetProperties().Select(p => p.Name).ToArray();
+
+        public int[,] Int2DArray { get; } = null!;
+
+        public IEnumerable Enumerable { get; } = null!;
+
+        public IList<IEnumerable> CollectionList { get; } = null!;
+    }
+
+    [AutoEquals]
+    public partial class ReferenceType_WithNullableCollectionEquatableBySequenceEqual
+    {
+        public IEnumerable<string>? Property { get; }
+    }
+
+    internal class IntComparer : IEqualityComparer<int>
+    {
+        public bool Equals(int x, int y)
+        {
+            throw new NotImplementedException();
+        }
+
+        public int GetHashCode([DisallowNull] int obj)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public partial class ReferenceType_WithMemberThatHasCustomComparer
+    {
+        [Equals(equalityComparer: typeof(IntComparer))]
+        public int Property { get; }
     }
 }
 

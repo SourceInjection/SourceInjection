@@ -1,6 +1,5 @@
 ﻿using Aspects.SourceGenerators;
 using CompileUnits.CSharp;
-using NUnit.Framework.Internal;
 using CompileUnit = Aspects.Test.CodeAnalysis.CompileUnit;
 
 namespace Aspects.Test.Equals
@@ -28,6 +27,13 @@ namespace Aspects.Test.Equals
         public static string MemberEqualization(string memberName) => $"&& {memberName}.Equals(#i.{memberName})";
 
         public static string NullSafeMemberEqualization(string memberName) => $"&& ({memberName} == null && #i.{memberName} == null " +
-                $"|| {memberName}?.Equals(#i.{memberName}) == true)";
+            $"|| {memberName}?.Equals(#i.{memberName}) == true)";
+
+        public static string LinqCollectionEqualization(string memberName) => $"&& System.Linq.Enumerable.SequenceEqual({memberName}, #i.{memberName})";
+
+        public static string NullSafeLinqCollectionEqualization(string memberName) => $"&& ({memberName} == null && #i.{memberName} == null " +
+            $"|| {memberName} != null && #i.{memberName} != null && System.Linq.Enumerable.SequenceEqual({memberName}, #i.{memberName}))";
+
+        public static string AspectsCollectionEqualization(string memberName) => $"&& Aspects.Collections.Enumerable.SequenceEqual({memberName}, #i.{memberName})";
     }
 }

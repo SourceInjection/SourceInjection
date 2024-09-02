@@ -1,4 +1,6 @@
-﻿namespace Aspects.Attributes.Interfaces
+﻿using System;
+
+namespace Aspects.Attributes.Interfaces
 {
     public interface IAutoEqualsAttribute 
     {
@@ -12,6 +14,8 @@
     public interface IEqualsAttribute 
     { 
         NullSafety NullSafety { get; }
+
+        string EqualityComparer { get; }
     }
 
     public interface IEqualsExcludeAttribute { }

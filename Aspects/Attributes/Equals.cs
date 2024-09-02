@@ -65,20 +65,30 @@ namespace Aspects.Attributes
     /// </summary>
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, Inherited = true, AllowMultiple = false)]
     public class EqualsAttribute : Attribute, IEqualsAttribute 
-    { 
+    {
         /// <summary>
         /// Creates an instance of <see cref="EqualsAttribute"/>.
         /// </summary>
         /// <param name="nullSafety">Determines if null safe equalizations are used.</param>
-        public EqualsAttribute(NullSafety nullSafety = NullSafety.Auto)
+        /// <param name="equalityComparer">Determines if a comparer is used.</param>
+        public EqualsAttribute(NullSafety nullSafety = NullSafety.Auto, Type equalityComparer = null)
+            : this(nullSafety, equalityComparer?.FullName) { }
+
+        private EqualsAttribute(NullSafety nullSafety = NullSafety.Auto, string equalityComparer = null)
         {
             NullSafety = nullSafety;
+            EqualityComparer = equalityComparer;
         }
 
         /// <summary>
         /// Determines if null safe operations are used.
         /// </summary>
         public NullSafety NullSafety { get; }
+
+        /// <summary>
+        /// The equality comparer which is used to compare the properties.
+        /// </summary>
+        public string EqualityComparer { get; }
     }
 
     /// <summary>

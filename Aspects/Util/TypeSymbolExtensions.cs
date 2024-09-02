@@ -3,11 +3,27 @@ using Microsoft.CodeAnalysis;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Collections;
 
 namespace Aspects.Util
 {
     internal static class TypeSymbolExtensions
     {
+        /// <summary>
+        /// Checks if the <see cref="ITypeSymbol"/> can be compared with SequenceEqual.
+        /// </summary>
+        /// <param name="type">The <see cref="ITypeSymbol"/> which is checked.</param>
+        /// <returns><see langword="true"/> if the given <see cref="ITypeSymbol"/> can be compared with SequenceEqual else <see langword="false"/>.</returns>
+        public static bool CanBeComparedBySequenceEqual(this ITypeSymbol type)
+        {
+            if (type is IArrayTypeSymbol ats)
+                return ats.Rank == 1 && (!ats.ElementType.IsEnumerable() || ats.ElementType.IsString());
+
+            return type is INamedTypeSymbol nts
+                && IsKnownGenericCollection(type)
+                && nts.TypeArguments.All(ta => !ta.IsEnumerable() || ta.IsString());
+        }
+
         /// <summary>
         /// Computes the inheritance of a <see cref="ITypeSymbol"/> (including itself).
         /// </summary>
@@ -53,6 +69,17 @@ namespace Aspects.Util
         {
             return symbol.ToDisplayString() == CodeSnippets.IEnumerableName
                 || symbol.AllInterfaces.Any(i => i.ToDisplayString() == CodeSnippets.IEnumerableName);
+        }
+
+        /// <summary>
+        /// Checks if the <see cref="ITypeSymbol"/> implements the interface System.Collections.Generic.<see cref="IEnumerable"/>.
+        /// </summary>
+        /// <param name="symbol">The <see cref="ITypeSymbol"/> which is checked to be a System.Collections.Generic.<see cref="IEnumerable"/>.</param>
+        /// <returns><see langword="true"/> if the <see cref="ITypeSymbol"/> is a System.Collections.Generic.<see cref="IEnumerable"/> else <see langword="false"/></returns>
+        public static bool IsGenericEnumerable(this ITypeSymbol symbol)
+        {
+            return symbol.ToDisplayString().StartsWith(CodeSnippets.GenericIEnumerableName)
+                || symbol.AllInterfaces.Any(i => i.ToDisplayString().StartsWith(CodeSnippets.GenericIEnumerableName));
         }
 
         /// <summary>
@@ -317,6 +344,14 @@ namespace Aspects.Util
             var s = type.ToDisplayString();
             return s == typeName
                 || alsoCheckNullable && s == typeName + '?';
+        }
+
+        private static bool IsKnownGenericCollection(this ITypeSymbol type)
+        {
+            var name = type.ToDisplayString().TrimEnd('?');
+            if (name.Contains('<') && name.Contains('>'))
+                name = name.Substring(0, name.IndexOf('<') + 1) + name.Substring(name.LastIndexOf('>'));
+            return KnownTypes.GenericCollections.Contains(name);
         }
     }
 }

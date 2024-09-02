@@ -1,10 +1,5 @@
-﻿
-using Aspects.Collections;
-using Aspects.Util;
+﻿using Aspects.Util;
 using Microsoft.CodeAnalysis;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 namespace Aspects.SourceGenerators.Common
@@ -12,12 +7,23 @@ namespace Aspects.SourceGenerators.Common
     internal static class CodeSnippets
     {
         private static readonly string s_enumerableClass = typeof(Collections.Enumerable).FullName;
-        private static readonly string s_sequenceEquals = $"{s_enumerableClass}.{nameof(Collections.Enumerable.SequenceEquals)}";
-        private static readonly string s_combinedHashCode = $"{s_enumerableClass}.{nameof(Collections.Enumerable.CombinedHashCode)}";
-        private static readonly string s_iEnumerableName = typeof(IEnumerable).FullName;
+        private static readonly string s_safeSequenceEquals = $"{s_enumerableClass}.{nameof(Collections.Enumerable.SequenceEqual)}";
+        private static readonly string s_safeCombinedHashCode = $"{s_enumerableClass}.{nameof(Collections.Enumerable.CombinedHashCode)}";
+
+        private static readonly string s_iEnumerableName = typeof(System.Collections.IEnumerable).FullName;
+        private static readonly string s_genericIEnumerableName= "System.Collections.Generic.IEnumerable";
+
+        private static readonly string s_linqEnumerableName = typeof(System.Linq.Enumerable).FullName;
+        private static readonly string s_linqSequenceEquals = $"{s_linqEnumerableName}.{nameof(System.Linq.Enumerable.SequenceEqual)}";
 
         /// <summary>
-        /// Gets the full name of <see cref="IEnumerable"/>.
+        /// System.Collections.Generic.<see cref="IEnumerable"/>.
+        /// </summary>
+        public static string GenericIEnumerableName => s_genericIEnumerableName;
+
+
+        /// <summary>
+        /// System.Collections.<see cref="IEnumerable"/>.
         /// </summary>
         public static string IEnumerableName => s_iEnumerableName;
 
@@ -29,7 +35,7 @@ namespace Aspects.SourceGenerators.Common
         /// <param name="name">The desired name.</param>
         /// <param name="alreadyCreatedVariables">if multiple variables are needed you may wan't to take care of them too.</param>
         /// <returns>A variable name without conflicts within its containing type.</returns>
-        public static string CreateVariable(INamedTypeSymbol type, string name = "temp", ISet<string> alreadyCreatedVariables = null)
+        public static string CreateVariable(INamedTypeSymbol type, string name = "temp", System.Collections.Generic.ISet<string> alreadyCreatedVariables = null)
         {
             var raw = name;
             var i = 0;
@@ -44,10 +50,10 @@ namespace Aspects.SourceGenerators.Common
         /// Creates a combined hash code method call which evaluates the hash code of <see cref="IEnumerable"/>s.
         /// </summary>
         /// <param name="argument">The name of the argument which is passed to the call.</param>
-        /// <returns>A call of <see cref="Enumerable.CombinedHashCode(IEnumerable)"/>.</returns>
-        public static string CombinedHashCodeMethod(string argument)
+        /// <returns>A call of Aspects.<see cref="Collections.Enumerable.CombinedHashCode(IEnumerable)"/>.</returns>
+        public static string SafeCombinedHashCodeMethod(string argument)
         {
-            return $"{s_combinedHashCode}({argument})";
+            return $"{s_safeCombinedHashCode}({argument})";
         }
 
         /// <summary>
@@ -55,10 +61,22 @@ namespace Aspects.SourceGenerators.Common
         /// </summary>
         /// <param name="arg1">The name of the first argument which is passed to the call.</param>
         /// <param name="arg2">The name of the second argument which is passed to the call.</param>
-        /// <returns>A call of <see cref="Enumerable.SequenceEquals(IEnumerable, IEnumerable)"/>.</returns>
-        public static string SequenceEqualsMethod(string arg1, string arg2)
+        /// <returns>A call of Aspects.<see cref="Collections.Enumerable.SequenceEquals(IEnumerable, IEnumerable)"/>.</returns>
+        public static string SafeSequenceEqualsMethod(string arg1, string arg2)
         {
-            return $"{s_sequenceEquals}({arg1}, {arg2})";
+            return $"{s_safeSequenceEquals}({arg1}, {arg2})";
+        }
+
+
+        /// <summary>
+        /// Creates a <see cref="IEnumerable"/> comparison which evaluates if two <see cref="IEnumerable"/>s are equal.
+        /// </summary>
+        /// <param name="arg1">The name of the first argument which is passed to the call.</param>
+        /// <param name="arg2">The name of the second argument which is passed to the call.</param>
+        /// <returns>A call of <see cref="System.Linq.Enumerable.SequenceEquals(IEnumerable, IEnumerable)"/>.</returns>
+        public static string LinqSequenceEqualsMethod(string arg1, string arg2)
+        {
+            return $"{s_linqSequenceEquals}({arg1}, {arg2})";
         }
 
         /// <summary>
@@ -136,13 +154,22 @@ namespace Aspects.SourceGenerators.Common
             if (type.CanUseEqualityOperatorsByDefault())
                 return $"{nameA} != {nameB}";
 
-            if (type.IsEnumerable() && !type.OverridesEquals())
-                return $"!{SequenceEqualsMethod(nameA, nameB)}";
+            if (!type.OverridesEquals())
+            {
+                if (type.CanBeComparedBySequenceEqual())
+                {
+                    return nullSafe
+                        ? NullSafeSequenceInequality(nameA, nameB)
+                        : $"!{s_linqSequenceEquals}({nameA}, {nameB})";
+                }
+                if (type.IsEnumerable())
+                    return $"!{SafeSequenceEqualsMethod(nameA, nameB)}";
+            }
 
             if (!type.IsReferenceType || !nullSafe)
                 return $"!{nameA}.{nameof(Equals)}({nameB})";
 
-            return $"{nameA} != null && !{nameA}.{nameof(Equals)}({nameB}) || {nameA} == null && {nameB} != null";
+            return NullSafeInequality(nameA, nameB);
         }
 
         /// <summary>
@@ -163,13 +190,44 @@ namespace Aspects.SourceGenerators.Common
             if (type.CanUseEqualityOperatorsByDefault())
                 return $"{nameA} == {nameB}";
 
-            if (type.IsEnumerable() && !type.OverridesEquals())
-                return $"{SequenceEqualsMethod(nameA, nameB)}";
+            if (!type.OverridesEquals())
+            {
+                if (type.CanBeComparedBySequenceEqual())
+                {
+                    return nullSafe
+                        ? NullSafeSequenceEquality(nameA, nameB)
+                        : $"{s_linqSequenceEquals}({nameA}, {nameB})";
+                }
+                if (type.IsEnumerable())
+                    return $"{SafeSequenceEqualsMethod(nameA, nameB)}";
+            }
 
             if (!type.IsReferenceType || !nullSafe)
                 return $"{nameA}.{nameof(Equals)}({nameB})";
 
+            return NullSafeEquality(nameA, nameB);
+        }
+
+        private static string NullSafeInequality(string nameA, string nameB)
+        {
+            return $"{nameA} != null && !{nameA}.{nameof(Equals)}({nameB}) || {nameA} == null && {nameB} != null";
+        }
+
+        private static string NullSafeEquality(string nameA, string nameB)
+        {
             return $"{nameA} == null && {nameB} == null || {nameA}?.{nameof(Equals)}({nameB}) == true";
         }
+
+        private static string NullSafeSequenceEquality(string nameA, string nameB)
+        {
+            return $"{nameA} == null && {nameB} == null || {nameA} != null && {nameB} != null && {s_linqSequenceEquals}({nameA}, {nameB})";
+        }
+
+        private static string NullSafeSequenceInequality(string nameA, string nameB)
+        {
+            return $"{nameA} == null && {nameB} != null || {nameA} != null && {nameB} == null || {nameA} != null && {nameB} != null && {s_linqSequenceEquals}({nameA}, {nameB})";
+        }
+
+
     }
 }

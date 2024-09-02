@@ -1,5 +1,4 @@
-﻿using Aspects.Test.Equals;
-using CompileUnits.CSharp;
+﻿using CompileUnits.CSharp;
 using NUnit.Framework;
 
 namespace Aspects.Test.Equals.Code
@@ -8,7 +7,6 @@ namespace Aspects.Test.Equals.Code
     public class ComparisonsTests
     {
         private const string propertyName = "Property";
-
 
         private static bool IsNullSafe(IMethod m) => m.Body.Contains(EqualsMethod.NullSafeMemberEqualization(propertyName));
 
@@ -25,7 +23,6 @@ namespace Aspects.Test.Equals.Code
             var argName = m.Parameters[0].Name;
             return m.Body.Contains($"&& base.Equals({argName})");
         }
-
 
         [Test]
         public void ClassTypeEqualization_ContainsReferenceEqualization()
@@ -178,6 +175,33 @@ namespace Aspects.Test.Equals.Code
             var b = new ReferenceTypeEmpty();
 
             Assert.That(a, Is.EqualTo(b));
+        }
+
+        [Test]
+        [TestCaseSource(
+            typeof(ReferenceType_WithCollectionsEquatableBySequenceEqual),
+            nameof(ReferenceType_WithCollectionsEquatableBySequenceEqual.Properties))]
+        public void PropertyEqualization_WithCollection_ThatIsComparableBySequenceEqual_UsesLinqSequenceEqual(string propertyName)
+        {
+            var sut = EqualsMethod.FromType<ReferenceType_WithCollectionsEquatableBySequenceEqual>();
+            Assert.That(sut.Body.Contains(EqualsMethod.LinqCollectionEqualization(propertyName)));
+        }
+
+        [Test]
+        [TestCaseSource(
+            typeof(ReferenceType_WithCollectionsNotEquatableBySequenceEqual),
+            nameof(ReferenceType_WithCollectionsNotEquatableBySequenceEqual.Properties))]
+        public void PropertyEqualization_WithCollection_ThatIsNotComparableBySequenceEqual_UsesAspectsSequenceEqual(string propertyName)
+        {
+            var sut = EqualsMethod.FromType<ReferenceType_WithCollectionsNotEquatableBySequenceEqual>();
+            Assert.That(sut.Body.Contains(EqualsMethod.AspectsCollectionEqualization(propertyName)));
+        }
+
+        [Test]
+        public void PropertyEqualization_WithCollection_ThatIsNullableAndCanBeComparedWithSequenceEqual_UsesNullsafeLinqSequenceEqual()
+        {
+            var sut = EqualsMethod.FromType<ReferenceType_WithNullableCollectionEquatableBySequenceEqual>();
+            Assert.That(sut.Body.Contains(EqualsMethod.NullSafeLinqCollectionEqualization(propertyName)));
         }
     }
 }

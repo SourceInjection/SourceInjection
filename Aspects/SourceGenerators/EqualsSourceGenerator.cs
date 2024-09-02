@@ -7,6 +7,7 @@ using Microsoft.CodeAnalysis;
 using System;
 using System.Linq;
 using System.Text;
+using System.Xml.Linq;
 using TypeInfo = Aspects.SourceGenerators.Common.TypeInfo;
 
 namespace Aspects.SourceGenerators
@@ -55,7 +56,6 @@ namespace Aspects.SourceGenerators
                 var memberEquals = MemberEquals(
                     symbol,
                     typeInfo.HasNullableEnabled,
-                    GetNullSafety(symbol, config),
                     config);
 
                 sb.AppendLine().Append(CodeSnippets.Indent($"&& {memberEquals}", 2));
@@ -107,12 +107,10 @@ namespace Aspects.SourceGenerators
                         || syBase.GetMembers().Any(m => m.HasAttributeOfType<IEqualsAttribute>())));
         }
 
-        private static NullSafety GetNullSafety(ISymbol symbol, IAutoEqualsAttribute config)
+        private static NullSafety GetNullSafety(ISymbol symbol, IAutoEqualsAttribute config, IEqualsAttribute memberConfig)
         {
-            var memberAttribute = GetMemberAttribute(symbol);
-
-            if (memberAttribute.NullSafety != NullSafety.Auto)
-                return memberAttribute.NullSafety;
+            if (memberConfig.NullSafety != NullSafety.Auto)
+                return memberConfig.NullSafety;
             if (symbol.HasNotNullAttribute())
                 return NullSafety.Off;
             if(symbol.HasMaybeNullAttribute())
@@ -120,15 +118,29 @@ namespace Aspects.SourceGenerators
             return config.NullSafety;
         }
 
-        private static string MemberEquals(ISymbol symbol, bool nullableEnabled, NullSafety nullSafety, IAutoEqualsAttribute config)
+        private static string MemberEquals(ISymbol symbol, bool nullableEnabled, IAutoEqualsAttribute config)
         {
+            var memberConfig = GetMemberAttribute(symbol);
+            var nullSafety = GetNullSafety(symbol, config, memberConfig);
+
             var type = GetType(symbol);
             var nullSafe = nullSafety == NullSafety.On ||
                 nullSafety == NullSafety.Auto && (!nullableEnabled || type.HasNullableAnnotation());
 
             var memberName = GetMemberName(symbol, config);
 
-            return Comparison(type, memberName, nullSafe);
+            if (string.IsNullOrEmpty(memberConfig.EqualityComparer))
+                return Comparison(type, memberName, nullSafe);
+
+            return ComparerComparison(memberConfig.EqualityComparer, memberName, nullSafe && type.IsReferenceType);
+        }
+
+        private static string ComparerComparison(string comparer, string memberName, bool nullSafe)
+        {
+            var s = $"new {comparer}().Equals({memberName}, {otherName}.{memberName})";
+            if (nullSafe)
+                s = $"({memberName} == null && {otherName}.{memberName} == null || {memberName} != null && {otherName}.{memberName} != null && {s})";
+            return s;
         }
 
         private static string GetMemberName(ISymbol symbol, IAutoEqualsAttribute config)
@@ -184,9 +196,9 @@ namespace Aspects.SourceGenerators
         public static T GetFirstOrNull<T>(ISymbol symbol) where T : class
         {
             var attData = symbol.AttributesOfType<T>().FirstOrDefault();
-            if (attData is null || !AttributeFactory.TryCreate<T>(attData, out var config))
+            if (attData is null)
                 return null;
-            return config;
+            return AttributeFactory.Create<T>(attData);
         }
     }
 }

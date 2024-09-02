@@ -98,7 +98,7 @@ namespace Aspects.SourceGenerators
         {
             if (!MustUseCombinedHashCode(symbol))
                 return symbol.Name;
-            return CodeSnippets.CombinedHashCodeMethod(symbol.Name);
+            return CodeSnippets.SafeCombinedHashCodeMethod(symbol.Name);
         }
 
         private static bool ShouldIncludeBase(TypeInfo typeInfo, IAutoHashCodeAttribute config)
