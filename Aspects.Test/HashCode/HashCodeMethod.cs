@@ -1,4 +1,4 @@
-﻿namespace Aspects.Test.CompileTime.HashCode
+﻿namespace Aspects.Test.HashCode
 {
     internal class HashCodeMethod
     {
