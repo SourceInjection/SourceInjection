@@ -1,5 +1,6 @@
 ﻿using CompileUnits.CSharp;
 using NUnit.Framework;
+using System.Reflection;
 
 namespace Aspects.Test.Equals.Code
 {
@@ -8,21 +9,21 @@ namespace Aspects.Test.Equals.Code
     {
         private const string propertyName = "Property";
 
-        private static bool IsNullSafe(IMethod m) => m.Body.Contains(EqualsMethod.NullSafeMemberEqualization(propertyName));
+        private static bool IsNullSafe(IMethod m, string name = propertyName) 
+            => m.Body.Contains(EqualsMethod.NullSafeMemberEqualization(name));
 
-        private static bool IsNotNullSafe(IMethod m) => m.Body.Contains(EqualsMethod.MemberEqualization(propertyName));
+        private static bool IsNotNullSafe(IMethod m, string name = propertyName) 
+            => m.Body.Contains(EqualsMethod.MemberEqualization(name));
 
-        private static bool DoesNotCallBase(IMethod m) => !m.Body.Contains("base");
+        private static bool DoesNotCallBase(IMethod m) 
+            => !m.Body.Contains("base");
 
-        private static bool UsesOperatorEqualization(IMethod m, string propertyName) 
-            => m.Body.Contains(EqualsMethod.MemberOperatorEqualization(propertyName));
+        private static bool UsesOperatorEqualization(IMethod m, string name) 
+            => m.Body.Contains(EqualsMethod.MemberOperatorEqualization(name));
 
 
         private static bool CallsBase(IMethod m)
-        {
-            var argName = m.Parameters[0].Name;
-            return m.Body.Contains($"&& base.Equals({argName})");
-        }
+            => m.Body.Contains($"&& base.Equals({m.Parameters[0].Name})");
 
         [Test]
         public void ClassTypeEqualization_ContainsReferenceEqualization()
@@ -202,6 +203,17 @@ namespace Aspects.Test.Equals.Code
         {
             var sut = EqualsMethod.FromType<ReferenceType_WithNullableCollectionEquatableBySequenceEqual>();
             Assert.That(sut.Body.Contains(EqualsMethod.NullSafeLinqCollectionEqualization(propertyName)));
+        }
+
+        [Test]
+        public void PropertyEqualization_WithCustomComparer_UsesComparer()
+        {
+            var sut = EqualsMethod.FromType<ReferenceType_WithMemberThatHasCustomComparer>();
+            var comparerName = typeof(ReferenceType_WithMemberThatHasCustomComparer).FullName + "."
+                + typeof(ReferenceType_WithMemberThatHasCustomComparer)
+                    .GetNestedTypes(BindingFlags.NonPublic).First().Name;
+
+            Assert.That(sut.Body.Contains($"&& new {comparerName}().Equals({propertyName}, #i.{propertyName});"));
         }
     }
 }
