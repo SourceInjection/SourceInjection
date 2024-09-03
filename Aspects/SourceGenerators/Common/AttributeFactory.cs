@@ -57,12 +57,18 @@ namespace Aspects.SourceGenerators.Common
 
             string name = data.AttributeClass.ToDisplayString();
             var type = Type.GetType(name);
+            var args = data.ConstructorArguments
+                    .Select(arg => SelectValue(arg))
+                    .ToArray();
 
-            // TODO write non public constructor detection
-            var ci = 
-
-            return (T)Activator.CreateInstance(type, data.ConstructorArguments
-                .Select(arg => SelectValue(arg)).ToArray());
+            try
+            {
+                return (T)Activator.CreateInstance(type, args);
+            }
+            catch
+            {
+                return (T)Activator.CreateInstance(type, BindingFlags.Instance | BindingFlags.NonPublic, null, args, null);
+            }
         }
 
         private static object SelectValue(TypedConstant constant)

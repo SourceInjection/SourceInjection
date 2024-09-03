@@ -165,21 +165,21 @@ namespace Aspects.Test.Equals.Code
         public IEnumerable<string>? Property { get; }
     }
 
-    internal class IntComparer : IEqualityComparer<int>
-    {
-        public bool Equals(int x, int y)
-        {
-            throw new NotImplementedException();
-        }
-
-        public int GetHashCode([DisallowNull] int obj)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
     public partial class ReferenceType_WithMemberThatHasCustomComparer
     {
+        private class IntComparer : IEqualityComparer<int>
+        {
+            public bool Equals(int x, int y)
+            {
+                throw new NotImplementedException();
+            }
+
+            public int GetHashCode([DisallowNull] int obj)
+            {
+                throw new NotImplementedException();
+            }
+        }
+
         [Equals(equalityComparer: typeof(IntComparer))]
         public int Property { get; }
     }
