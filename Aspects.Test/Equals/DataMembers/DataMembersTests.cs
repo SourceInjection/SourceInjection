@@ -1,5 +1,4 @@
 ﻿using Aspects.SourceGenerators.Common;
-using Aspects.Test.Equals;
 using CompileUnits.CSharp;
 using NUnit.Framework;
 using System.Reflection;
@@ -14,7 +13,7 @@ namespace Aspects.Test.Equals.DataMembers
             var flags = BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public;
 
             return (EqualsMethod.FromType<T>(),
-                typeof(T).GetProperty(CodeSnippets.PropertyNameFromField(fieldName), flags)!.Name);
+                typeof(T).GetProperty(SourceGenerators.Common.Code.PropertyNameFromField(fieldName), flags)!.Name);
         }
 
         private static (IMethod Method, string FieldName, string PropertyName) GetTypeInfo<T>()

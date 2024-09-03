@@ -14,7 +14,7 @@ namespace Aspects.Util
         /// </summary>
         /// <param name="type">The <see cref="ITypeSymbol"/> which is checked.</param>
         /// <returns><see langword="true"/> if the given <see cref="ITypeSymbol"/> can be compared with SequenceEqual else <see langword="false"/>.</returns>
-        public static bool CanBeComparedBySequenceEqual(this ITypeSymbol type)
+        public static bool CanUseLinqExtensions(this ITypeSymbol type)
         {
             if (type is IArrayTypeSymbol ats)
                 return ats.Rank == 1 && (!ats.ElementType.IsEnumerable() || ats.ElementType.IsString());
@@ -67,8 +67,8 @@ namespace Aspects.Util
         /// <returns><see langword="true"/> if the <see cref="ITypeSymbol"/> is a <see cref="IEnumerable"/> else <see langword="false"/></returns>
         public static bool IsEnumerable(this ITypeSymbol symbol)
         {
-            return symbol.ToDisplayString() == CodeSnippets.IEnumerableName
-                || symbol.AllInterfaces.Any(i => i.ToDisplayString() == CodeSnippets.IEnumerableName);
+            return symbol.ToDisplayString().TrimEnd('?') == Paths.IEnumerableName
+                || symbol.AllInterfaces.Any(i => i.ToDisplayString().TrimEnd('?') == Paths.IEnumerableName);
         }
 
         /// <summary>
@@ -78,8 +78,8 @@ namespace Aspects.Util
         /// <returns><see langword="true"/> if the <see cref="ITypeSymbol"/> is a System.Collections.Generic.<see cref="IEnumerable"/> else <see langword="false"/></returns>
         public static bool IsGenericEnumerable(this ITypeSymbol symbol)
         {
-            return symbol.ToDisplayString().StartsWith(CodeSnippets.GenericIEnumerableName)
-                || symbol.AllInterfaces.Any(i => i.ToDisplayString().StartsWith(CodeSnippets.GenericIEnumerableName));
+            return symbol.ToDisplayString().StartsWith(Paths.GenericIEnumerableName)
+                || symbol.AllInterfaces.Any(i => i.ToDisplayString().StartsWith(Paths.GenericIEnumerableName));
         }
 
         /// <summary>

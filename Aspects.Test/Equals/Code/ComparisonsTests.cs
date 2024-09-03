@@ -21,7 +21,6 @@ namespace Aspects.Test.Equals.Code
         private static bool UsesOperatorEqualization(IMethod m, string name) 
             => m.Body.Contains(EqualsMethod.MemberOperatorEqualization(name));
 
-
         private static bool CallsBase(IMethod m)
             => m.Body.Contains($"&& base.Equals({m.Parameters[0].Name})");
 

@@ -26,7 +26,6 @@ namespace Aspects.SourceGenerators
         protected override string TypeBody(TypeInfo typeInfo)
         {
             const int hashCodeCombineMaxArgs = 8;
-
             var config = GetConfigAttribute(typeInfo);
 
             var sb = new StringBuilder();
@@ -45,36 +44,36 @@ namespace Aspects.SourceGenerators
 
             if (length <= hashCodeCombineMaxArgs)
                 sb.AppendLine(HashCodeCombine(symbols, includeBase));
-            else sb.AppendLine(HashCodeHash(symbols, includeBase));
+            else sb.AppendLine(HashCodeAppend(symbols, includeBase));
 
             sb.Append('}');
             return sb.ToString();
         }
 
-        private string HashCodeHash(ISymbol[] symbols, bool includeBase)
+        private string HashCodeAppend(ISymbol[] symbols, bool includeBase)
         {
             var sb = new StringBuilder();
-            sb.AppendLine(CodeSnippets.Indent("var hash = new System.HashCode();"));
+            sb.AppendLine(Code.Indent("var hash = new System.HashCode();"));
 
             if (includeBase)
-                sb.AppendLine(CodeSnippets.Indent($"hash.Add(base.{Name}());"));
+                sb.AppendLine(Code.Indent($"hash.Add(base.{Name}());"));
 
             for (int i = 0; i < symbols.Length; i++)
-                sb.AppendLine(CodeSnippets.Indent($"hash.Add({MemberHash(symbols[i])});"));
+                sb.AppendLine(Code.Indent($"hash.Add({MemberHash(symbols[i])});"));
 
-            sb.Append(CodeSnippets.Indent("return hash.ToHashCode();"));
+            sb.Append(Code.Indent("return hash.ToHashCode();"));
             return sb.ToString();
         }
 
         private string HashCodeCombine(ISymbol[] symbols, bool includeBase)
         {
             var sb = new StringBuilder();
-            sb.Append(CodeSnippets.Indent("return System.HashCode.Combine("));
+            sb.Append(Code.Indent("return System.HashCode.Combine("));
 
             if (includeBase)
             {
                 sb.AppendLine();
-                sb.Append(CodeSnippets.Indent($"base.{Name}()", 2));
+                sb.Append(Code.Indent($"base.{Name}()", 2));
                 if (symbols.Length > 0)
                     sb.Append(',');
             }
@@ -82,12 +81,12 @@ namespace Aspects.SourceGenerators
             if (symbols.Length > 0)
             {
                 sb.AppendLine();
-                sb.Append(CodeSnippets.Indent($"{MemberHash(symbols[0])}", 2));
+                sb.Append(Code.Indent($"{MemberHash(symbols[0])}", 2));
 
                 for (var i = 1; i < symbols.Length; i++)
                 {
                     sb.AppendLine(",");
-                    sb.Append(CodeSnippets.Indent($"{MemberHash(symbols[i])}", 2));
+                    sb.Append(Code.Indent($"{MemberHash(symbols[i])}", 2));
                 }
             }
             sb.Append(");");
@@ -98,7 +97,7 @@ namespace Aspects.SourceGenerators
         {
             if (!MustUseCombinedHashCode(symbol))
                 return symbol.Name;
-            return CodeSnippets.SafeCombinedHashCodeMethod(symbol.Name);
+            return $"{Paths.AspectsDeepCombinedHashCode}({symbol.Name})";
         }
 
         private static bool ShouldIncludeBase(TypeInfo typeInfo, IAutoHashCodeAttribute config)

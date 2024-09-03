@@ -7,7 +7,6 @@ using Microsoft.CodeAnalysis;
 using System;
 using System.Linq;
 using System.Text;
-using System.Xml.Linq;
 using TypeInfo = Aspects.SourceGenerators.Common.TypeInfo;
 
 namespace Aspects.SourceGenerators
@@ -35,7 +34,7 @@ namespace Aspects.SourceGenerators
             var sb = new StringBuilder();
             AppendMethodStart(typeInfo, sb);
 
-            sb.Append(CodeSnippets.Indent("return"));
+            sb.Append(Code.Indent("return"));
             if (typeInfo.Symbol.IsReferenceType)
                 sb.Append($" {argName} == this ||");
 
@@ -48,7 +47,7 @@ namespace Aspects.SourceGenerators
             if (ShouldIncludeBase(typeInfo, config))
             {
                 sb.AppendLine();
-                sb.Append(CodeSnippets.Indent($"&& base.{Name}({argName})", 2));
+                sb.Append(Code.Indent($"&& base.{Name}({argName})", 2));
             }
 
             foreach (var symbol in symbols)
@@ -58,7 +57,7 @@ namespace Aspects.SourceGenerators
                     typeInfo.HasNullableEnabled,
                     config);
 
-                sb.AppendLine().Append(CodeSnippets.Indent($"&& {memberEquals}", 2));
+                sb.AppendLine().Append(Code.Indent($"&& {memberEquals}", 2));
             }
 
             sb.AppendLine(";");
@@ -138,9 +137,9 @@ namespace Aspects.SourceGenerators
         private static string ComparerComparison(string comparer, string memberName, bool nullSafe)
         {
             var s = $"new {comparer}().Equals({memberName}, {otherName}.{memberName})";
-            if (nullSafe)
-                s = $"({memberName} == null && {otherName}.{memberName} == null || {memberName} != null && {otherName}.{memberName} != null && {s})";
-            return s;
+            if (!nullSafe)
+                return s;
+            return $"{memberName} == null && {otherName}.{memberName} == null || {memberName} != null && {otherName}.{memberName} != null && {s}";
         }
 
         private static string GetMemberName(ISymbol symbol, IAutoEqualsAttribute config)
@@ -175,7 +174,7 @@ namespace Aspects.SourceGenerators
 
         private static string Comparison(ITypeSymbol type, string memberName, bool nullSafe)
         {
-            var snippet = CodeSnippets.EqualityCheck(type, memberName, $"{otherName}.{memberName}", nullSafe);
+            var snippet = Code.EqualityCheck(type, memberName, $"{otherName}.{memberName}", nullSafe);
             return snippet.Contains("||")
                 ? $"({snippet})"
                 : snippet;

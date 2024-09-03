@@ -23,7 +23,7 @@ namespace Aspects.Attributes
         /// <returns>The name of the generated property.</returns>
         public string PropertyName(IFieldSymbol field)
         {
-            return CodeSnippets.PropertyNameFromField(field);
+            return Code.PropertyNameFromField(field);
         }
     }
 
@@ -106,7 +106,7 @@ namespace Aspects.Attributes
         /// <returns>The name of the generated property.</returns>
         public string PropertyName(IFieldSymbol field)
         {
-            return CodeSnippets.PropertyNameFromField(field);
+            return Code.PropertyNameFromField(field);
         }
     }
 }

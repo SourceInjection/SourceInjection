@@ -7,7 +7,10 @@
         BaseCall BaseCall { get; }
     }
 
-    public interface IHashCodeAttribute { }
+    public interface IHashCodeAttribute 
+    {
+        string EqualityComparer { get; }
+    }
 
     public interface IHashCodeExcludeAttribute { }
 }

@@ -6,7 +6,7 @@ namespace Aspects.Util
     internal static class EnumerableExtensions
     {
         /// <summary>
-        /// Computes the hash code of <see cref="IEnumerable"/>s.
+        /// Computes the hash code of nested <see cref="IEnumerable"/>s.
         /// </summary>
         /// <param name="col">The <see cref="IEnumerable"/> for which the hash code is computed.</param>
         /// <returns>The hash code of the <see cref="IEnumerable"/>.</returns>
@@ -22,6 +22,19 @@ namespace Aspects.Util
                     hash.Add(item);
             }
 
+            return hash.ToHashCode();
+        }
+
+        /// <summary>
+        /// Computes the hash code of <see cref="IEnumerable"/>s.
+        /// </summary>
+        /// <param name="col">The <see cref="IEnumerable"/> for which the hash code is computed.</param>
+        /// <returns>The hash code of the <see cref="IEnumerable"/>.</returns>
+        public static int CombinedHashCode(this IEnumerable col)
+        {
+            var hash = new HashCode();
+            foreach (var item in col)
+                hash.Add(item);
             return hash.ToHashCode();
         }
 

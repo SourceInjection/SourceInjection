@@ -1,5 +1,6 @@
 ﻿using Aspects.Attributes.Interfaces;
 using System;
+using System.Collections;
 
 namespace Aspects.Attributes
 {
@@ -70,7 +71,7 @@ namespace Aspects.Attributes
         /// Creates an instance of <see cref="EqualsAttribute"/>.
         /// </summary>
         /// <param name="nullSafety">Determines if null safe equalizations are used.</param>
-        /// <param name="equalityComparer">Determines if a comparer is used.</param>
+        /// <param name="equalityComparer">Determines the comparer which is then used to compare for equalization.</param>
         public EqualsAttribute(NullSafety nullSafety = NullSafety.Auto, Type equalityComparer = null)
             : this(nullSafety, equalityComparer?.FullName) { }
 

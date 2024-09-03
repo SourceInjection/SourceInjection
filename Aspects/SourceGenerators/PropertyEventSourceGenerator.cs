@@ -133,7 +133,7 @@ $@"protected virtual void {PropertyChangingNotifyMethod}(string propertyName)
 
         private static string PropertyCode(IFieldSymbol field, bool nullableEnabled)
         {
-            var name = CodeSnippets.PropertyNameFromField(field);
+            var name = Code.PropertyNameFromField(field);
             var sb = new StringBuilder();
 
             var type = field.Type.ToDisplayString();
@@ -159,14 +159,14 @@ $@"protected virtual void {PropertyChangingNotifyMethod}(string propertyName)
 
         private static string GetterCode(IFieldSymbol field)
         {
-            return CodeSnippets.Indent($"get => {field.Name};");
+            return Code.Indent($"get => {field.Name};");
         }
 
         private static string SetterCode(IFieldSymbol field, bool nullableEnabled)
         {
             var sb = new StringBuilder();
-            sb.AppendLine(CodeSnippets.Indent("set"));
-            sb.AppendLine(CodeSnippets.Indent("{"));
+            sb.AppendLine(Code.Indent("set"));
+            sb.AppendLine(Code.Indent("{"));
 
             var changingAttribute = GetAttribute<INotifyPropertyChangingAttribute>(field);
             var changedAttribute = GetAttribute<INotifyPropertyChangedAttribute>(field);
@@ -180,7 +180,7 @@ $@"protected virtual void {PropertyChangingNotifyMethod}(string propertyName)
             else
                 sb.AppendLine(SetterCodeWithChangingEqualityCheck(field, changedAttribute, nullSafe));
 
-            sb.Append(CodeSnippets.Indent("}"));
+            sb.Append(Code.Indent("}"));
             return sb.ToString();
         }
 
@@ -188,16 +188,16 @@ $@"protected virtual void {PropertyChangingNotifyMethod}(string propertyName)
             IFieldSymbol field, INotifyPropertyChangedAttribute changedAttribute, bool nullSafe)
         {
             var sb = new StringBuilder();
-            var propertyName = CodeSnippets.PropertyNameFromField(field);
+            var propertyName = Code.PropertyNameFromField(field);
 
             if (changedAttribute?.EqualityCheck is true)
             {
                 const int tab = 3;
                 sb.AppendLine(InequalityConditionCode(field, nullSafe));
-                sb.AppendLine(CodeSnippets.Indent("{", tab - 1));
+                sb.AppendLine(Code.Indent("{", tab - 1));
                 sb.AppendLine(SetField(field.Name, tab));
                 sb.AppendLine(RaiseChangedEvent(propertyName, tab));
-                sb.Append(CodeSnippets.Indent("}", tab - 1));
+                sb.Append(Code.Indent("}", tab - 1));
             }
             else
             {
@@ -215,14 +215,14 @@ $@"protected virtual void {PropertyChangingNotifyMethod}(string propertyName)
 
             string tempVar = null;
             var sb = new StringBuilder();
-            var propertyName = CodeSnippets.PropertyNameFromField(field);
+            var propertyName = Code.PropertyNameFromField(field);
 
             sb.AppendLine(RaiseChangingEvent(propertyName, tab));
 
             if (changedAttribute?.EqualityCheck is true)
             {
-                tempVar = CodeSnippets.CreateVariable(field.ContainingType);
-                sb.AppendLine(CodeSnippets.Indent($"var {tempVar} = {field.Name};", tab));
+                tempVar = Code.CreateUnconflictingVariable(field.ContainingType);
+                sb.AppendLine(Code.Indent($"var {tempVar} = {field.Name};", tab));
             }
 
             sb.Append(SetField(field.Name, tab));
@@ -235,9 +235,9 @@ $@"protected virtual void {PropertyChangingNotifyMethod}(string propertyName)
                 else
                 {
                     sb.AppendLine(InequalityConditionCode(field, nullSafe, $"{tempVar}"));
-                    sb.AppendLine(CodeSnippets.Indent("{", tab));
+                    sb.AppendLine(Code.Indent("{", tab));
                     sb.AppendLine(RaiseChangedEvent(propertyName, tab + 1));
-                    sb.Append(CodeSnippets.Indent("}", tab));
+                    sb.Append(Code.Indent("}", tab));
                 }
             }
             return sb.ToString();
@@ -247,11 +247,11 @@ $@"protected virtual void {PropertyChangingNotifyMethod}(string propertyName)
             IFieldSymbol field, INotifyPropertyChangedAttribute changedAttribute, bool nullSafe)
         {
             var sb = new StringBuilder();
-            var propertyName = CodeSnippets.PropertyNameFromField(field);
+            var propertyName = Code.PropertyNameFromField(field);
 
             const int tab = 3;
             sb.AppendLine(InequalityConditionCode(field, nullSafe));
-            sb.AppendLine(CodeSnippets.Indent("{", tab - 1));
+            sb.AppendLine(Code.Indent("{", tab - 1));
             sb.AppendLine(RaiseChangingEvent(propertyName, tab));
 
             if (!(changedAttribute?.EqualityCheck is false))
@@ -260,7 +260,7 @@ $@"protected virtual void {PropertyChangingNotifyMethod}(string propertyName)
             if (changedAttribute?.EqualityCheck is true)
                 sb.AppendLine(RaiseChangedEvent(propertyName, tab));
 
-            sb.AppendLine(CodeSnippets.Indent("}", tab - 1));
+            sb.AppendLine(Code.Indent("}", tab - 1));
             if (changedAttribute?.EqualityCheck is false)
             {
                 sb.AppendLine(SetField(field.Name, tab - 1));
@@ -271,8 +271,8 @@ $@"protected virtual void {PropertyChangingNotifyMethod}(string propertyName)
 
         private static string InequalityConditionCode(IFieldSymbol symbol, bool nullSafe, string other = "value")
         {
-            return CodeSnippets.Indent(
-                $"if ({CodeSnippets.InequalityCheck(symbol.Type, symbol.Name, other, nullSafe)})", 2);
+            return Code.Indent(
+                $"if ({Code.InequalityCheck(symbol.Type, symbol.Name, other, nullSafe)})", 2);
         }
 
         private static T GetAttribute<T>(IFieldSymbol field)
@@ -287,17 +287,17 @@ $@"protected virtual void {PropertyChangingNotifyMethod}(string propertyName)
 
         private static string SetField(string fieldName, int tabCount)
         {
-            return CodeSnippets.Indent($"{fieldName} = value;", tabCount);
+            return Code.Indent($"{fieldName} = value;", tabCount);
         }
 
         private static string RaiseChangingEvent(string propName, int tabCount)
         {
-            return CodeSnippets.Indent($"{PropertyChangingNotifyMethod}(\"{propName}\");" , tabCount);
+            return Code.Indent($"{PropertyChangingNotifyMethod}(\"{propName}\");" , tabCount);
         }
 
         private static string RaiseChangedEvent(string propName, int tabCount)
         {
-            return CodeSnippets.Indent($"{PropertyChangedNotifyMethod}(\"{propName}\");", tabCount);
+            return Code.Indent($"{PropertyChangedNotifyMethod}(\"{propName}\");", tabCount);
         }
     }
 }

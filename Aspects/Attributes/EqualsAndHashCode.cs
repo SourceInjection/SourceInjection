@@ -1,5 +1,6 @@
 ﻿using Aspects.Attributes.Interfaces;
 using System;
+using System.Collections;
 
 namespace Aspects.Attributes
 {
@@ -94,19 +95,30 @@ namespace Aspects.Attributes
     /// </summary>
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, Inherited = true, AllowMultiple = false)]
     public class EqualsAndHashCodeAttribute : Attribute, IEqualsAttribute, IHashCodeAttribute 
-    { 
+    {
         /// <summary>
         /// Creates an instance of <see cref="EqualsAndHashCodeAttribute"/>.
         /// </summary>
         /// <param name="equalsNullSafety">Determines if the equalization is generated null safe.</param>
-        public EqualsAndHashCodeAttribute(NullSafety equalsNullSafety = NullSafety.Auto, string equalsEqualityComparer = null) 
+        /// <param name="equalsEqualityComparer">Determines the comparer which is then used to compare for equalization.</param>
+        public EqualsAndHashCodeAttribute(NullSafety equalsNullSafety = NullSafety.Auto, Type equalsEqualityComparer = null)
+            : this(equalsNullSafety, equalsEqualityComparer?.FullName)
+        { }
+
+        private EqualsAndHashCodeAttribute(NullSafety equalsNullSafety = NullSafety.Auto, string equalsEqualityComparer = null, string hashCodeEqualityComparer = null) 
         {
             EqualsNullSafety = equalsNullSafety;
             EqualsEqualityComparer = equalsEqualityComparer;
+            HashCodeEqualityComparer = hashCodeEqualityComparer;
         }
 
         /// <summary>
-        /// The equality comparer which is used to compare the properties.
+        /// The equality comparer which is evaluate the hash code of the data member.
+        /// </summary>
+        public string HashCodeEqualityComparer { get; }
+
+        /// <summary>
+        /// The equality comparer which is used to compare the data members.
         /// </summary>
         public string EqualsEqualityComparer { get; }
 
@@ -118,6 +130,8 @@ namespace Aspects.Attributes
         NullSafety IEqualsAttribute.NullSafety => EqualsNullSafety;
 
         string IEqualsAttribute.EqualityComparer => EqualsEqualityComparer;
+
+        string IHashCodeAttribute.EqualityComparer => HashCodeEqualityComparer;
     }
 
     /// <summary>

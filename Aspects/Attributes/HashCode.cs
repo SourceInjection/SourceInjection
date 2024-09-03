@@ -52,7 +52,19 @@ namespace Aspects.Attributes
     /// If used in combination with <see cref="AutoHashCodeAttribute"/> this attribute includes members that are normally excluded.
     /// </summary>
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, Inherited = true, AllowMultiple = false)]
-    public class HashCodeAttribute : Attribute, IHashCodeAttribute { }
+    public class HashCodeAttribute : Attribute, IHashCodeAttribute 
+    {
+        public HashCodeAttribute(Type equalityComparer = null)
+            : this(equalityComparer?.FullName)
+        { }
+
+        private HashCodeAttribute(string equalityComparer)
+        {
+            EqualityComparer = equalityComparer;
+        }
+
+        public string EqualityComparer { get; }
+    }
 
     /// <summary>
     /// Must be used in combination with <see cref="AutoHashCodeAttribute"/>.
