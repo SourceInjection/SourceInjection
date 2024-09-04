@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections;
 using System.Linq;
 using System;
+using Aspects.SourceGenerators.Common;
 
 namespace Aspects.Util
 {
@@ -34,31 +35,6 @@ namespace Aspects.Util
         }
 
         /// <summary>
-        /// Checks if the <see cref="ISymbol"/> is a public <see cref="IPropertySymbol"/>.
-        /// </summary>
-        /// <param name="symbol">The symbol which is checked to be a public <see cref="IPropertySymbol".</param>
-        /// <returns><see langword="true"/> if the <see cref="ISymbol"/> is a public <see cref="IPropertySymbol"/> else <see langword="false"/>.</returns>
-        public static bool IsPublicProperty(this ISymbol symbol)
-        {
-            return symbol is IPropertySymbol property
-                && property.DeclaredAccessibility == Accessibility.Public
-                && property.GetMethod != null
-                && (property.GetMethod.DeclaredAccessibility == Accessibility.NotApplicable
-                    || property.GetMethod.DeclaredAccessibility == Accessibility.Public);
-        }
-
-        /// <summary>
-        /// Checks if the given <see cref="ISymbol"/> is a public <see cref="IFieldSymbol"/>.
-        /// </summary>
-        /// <param name="symbol">The <see cref="ISymbol"/> which is checked to be a public <see cref="IFieldSymbol"/>.</param>
-        /// <returns><see langword="true"/> if the <see cref="ISymbol"/> is a public <see cref="IFieldSymbol"/> else <see langword="false"/>.</returns>
-        public static bool IsPublicField(this ISymbol symbol)
-        {
-            return symbol is IFieldSymbol field
-                && field.DeclaredAccessibility == Accessibility.Public;
-        }
-
-        /// <summary>
         /// Checks if the given <see cref="ISymbol"/> has a System.Diagnostic.Analysis.NotNull attribute.
         /// </summary>
         /// <param name="symbol">The <see cref="ISymbol"/> to be checked.</param>
@@ -66,7 +42,7 @@ namespace Aspects.Util
         public static bool HasNotNullAttribute(this ISymbol symbol)
         {
             return symbol.GetAttributes()
-                .Any(a => IsNotNullAttribute(a.AttributeClass.ToDisplayString()));
+                .Any(a => a.AttributeClass.ToDisplayString() == NameOf.NotNullAttribute);
         }
 
         /// <summary>
@@ -77,19 +53,7 @@ namespace Aspects.Util
         public static bool HasMaybeNullAttribute(this ISymbol symbol)
         {
             return symbol.GetAttributes()
-                .Any(a => IsMaybeNullAttribute(a.AttributeClass.ToDisplayString()));
-        }
-
-        private static bool IsNotNullAttribute(string attributeName)
-        {
-            const string notNullAttribute = "System.Diagnostics.CodeAnalysis.NotNullAttribute";
-            return attributeName == notNullAttribute;
-        }
-
-        private static bool IsMaybeNullAttribute(string attributeName)
-        {
-            const string maybeNullAttribute = "System.Diagnostics.CodeAnalysis.MaybeNullAttribute";
-            return attributeName == maybeNullAttribute;
+                .Any(a => a.AttributeClass.ToDisplayString() == NameOf.MaybeNullAttribute);
         }
     }
 }

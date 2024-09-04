@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Aspects.Attributes.Interfaces
+﻿namespace Aspects.Attributes.Interfaces
 {
     public interface IAutoEqualsAttribute 
     {
@@ -11,7 +9,7 @@ namespace Aspects.Attributes.Interfaces
         NullSafety NullSafety { get; }
     }
 
-    public interface IEqualsAttribute 
+    public interface IEqualsAttribute : IUseOnPropertyGenerationAttribute
     { 
         NullSafety NullSafety { get; }
 

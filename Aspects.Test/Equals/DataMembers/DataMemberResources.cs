@@ -66,7 +66,7 @@ namespace Aspects.Test.Equals.DataMembers
     {
         [Equals(nullSafety: NullSafety.On)]
         [NotifyPropertyChanged]
-        private object _Object = null!;
+        private object _object = null!;
     }
 }
 

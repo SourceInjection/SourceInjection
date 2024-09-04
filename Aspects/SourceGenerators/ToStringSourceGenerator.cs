@@ -1,12 +1,12 @@
 ﻿using Aspects.SourceGenerators.Base;
 using Microsoft.CodeAnalysis;
-using System.Linq;
 using System.Text;
 using TypeInfo = Aspects.SourceGenerators.Common.TypeInfo;
 using Aspects.Attributes.Interfaces;
-using Aspects.Util;
 using Aspects.SourceGenerators.Common;
 using Aspects.Attributes;
+using Aspects.Util;
+using System.Linq;
 
 namespace Aspects.SourceGenerators
 {
@@ -18,28 +18,26 @@ namespace Aspects.SourceGenerators
 
         protected override DataMemberPriority Priority { get; } = DataMemberPriority.Property;
 
-        protected override DataMemberKind DataMemberKindFromAttribute(IAutoToStringAttribute attr)
-        {
-            return attr.DataMemberKind;
-        }
-
         protected override string TypeBody(TypeInfo typeInfo)
         {
+            var config = GetConfigAttribute(typeInfo);
+
             var sb = new StringBuilder();
             sb.AppendLine($"public override string {Name}()");
             sb.AppendLine("{");
 
             sb.Append(Code.Indent($"return $\"({typeInfo.Name})"));
 
-            var names = GetMemberNames(typeInfo);
+            var symbols = GetSymbols(typeInfo, typeInfo.Members(true), config.DataMemberKind)
+                .ToArray();
 
-            if (names.Length > 0)
+            if (symbols.Length > 0)
             {
                 sb.Append("{{");
-                sb.Append($"{names[0]}: {{{names[0]}}}");
+                sb.Append($"{symbols[0].Name}: {{{symbols[0].Name}}}");
 
-                for(int i = 1; i < names.Length; i++)
-                    sb.Append($", {names[i]}: {{{names[i]}}}");
+                for(int i = 1; i < symbols.Length; i++)
+                    sb.Append($", {symbols[i].Name}: {{{symbols[i].Name}}}");
                 sb.Append("}}");
             }
             sb.AppendLine("\";");
@@ -48,32 +46,12 @@ namespace Aspects.SourceGenerators
             return sb.ToString();
         }
 
-        private string[] GetMemberNames(TypeInfo typeInfo)
+        private static IAutoToStringAttribute GetConfigAttribute(TypeInfo typeInfo)
         {
-            return GetPublicSymbols(typeInfo)
-                .Where(sy => !IsExcluded(sy))
-                .Select(sy => sy.Name)
-                .Concat(typeInfo.Symbol.GetMembers()
-                    .OfType<IFieldSymbol>()
-                    .SelectMany(f => f.AttributesOfType<IGeneratesPublicDataMemberPropertyFromFieldAttribute>()
-                        .Select(a => GetAttribute(a)?.PropertyName(f))
-                        .Where(s => !string.IsNullOrEmpty(s))))
-                .Distinct()
-                .ToArray();
-        }
-
-        private IGeneratesPublicDataMemberPropertyFromFieldAttribute GetAttribute(AttributeData attributeData)
-        {
-            if (!AttributeFactory.TryCreate<IGeneratesPublicDataMemberPropertyFromFieldAttribute>(attributeData, out var result))
-                return null;
-            return result;
-        }
-
-        private static bool IsExcluded(ISymbol symbol)
-        {
-            return !symbol.HasAttributeOfType<IToStringAttribute>() && (
-                symbol is IPropertySymbol p && p.Type.IsEnumerable()
-                || symbol is IFieldSymbol f && (f.Type.IsEnumerable() || f.HasAttributeOfType<IGeneratesPublicDataMemberPropertyFromFieldAttribute>()));
+            var attData = typeInfo.Symbol.AttributesOfType<IAutoToStringAttribute>().FirstOrDefault();
+            if (attData is null || !AttributeFactory.TryCreate<IAutoToStringAttribute>(attData, out var config))
+                return new AutoToStringAttribute();
+            return config;
         }
     }
 }

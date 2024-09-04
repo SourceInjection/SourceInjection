@@ -67,8 +67,8 @@ namespace Aspects.Util
         /// <returns><see langword="true"/> if the <see cref="ITypeSymbol"/> is a <see cref="IEnumerable"/> else <see langword="false"/></returns>
         public static bool IsEnumerable(this ITypeSymbol symbol)
         {
-            return symbol.ToDisplayString().TrimEnd('?') == Paths.IEnumerableName
-                || symbol.AllInterfaces.Any(i => i.ToDisplayString().TrimEnd('?') == Paths.IEnumerableName);
+            return symbol.ToDisplayString().TrimEnd('?') == NameOf.IEnumerable
+                || symbol.AllInterfaces.Any(i => i.ToDisplayString().TrimEnd('?') == NameOf.IEnumerable);
         }
 
         /// <summary>
@@ -78,8 +78,8 @@ namespace Aspects.Util
         /// <returns><see langword="true"/> if the <see cref="ITypeSymbol"/> is a System.Collections.Generic.<see cref="IEnumerable"/> else <see langword="false"/></returns>
         public static bool IsGenericEnumerable(this ITypeSymbol symbol)
         {
-            return symbol.ToDisplayString().StartsWith(Paths.GenericIEnumerableName)
-                || symbol.AllInterfaces.Any(i => i.ToDisplayString().StartsWith(Paths.GenericIEnumerableName));
+            return symbol.ToDisplayString().StartsWith(NameOf.GenericIEnumerable)
+                || symbol.AllInterfaces.Any(i => i.ToDisplayString().StartsWith(NameOf.GenericIEnumerable));
         }
 
         /// <summary>

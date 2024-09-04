@@ -1,6 +1,7 @@
 ﻿using Aspects.Attributes;
 using Aspects.Attributes.Interfaces;
 using Aspects.SourceGenerators.Base;
+using Aspects.SourceGenerators.Base.DataMembers;
 using Aspects.SourceGenerators.Common;
 using Aspects.Util;
 using Microsoft.CodeAnalysis;
@@ -18,11 +19,6 @@ namespace Aspects.SourceGenerators
 
         protected override DataMemberPriority Priority { get; } = DataMemberPriority.Field;
 
-        protected override DataMemberKind DataMemberKindFromAttribute(IAutoHashCodeAttribute attr)
-        {
-            return attr.DataMemberKind;
-        }
-
         protected override string TypeBody(TypeInfo typeInfo)
         {
             const int hashCodeCombineMaxArgs = 8;
@@ -38,7 +34,8 @@ namespace Aspects.SourceGenerators
             sb.AppendLine($"public override int {Name}()");
             sb.AppendLine("{");
 
-            var symbols = GetLocalTargetedSymbols(typeInfo).ToArray();
+            var symbols = GetSymbols(typeInfo, typeInfo.Symbol.GetMembers(), config.DataMemberKind)
+                .ToArray();
             var includeBase = ShouldIncludeBase(typeInfo, config);
             var length = symbols.Length + (includeBase ? 1 : 0);
 
@@ -50,7 +47,7 @@ namespace Aspects.SourceGenerators
             return sb.ToString();
         }
 
-        private string HashCodeAppend(ISymbol[] symbols, bool includeBase)
+        private string HashCodeAppend(DataMemberSymbolInfo[] symbols, bool includeBase)
         {
             var sb = new StringBuilder();
             sb.AppendLine(Code.Indent("var hash = new System.HashCode();"));
@@ -65,7 +62,7 @@ namespace Aspects.SourceGenerators
             return sb.ToString();
         }
 
-        private string HashCodeCombine(ISymbol[] symbols, bool includeBase)
+        private string HashCodeCombine(DataMemberSymbolInfo[] symbols, bool includeBase)
         {
             var sb = new StringBuilder();
             sb.Append(Code.Indent("return System.HashCode.Combine("));
@@ -93,11 +90,11 @@ namespace Aspects.SourceGenerators
             return sb.ToString();
         }
 
-        private static string MemberHash(ISymbol symbol)
+        private static string MemberHash(DataMemberSymbolInfo symbol)
         {
             if (!MustUseCombinedHashCode(symbol))
                 return symbol.Name;
-            return $"{Paths.AspectsDeepCombinedHashCode}({symbol.Name})";
+            return $"{NameOf.AspectsDeepCombinedHashCode}({symbol.Name})";
         }
 
         private static bool ShouldIncludeBase(TypeInfo typeInfo, IAutoHashCodeAttribute config)
@@ -110,16 +107,10 @@ namespace Aspects.SourceGenerators
                         || syBase.GetMembers().Any(m => m.HasAttributeOfType<IHashCodeAttribute>())));
         }
 
-        private static bool MustUseCombinedHashCode(ISymbol symbol)
+        private static bool MustUseCombinedHashCode(DataMemberSymbolInfo symbol)
         {
-            ITypeSymbol type;
-            if (symbol is IPropertySymbol p)
-                type = p.Type;
-            else if(symbol is IFieldSymbol f)
-                type = f.Type;
-            else return false;
-
-            return type.IsEnumerable() && !type.OverridesGetHashCode();
+            return symbol.Type.IsEnumerable() 
+                && !symbol.Type.OverridesGetHashCode();
         }
 
         private static IAutoHashCodeAttribute GetConfigAttribute(TypeInfo typeInfo)

@@ -2,6 +2,8 @@
 
 namespace Aspects.Attributes.Interfaces
 {
+    public interface IUseOnPropertyGenerationAttribute { }
+
     public interface IGeneratesPublicDataMemberPropertyFromFieldAttribute 
     {
         string PropertyName(IFieldSymbol field);

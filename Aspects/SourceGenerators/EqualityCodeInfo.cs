@@ -1,4 +1,6 @@
-﻿namespace Aspects.SourceGenerators.Common
+﻿using Aspects.SourceGenerators.Common;
+
+namespace Aspects.SourceGenerators
 {
     internal class EqualityCodeInfo
     {
@@ -13,13 +15,13 @@
             _nameB = nameB;
         }
 
-        public string LinqSequenceEquality() => MayInversed($"{Paths.LinqSequenceEqual}({_nameA}, {_nameB})");
+        public string LinqSequenceEquality() => MayInversed($"{NameOf.LinqSequenceEqual}({_nameA}, {_nameB})");
 
-        public string NullSafeLinqSequenceEquality() => NullSafeSequenceEquality(Paths.LinqSequenceEqual);
+        public string NullSafeLinqSequenceEquality() => NullSafeSequenceEquality(NameOf.LinqSequenceEqual);
 
-        public string AspectsSequenceEquality() => MayInversed($"{Paths.AspectsSequenceEqual}({_nameA}, {_nameB})");
+        public string AspectsSequenceEquality() => MayInversed($"{NameOf.AspectsSequenceEqual}({_nameA}, {_nameB})");
 
-        public string NullSafeAspectsSequenceEquality() => NullSafeSequenceEquality(Paths.AspectsSequenceEqual);
+        public string NullSafeAspectsSequenceEquality() => NullSafeSequenceEquality(NameOf.AspectsSequenceEqual);
 
         public string MethodEquality() => MayInversed($"{_nameA}.{nameof(Equals)}({_nameB})");
 

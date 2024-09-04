@@ -5,7 +5,7 @@
         DataMemberKind DataMemberKind { get; }
     }
 
-    public interface IToStringAttribute { }
+    public interface IToStringAttribute : IUseOnPropertyGenerationAttribute { }
 
     public interface IToStringExcludeAttribute { }
 }

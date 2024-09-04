@@ -1,4 +1,4 @@
-﻿namespace Aspects.SourceGenerators.Common
+﻿namespace Aspects.SourceGenerators
 {
     internal class HashCodeCodeInfo
     {

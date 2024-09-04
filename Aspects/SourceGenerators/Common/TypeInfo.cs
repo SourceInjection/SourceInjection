@@ -16,20 +16,22 @@ namespace Aspects.SourceGenerators.Common
         private readonly Lazy<List<INamedTypeSymbol>> _inheritanceFromBottomToTop;
         private readonly Lazy<List<PropertyInfo>> _localPropertyInfos;
         private readonly Lazy<bool> _hasNullableEnabled;
+        private readonly GeneratorSyntaxContext _context;
 
         public TypeInfo(GeneratorSyntaxContext context, TypeDeclarationSyntax syntaxNode, INamedTypeSymbol typeSymbol)
         {
+            _context = context;
             SyntaxNode = syntaxNode;
             Symbol = typeSymbol;
 
-            _hasNullableEnabled = new Lazy<bool>(() => context.SemanticModel.GetNullableContext(0).AnnotationsEnabled() 
+            _hasNullableEnabled = new Lazy<bool>(() => _context.SemanticModel.GetNullableContext(0).AnnotationsEnabled()
                 && !syntaxNode.HasNullableDisabledDirective());
             _hasPartialModifier = new Lazy<bool>(() => syntaxNode.HasPartialModifier());
             _declaration = new Lazy<string>(() => syntaxNode.Declaration());
             _name = new Lazy<string>(() => syntaxNode.NameWithGenericParameters());
             _fullName = new Lazy<string>(() => syntaxNode.FullNameWithGenericParameters());
             _inheritanceFromBottomToTop = new Lazy<List<INamedTypeSymbol>>(() => typeSymbol.InheritanceFromBottomToTop().ToList());
-            _localPropertyInfos = new Lazy<List<PropertyInfo>>(() => LoadProperties(context));
+            _localPropertyInfos = new Lazy<List<PropertyInfo>>(() => LoadProperties(_context));
         }
 
         public TypeDeclarationSyntax SyntaxNode { get; }
@@ -65,13 +67,10 @@ namespace Aspects.SourceGenerators.Common
 
         private List<PropertyInfo> LoadProperties(GeneratorSyntaxContext context)
         {
-            var localProperties = new HashSet<IPropertySymbol>(
-                Symbol.GetMembers().OfType<IPropertySymbol>(), SymbolEqualityComparer.Default);
-
             return SyntaxNode.DescendantNodes()
                 .OfType<PropertyDeclarationSyntax>()
                 .Select(pds => new { PropertyDeclarationSyntax = pds, Symbol = context.SemanticModel.GetDeclaredSymbol(pds) })
-                .Where(tuple => tuple.Symbol is IPropertySymbol && localProperties.Contains(tuple.Symbol, SymbolEqualityComparer.Default))
+                .Where(tuple => tuple.Symbol is IPropertySymbol)
                 .Select(tuple => new PropertyInfo(tuple.PropertyDeclarationSyntax, (IPropertySymbol)tuple.Symbol))
                 .ToList();
         }

@@ -1,10 +1,11 @@
 ﻿using Aspects.Attributes;
+using Aspects.Attributes.Interfaces;
+using Aspects.SourceGenerators.Base.DataMembers;
 using Aspects.SourceGenerators.Common;
 using Aspects.SourceGenerators.Queries;
 using Aspects.SyntaxReceivers;
 using Aspects.Util;
 using Microsoft.CodeAnalysis;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using TypeInfo = Aspects.SourceGenerators.Common.TypeInfo;
@@ -12,7 +13,7 @@ using TypeInfo = Aspects.SourceGenerators.Common.TypeInfo;
 namespace Aspects.SourceGenerators.Base
 {
     internal abstract class ObjectMethodSourceGeneratorBase<TConfigAttribute, TAttribute, TExcludeAttribute>
-        : TypeSourceGeneratorBase
+        : TypeSourceGeneratorBase where TAttribute : IUseOnPropertyGenerationAttribute
     {
         protected enum DataMemberPriority { Field, Property };
 
@@ -24,99 +25,64 @@ namespace Aspects.SourceGenerators.Base
 
         protected override IEnumerable<string> Dependencies(TypeInfo typeInfo) => Enumerable.Empty<string>();
 
-        protected IEnumerable<ISymbol> GetLocalTargetedSymbols(TypeInfo typeInfo)
+        protected IEnumerable<DataMemberSymbolInfo> GetSymbols(TypeInfo typeInfo, IEnumerable<ISymbol> members, DataMemberKind dataMemberKind)
         {
-            return GetSymbols(typeInfo, typeInfo.Members());
-        }
+            var conflicts = typeInfo.LocalPropertyInfos
+                .Where(pi => pi.LinkedField != null
+                    && IsTargeted(pi.LinkedField, dataMemberKind)
+                    && IsTargeted(pi.Symbol, dataMemberKind, typeInfo.LocalPropertyInfos));
 
-        protected IEnumerable<ISymbol> GetPublicSymbols(TypeInfo typeInfo)
-        {
-            return GetSymbols(typeInfo, typeInfo.Members(true)
-                .Where(sy => sy.IsPublicProperty() || sy.IsPublicField()));
-        }
+            var blockedSymbols = Priority == DataMemberPriority.Field
+                ? new HashSet<ISymbol>(conflicts.Select(pi => pi.Symbol), SymbolEqualityComparer.Default)
+                : new HashSet<ISymbol>(conflicts.Select(pi => pi.LinkedField), SymbolEqualityComparer.Default);
 
-        private IEnumerable<ISymbol> GetSymbols(TypeInfo typeInfo, IEnumerable<ISymbol> members)
-        {
-            if (TryGetDataMemberKind(typeInfo, out var dataMemberKind))
+            foreach (var member in members.Where(m => !blockedSymbols.Contains(m, SymbolEqualityComparer.Default)))
             {
-                if (dataMemberKind == DataMemberKind.Property)
-                    return GetProperties(members);
-                else if (dataMemberKind == DataMemberKind.Field)
-                    return GetFields(members);
-                else if (dataMemberKind == DataMemberKind.DataMember)
-                    return GetDataMembers(typeInfo, members);
-                throw new NotImplementedException();
+                if (member is IPropertySymbol p && IsTargeted(p, dataMemberKind, typeInfo.LocalPropertyInfos))
+                    yield return PropertySymbolInfo.Create(p);
+                else if(member is IFieldSymbol f)
+                {
+                    if (MustUseGeneratedProperty(f, dataMemberKind))
+                        yield return PropertySymbolInfo.Generate(f, Accessibility.Public);
+                    else if (IsTargeted(f, dataMemberKind))
+                        yield return FieldSymbolInfo.Create(f);
+                }
             }
-
-            return members
-                .Where(m => m is IFieldSymbol || m is IPropertySymbol p && PropertyIsInstanceMember(p))
-                .Where(m => m.HasAttributeOfType<TAttribute>());
         }
 
-        private bool TryGetDataMemberKind(TypeInfo typeInfo, out DataMemberKind kind)
+        private bool MustUseGeneratedProperty(IFieldSymbol f, DataMemberKind dataMemberKind)
         {
-            if (AttributeFactory.TryCreate<TConfigAttribute>(
-                typeInfo.Symbol.AttributesOfType<TConfigAttribute>().FirstOrDefault(), out var attr))
-            {
-                kind = DataMemberKindFromAttribute(attr);
-                return true;
-            }
-
-            kind = DataMemberKind.DataMember;
-            return false;
+            return f.HasAttributeOfType<IGeneratesPublicDataMemberPropertyFromFieldAttribute>()
+                && (dataMemberKind == DataMemberKind.DataMember && Priority == DataMemberPriority.Property || dataMemberKind == DataMemberKind.Property);
         }
 
-        protected abstract DataMemberKind DataMemberKindFromAttribute(TConfigAttribute attr);
-
-        private IEnumerable<ISymbol> GetDataMembers(TypeInfo typeInfo, IEnumerable<ISymbol> members)
+        private static bool IsTargeted(IFieldSymbol field, DataMemberKind dataMemberKind)
         {
-            IEnumerable<ISymbol> fields = GetFields(members);
-
-            var properties = typeInfo.LocalPropertyInfos
-                .Where(pi => pi.IsDataMember);
-
-            var linkedFields = properties
-                .Where(pi => pi.LinkedField != null)
-                .Select(pi => pi.LinkedField)
-                .ToArray();
-
-            if (Priority == DataMemberPriority.Property)
-            {
-                fields = fields
-                    .Where(f => !Array.Exists(linkedFields, lf => lf.Equals(f, SymbolEqualityComparer.Default)))
-                    .ToArray();
-
-                return fields.Concat(properties.Select(pi => pi.Symbol));
-            }
-            else if (Priority == DataMemberPriority.Field)
-            {
-                return fields.Concat(properties
-                    .Where(pi => pi.LinkedField is null)
-                    .Select(pi => pi.Symbol));
-            }
-            else throw new NotImplementedException($"{Priority}");
+            return !field.HasAttributeOfType<TExcludeAttribute>() && (
+                    dataMemberKind != DataMemberKind.Property
+                    && !field.IsImplicitlyDeclared 
+                    && !field.IsConst 
+                    && !field.IsStatic
+                || field.HasAttributeOfType<TAttribute>());
         }
 
-        private IEnumerable<IFieldSymbol> GetFields(IEnumerable<ISymbol> members)
+        private static bool IsTargeted(IPropertySymbol property, DataMemberKind dataMemberKind, IEnumerable<PropertyInfo> propertyInfos)
         {
-            return members
-                .OfType<IFieldSymbol>()
-                .Where(f => !f.IsImplicitlyDeclared && !f.IsConst && !f.IsStatic && !f.HasAttributeOfType<TExcludeAttribute>());
+            return !property.HasAttributeOfType<TExcludeAttribute>() && (
+                    dataMemberKind != DataMemberKind.Field
+                    && !property.IsImplicitlyDeclared
+                    && !property.IsStatic
+                    && property.GetMethod != null
+                    && !property.GetMethod.IsStatic
+                    && !property.IsOverride
+                    && IsDataMember(property, propertyInfos)
+                || property.HasAttributeOfType<TAttribute>());
         }
 
-        private IEnumerable<IPropertySymbol> GetProperties(IEnumerable<ISymbol> members)
+        private static bool IsDataMember(IPropertySymbol property, IEnumerable<PropertyInfo> propertyInfos)
         {
-            return members.OfType<IPropertySymbol>()
-                .Where(p => PropertyIsInstanceMember(p) 
-                    && (!p.IsOverride || p.HasAttributeOfType<TAttribute>()) && !p.HasAttributeOfType<TExcludeAttribute>());
-        }
-
-        private bool PropertyIsInstanceMember(IPropertySymbol property)
-        {
-            return !property.IsImplicitlyDeclared
-                && !property.IsStatic
-                && property.GetMethod != null
-                && !property.GetMethod.IsStatic;
+            return propertyInfos.FirstOrDefault(
+                pi => pi.Symbol.Equals(property, SymbolEqualityComparer.Default))?.IsDataMember == true;
         }
     }
 }
