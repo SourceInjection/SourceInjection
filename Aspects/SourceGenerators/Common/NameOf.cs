@@ -20,7 +20,9 @@ namespace Aspects.SourceGenerators.Common
 
         public static string AspectsEnumerable { get; } = typeof(Collections.Enumerable).FullName;
 
-        public static string AspectsSequenceEqual { get; } = $"{AspectsEnumerable}.{nameof(Collections.Enumerable.DeepSequenceEqual)}";
+        public static string AspectsDeepSequenceEqual { get; } = $"{AspectsEnumerable}.{nameof(Collections.Enumerable.DeepSequenceEqual)}";
+
+        public static string AspectsCombinedHashCode { get; } = $"{AspectsEnumerable}.{nameof(Collections.Enumerable.CombinedHashCode)}";
 
         public static string AspectsDeepCombinedHashCode { get; } = $"{AspectsEnumerable}.{nameof(Collections.Enumerable.DeepCombinedHashCode)}";
 

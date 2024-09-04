@@ -19,9 +19,9 @@ namespace Aspects.SourceGenerators
 
         public string NullSafeLinqSequenceEquality() => NullSafeSequenceEquality(NameOf.LinqSequenceEqual);
 
-        public string AspectsSequenceEquality() => MayInversed($"{NameOf.AspectsSequenceEqual}({_nameA}, {_nameB})");
+        public string AspectsSequenceEquality() => MayInversed($"{NameOf.AspectsDeepSequenceEqual}({_nameA}, {_nameB})");
 
-        public string NullSafeAspectsSequenceEquality() => NullSafeSequenceEquality(NameOf.AspectsSequenceEqual);
+        public string NullSafeAspectsSequenceEquality() => NullSafeSequenceEquality(NameOf.AspectsDeepSequenceEqual);
 
         public string MethodEquality() => MayInversed($"{_nameA}.{nameof(Equals)}({_nameB})");
 

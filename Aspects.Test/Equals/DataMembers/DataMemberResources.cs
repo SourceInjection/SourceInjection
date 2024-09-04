@@ -41,6 +41,22 @@ namespace Aspects.Test.Equals.DataMembers
     }
 
     [AutoEquals(dataMemberKind: DataMemberKind.Property)]
+    public partial class ClassWithPropertyLinkedField_ArrowFunction_DataMemberKind_Property
+    {
+        private int _int;
+
+        public int Int => _int;
+    }
+
+    [AutoEquals(dataMemberKind: DataMemberKind.Property)]
+    public partial class ClassWithPropertyLinkedField_ArrowFunction_CoalesceOperator_DataMemberKind_Property
+    {
+        private int? _int;
+
+        public int Int => _int ?? 0;
+    }
+
+    [AutoEquals(dataMemberKind: DataMemberKind.Property)]
     public partial class ClassWithGeneratedProperty_DataMemberKind_Property
     {
         [NotifyPropertyChanged]

@@ -5,7 +5,6 @@ using Aspects.SourceGenerators.Base.DataMembers;
 using Aspects.SourceGenerators.Common;
 using Aspects.Util;
 using Microsoft.CodeAnalysis;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;

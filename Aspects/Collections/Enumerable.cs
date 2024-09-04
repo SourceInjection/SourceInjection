@@ -10,11 +10,11 @@ namespace Aspects.Collections
         /// </summary>
         /// <param name="en">The <see cref="IEnumerable"/> for which the hash code is computed.</param>
         /// <returns>The hash code of the <see cref="IEnumerable"/>.</returns>
-        public static int DeepCombinedHashCode(IEnumerable en)
+        public static int DeepCombinedHashCode(this IEnumerable en)
         {
             if (en == null)
                 return 0;
-            return en.DeepCombinedHashCode();
+            return EnumerableExtensions.DeepCombinedHashCode(en);
         }
 
         /// <summary>
@@ -22,11 +22,11 @@ namespace Aspects.Collections
         /// </summary>
         /// <param name="en">The <see cref="IEnumerable"/> for which the hash code is computed.</param>
         /// <returns>The hash code of the <see cref="IEnumerable"/>.</returns>
-        public static int CombinedHashCode(IEnumerable en)
+        public static int CombinedHashCode(this IEnumerable en)
         {
             if (en == null)
                 return 0;
-            return en.CombinedHashCode();
+            return EnumerableExtensions.CombinedHashCode(en);
         }
 
         /// <summary>
@@ -37,11 +37,7 @@ namespace Aspects.Collections
         /// <returns><see langword="true"/> if the <see cref="IEnumerable"/>s are equal else <see langword="false"/>.</returns>
         public static bool DeepSequenceEqual(IEnumerable a, IEnumerable b)
         {
-            if (a == null && b == null)
-                return true;
-            if (a != null && b != null)
-                return a == b || a.DeepSequenceEqual(b);
-            return false;
+            return EnumerableExtensions.DeepSequenceEqual(a, b);
         }
     }
 }

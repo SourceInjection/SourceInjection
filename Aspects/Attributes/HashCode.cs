@@ -49,7 +49,7 @@ namespace Aspects.Attributes
     /// <summary>
     /// <see cref="Attribute"/> for automatic <see cref="object.GetHashCode"/> generation.<br/>
     /// All members with this attribute will be used to generate <see cref="object.GetHashCode"/>.<br/>
-    /// If used in combination with <see cref="AutoHashCodeAttribute"/> this attribute includes members that are normally excluded.
+    /// Also includes members that are normally excluded.
     /// </summary>
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, Inherited = true, AllowMultiple = false)]
     public class HashCodeAttribute : Attribute, IHashCodeAttribute 
