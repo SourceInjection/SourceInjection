@@ -2,6 +2,7 @@
 using Aspects.Attributes.Interfaces;
 using Aspects.SourceGenerators.Base.DataMembers;
 using Aspects.SourceGenerators.Common;
+using Aspects.SourceGenerators.DataMembers;
 using Aspects.SourceGenerators.Queries;
 using Aspects.SyntaxReceivers;
 using Aspects.Util;
@@ -12,8 +13,7 @@ using TypeInfo = Aspects.SourceGenerators.Common.TypeInfo;
 
 namespace Aspects.SourceGenerators.Base
 {
-    internal abstract class ObjectMethodSourceGeneratorBase<TConfigAttribute, TAttribute, TExcludeAttribute>
-        : TypeSourceGeneratorBase where TAttribute : IUseOnPropertyGenerationAttribute
+    internal abstract class ObjectMethodSourceGeneratorBase<TConfigAttribute, TAttribute, TExcludeAttribute> : TypeSourceGeneratorBase
     {
         protected enum DataMemberPriority { Field, Property };
 
@@ -43,7 +43,7 @@ namespace Aspects.SourceGenerators.Base
                 else if(member is IFieldSymbol f)
                 {
                     if (MustUseGeneratedProperty(f, dataMemberKind))
-                        yield return PropertySymbolInfo.Generate(f, Accessibility.Public);
+                        yield return GeneratedPropertySymbolInfo.Create(f, Accessibility.Public);
                     else if (IsTargeted(f, dataMemberKind))
                         yield return FieldSymbolInfo.Create(f);
                 }

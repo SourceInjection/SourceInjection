@@ -9,7 +9,7 @@
         NullSafety NullSafety { get; }
     }
 
-    public interface IEqualsAttribute : IUseOnPropertyGenerationAttribute
+    public interface IEqualsAttribute
     { 
         NullSafety NullSafety { get; }
 

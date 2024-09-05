@@ -7,7 +7,7 @@
         BaseCall BaseCall { get; }
     }
 
-    public interface IHashCodeAttribute : IUseOnPropertyGenerationAttribute
+    public interface IHashCodeAttribute
     {
         string EqualityComparer { get; }
     }

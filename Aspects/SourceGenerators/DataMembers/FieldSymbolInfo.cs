@@ -5,7 +5,7 @@ namespace Aspects.SourceGenerators.Base.DataMembers
 {
     internal class FieldSymbolInfo : DataMemberSymbolInfo
     {
-        private FieldSymbolInfo(
+        protected FieldSymbolInfo(
             string name,
             Accessibility
             declaredAccessibility,

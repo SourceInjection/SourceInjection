@@ -40,28 +40,16 @@ namespace Aspects.SourceGenerators.Base.DataMembers
                 || a.AttributeClass.AllInterfaces.Any(i => i.ToDisplayString() == name));
         }
 
-        public bool HasNotNullAttribute()
+        public virtual bool HasNotNullAttribute()
         {
             return Attributes
-                .Any(a => IsNotNullAttribute(a.AttributeClass.ToDisplayString()));
+                .Any(a => a.IsNotNullAttribute());
         }
 
-        public bool HasMaybeNullAttribute()
+        public virtual bool HasMaybeNullAttribute()
         {
             return Attributes
-                .Any(a => IsMaybeNullAttribute(a.AttributeClass.ToDisplayString()));
-        }
-
-        private static bool IsNotNullAttribute(string attributeName)
-        {
-            const string notNullAttribute = "System.Diagnostics.CodeAnalysis.NotNullAttribute";
-            return attributeName == notNullAttribute;
-        }
-
-        private static bool IsMaybeNullAttribute(string attributeName)
-        {
-            const string maybeNullAttribute = "System.Diagnostics.CodeAnalysis.MaybeNullAttribute";
-            return attributeName == maybeNullAttribute;
+                .Any(a => a.IsMayBeNullAttribute());
         }
     }
 }

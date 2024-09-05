@@ -1,6 +1,5 @@
 ﻿using Aspects.Attributes.Interfaces;
 using System;
-using System.Collections;
 
 namespace Aspects.Attributes
 {

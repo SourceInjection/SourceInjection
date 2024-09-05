@@ -1,6 +1,5 @@
 ﻿using Aspects.Attributes.Interfaces;
 using System;
-using System.Collections;
 
 namespace Aspects.Attributes
 {
@@ -13,7 +12,7 @@ namespace Aspects.Attributes
         /// <summary>
         /// Creates an instance of <see cref="AutoEqualsAndHashCodeAttribute"/>.
         /// </summary>
-        /// <param name="equalsDataMemberKind">
+        /// <param name="dataMemberKind">
         /// Defines which data members are used to generate <see cref="object.Equals(object)"/>.<br/>
         /// With <see cref="DataMemberKind.Field"/> only fields are used.<br/>
         /// With <see cref="DataMemberKind.Property"/> only properties are used.<br/>
@@ -22,72 +21,36 @@ namespace Aspects.Attributes
         /// Linked fields can only be detected when the property fullfilles the following grammar:
         /// <include file="Comments.xml" path="doc/members/member[@name='Properties:PropertySyntax']/*"/>
         /// </param>
-        /// <param name="hashCodeDataMemberKind">
-        /// Defines which data members are used to generate <see cref="object.GetHashCode()"/>.<br/>
-        /// With <see cref="DataMemberKind.Field"/> only fields are used.<br/>
-        /// With <see cref="DataMemberKind.Property"/> only properties are used.<br/>
-        /// The default value is <see cref="DataMemberKind.DataMember"/> 
-        /// which includes fields and properties and automaticly merges linked fields in properties by scanning the getter code.
-        /// Linked fields can only be detected when the property fullfilles the following grammar:
-        /// <include file="Comments.xml" path="doc/members/member[@name='Properties:PropertySyntax']/*"/>
+        /// <param name="baseCall">
+        /// Determines if <see langword="base"/>.Equals() and <see langword="base"/>.GetHashCode() is called.
         /// </param>
-        /// <param name="equalsBaseCall">
-        /// Determines if <see langword="base"/>.Equals() is called.
-        /// </param>
-        /// <param name="hashCodeBaseCall">
-        /// Determines if <see langword="base"/>.GetHashCode() is called.
-        /// </param>
-        /// <param name="equalsNullSafety">
+        /// <param name="nullSafety">
         /// Determines if the equals check is generated null safe.
         /// </param>
         public AutoEqualsAndHashCodeAttribute(
-            DataMemberKind equalsDataMemberKind = DataMemberKind.DataMember,
-            BaseCall equalsBaseCall = BaseCall.Auto,
-            NullSafety equalsNullSafety = NullSafety.Auto,
-            DataMemberKind hashCodeDataMemberKind = DataMemberKind.DataMember,
-            BaseCall hashCodeBaseCall = BaseCall.Auto)
+            DataMemberKind dataMemberKind = DataMemberKind.DataMember,
+            BaseCall baseCall = BaseCall.Auto,
+            NullSafety nullSafety = NullSafety.Auto)
         { 
-            EqualsDataMemberKind = equalsDataMemberKind;
-            EqualsBaseCall = equalsBaseCall;
-            EqualsNullSafety = equalsNullSafety;
-            HashCodeDataMemberKind = hashCodeDataMemberKind;
-            HashCodeBaseCall = hashCodeBaseCall;
+            DataMemberKind = dataMemberKind;
+            BaseCall = baseCall;
+            NullSafety = nullSafety;
         }
-
-        /// <summary>
-        /// Determines the <see cref="DataMemberKind"/> of the <see cref="object.Equals(object)"/> method generation.
-        /// </summary>
-        public DataMemberKind EqualsDataMemberKind { get; }
 
         /// <summary>
         /// Determines the <see cref="DataMemberKind"/> of the <see cref="object.GetHashCode()"/> method generation.
         /// </summary>
-        public DataMemberKind HashCodeDataMemberKind { get; }
+        public DataMemberKind DataMemberKind { get; }
 
         /// <summary>
         /// Determines if <see langword="base"/>.Equals() is called.
         /// </summary>
-        public BaseCall EqualsBaseCall { get; }
-
-        /// <summary>
-        /// Determines if <see langword="base"/>.GetHashCode() is called.
-        /// </summary>
-        public BaseCall HashCodeBaseCall { get; }
+        public BaseCall BaseCall { get; }
 
         /// <summary>
         /// Determines if the equalization is generated nullsafe.
         /// </summary>
-        public NullSafety EqualsNullSafety { get; }
-
-        DataMemberKind IAutoEqualsAttribute.DataMemberKind => EqualsDataMemberKind;
-
-        DataMemberKind IAutoHashCodeAttribute.DataMemberKind => HashCodeDataMemberKind;
-
-        BaseCall IAutoEqualsAttribute.BaseCall => EqualsBaseCall;
-
-        BaseCall IAutoHashCodeAttribute.BaseCall => HashCodeBaseCall;
-
-        NullSafety IAutoEqualsAttribute.NullSafety => EqualsNullSafety;
+        public NullSafety NullSafety { get; }
     }
 
     /// <summary>
@@ -105,33 +68,23 @@ namespace Aspects.Attributes
             : this(equalsNullSafety, equalsEqualityComparer?.FullName)
         { }
 
-        private EqualsAndHashCodeAttribute(NullSafety equalsNullSafety = NullSafety.Auto, string equalsEqualityComparer = null, string hashCodeEqualityComparer = null) 
+        private EqualsAndHashCodeAttribute(NullSafety nullSafety = NullSafety.Auto, string equalityComparer = null) 
         {
-            EqualsNullSafety = equalsNullSafety;
-            EqualsEqualityComparer = equalsEqualityComparer;
-            HashCodeEqualityComparer = hashCodeEqualityComparer;
+            NullSafety = nullSafety;
+            EqualityComparer = equalityComparer;
         }
 
         /// <summary>
-        /// The equality comparer which is evaluate the hash code of the data member.
+        /// The equality comparer which is evaluate the hash code and perform equalization of the data member.
         /// </summary>
-        public string HashCodeEqualityComparer { get; }
+        public string EqualityComparer { get; }
 
-        /// <summary>
-        /// The equality comparer which is used to compare the data members.
-        /// </summary>
-        public string EqualsEqualityComparer { get; }
 
         /// <summary>
         /// Determines if the equalization is generated nullsafe.
         /// </summary>
-        public NullSafety EqualsNullSafety { get; }
+        public NullSafety NullSafety { get; }
 
-        NullSafety IEqualsAttribute.NullSafety => EqualsNullSafety;
-
-        string IEqualsAttribute.EqualityComparer => EqualsEqualityComparer;
-
-        string IHashCodeAttribute.EqualityComparer => HashCodeEqualityComparer;
     }
 
     /// <summary>

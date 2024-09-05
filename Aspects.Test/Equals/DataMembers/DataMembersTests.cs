@@ -1,5 +1,4 @@
-﻿using Aspects.SourceGenerators.Common;
-using CompileUnits.CSharp;
+﻿using CompileUnits.CSharp;
 using NUnit.Framework;
 using System.Reflection;
 

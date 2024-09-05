@@ -1,6 +1,6 @@
 ﻿using Aspects.Attributes;
 
-#pragma warning disable CS0659
+#pragma warning disable CS0659, CS0649
 
 namespace Aspects.Test.Equals.DataMembers
 {
@@ -86,4 +86,4 @@ namespace Aspects.Test.Equals.DataMembers
     }
 }
 
-#pragma warning restore CS0659
+#pragma warning restore CS0659, CS0649

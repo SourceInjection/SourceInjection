@@ -1,6 +1,4 @@
-﻿using Aspects.Attributes.Interfaces;
-
-namespace Aspects.SourceGenerators.Common
+﻿namespace Aspects.SourceGenerators.Common
 {
     internal class NameOf
     {
@@ -29,7 +27,5 @@ namespace Aspects.SourceGenerators.Common
         public static string MaybeNullAttribute { get; } = "System.Diagnostics.CodeAnalysis.MaybeNullAttribute";
 
         public static string NotNullAttribute { get; } = "System.Diagnostics.CodeAnalysis.NotNullAttribute";
-
-        public static string IUseOnPropertyGenerationAttribute { get; } = typeof(IUseOnPropertyGenerationAttribute).FullName;
     }
 }

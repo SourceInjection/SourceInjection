@@ -12,8 +12,7 @@ using TypeInfo = Aspects.SourceGenerators.Common.TypeInfo;
 namespace Aspects.SourceGenerators
 {
     [Generator]
-    internal class HashCodeSourceGenerator 
-        : ObjectMethodSourceGeneratorBase<IAutoHashCodeAttribute, IHashCodeAttribute, IHashCodeExcludeAttribute>
+    internal class HashCodeSourceGenerator : ObjectMethodSourceGeneratorBase<IAutoHashCodeAttribute, IHashCodeAttribute, IHashCodeExcludeAttribute>
     {
         protected internal override string Name { get; } = nameof(GetHashCode);
 
