@@ -272,7 +272,7 @@ $@"protected virtual void {PropertyChangingNotifyMethod}(string propertyName)
         private static string InequalityConditionCode(IFieldSymbol symbol, bool nullSafe, string other = "value")
         {
             return Code.Indent(
-                $"if ({Code.InequalityCheck(symbol.Type, symbol.Name, other, nullSafe)})", 2);
+                $"if ({Code.InequalityCheck(symbol.Type, symbol.Name, other, nullSafe, null)})", 2);
         }
 
         private static T GetAttribute<T>(IFieldSymbol field)

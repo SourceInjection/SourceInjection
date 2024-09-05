@@ -31,7 +31,7 @@ namespace Aspects.Test.Equals.DataMembers
             var (sut, field, property) = GetTypeInfo<ClassWithPropertyLinkedField_DataMemberKind_DataMember>();
             Assert.Multiple(() =>
             {
-                Assert.That(sut.Body.Contains(EqualsMethod.MemberOperatorEqualization(field)));
+                Assert.That(sut.Body.Contains(EqualsMethod.OperatorEqualization(field)));
                 Assert.That(!sut.Body.Contains(property));
             });
         }
@@ -42,7 +42,7 @@ namespace Aspects.Test.Equals.DataMembers
             var (sut, field, property) = GetTypeInfo<ClassWithPropertyLinkedField_DataMemberKind_Field>();
             Assert.Multiple(() =>
             {
-                Assert.That(sut.Body.Contains(EqualsMethod.MemberOperatorEqualization(field)));
+                Assert.That(sut.Body.Contains(EqualsMethod.OperatorEqualization(field)));
                 Assert.That(!sut.Body.Contains(property));
             });
         }
@@ -53,7 +53,7 @@ namespace Aspects.Test.Equals.DataMembers
             var (sut, field, property) = GetTypeInfo<ClassWithPropertyLinkedField_DataMemberKind_Property>();
             Assert.Multiple(() =>
             {
-                Assert.That(sut.Body.Contains(EqualsMethod.MemberOperatorEqualization(property)));
+                Assert.That(sut.Body.Contains(EqualsMethod.OperatorEqualization(property)));
                 Assert.That(!sut.Body.Contains(field));
             });
         }
@@ -64,7 +64,7 @@ namespace Aspects.Test.Equals.DataMembers
             var (sut, field, property) = GetTypeInfo<ClassWithPropertyLinkedField_ArrowFunction_DataMemberKind_Property>();
             Assert.Multiple(() =>
             {
-                Assert.That(sut.Body.Contains(EqualsMethod.MemberOperatorEqualization(property)));
+                Assert.That(sut.Body.Contains(EqualsMethod.OperatorEqualization(property)));
                 Assert.That(!sut.Body.Contains(field));
             });
         }
@@ -75,7 +75,7 @@ namespace Aspects.Test.Equals.DataMembers
             var (sut, field, property) = GetTypeInfo<ClassWithPropertyLinkedField_ArrowFunction_CoalesceOperator_DataMemberKind_Property>();
             Assert.Multiple(() =>
             {
-                Assert.That(sut.Body.Contains(EqualsMethod.MemberOperatorEqualization(property)));
+                Assert.That(sut.Body.Contains(EqualsMethod.OperatorEqualization(property)));
                 Assert.That(!sut.Body.Contains(field));
             });
         }
@@ -86,7 +86,7 @@ namespace Aspects.Test.Equals.DataMembers
             var (sut, field, property) = GetTypeInfo<ClassWithGeneratedProperty_DataMemberKind_Property>();
             Assert.Multiple(() =>
             {
-                Assert.That(sut.Body.Contains(EqualsMethod.MemberOperatorEqualization(property)));
+                Assert.That(sut.Body.Contains(EqualsMethod.OperatorEqualization(property)));
                 Assert.That(!sut.Body.Contains(field));
             });
         }
@@ -97,7 +97,7 @@ namespace Aspects.Test.Equals.DataMembers
             var (sut, field, property) = GetTypeInfo<ClassWithGeneratedProperty_DataMemberKind_Field>();
             Assert.Multiple(() =>
             {
-                Assert.That(sut.Body.Contains(EqualsMethod.MemberOperatorEqualization(field)));
+                Assert.That(sut.Body.Contains(EqualsMethod.OperatorEqualization(field)));
                 Assert.That(!sut.Body.Contains(property));
             });
         }
@@ -108,7 +108,7 @@ namespace Aspects.Test.Equals.DataMembers
             var (sut, field, property) = GetTypeInfo<ClassWithGeneratedProperty_DataMemberKind_DataMember>();
             Assert.Multiple(() =>
             {
-                Assert.That(sut.Body.Contains(EqualsMethod.MemberOperatorEqualization(field)));
+                Assert.That(sut.Body.Contains(EqualsMethod.OperatorEqualization(field)));
                 Assert.That(!sut.Body.Contains(property));
             });
         }
@@ -121,7 +121,7 @@ namespace Aspects.Test.Equals.DataMembers
 
             Assert.Multiple(() =>
             {
-                Assert.That(sut.Body.Contains(EqualsMethod.NullSafeMemberEqualization(property)));
+                Assert.That(sut.Body.Contains(EqualsMethod.NullSafeEqualsEqualization(property)));
                 Assert.That(!sut.Body.Contains(field));
             });
         }

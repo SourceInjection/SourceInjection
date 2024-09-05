@@ -54,16 +54,23 @@ namespace Aspects.Attributes
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, Inherited = true, AllowMultiple = false)]
     public class HashCodeAttribute : Attribute, IHashCodeAttribute 
     {
-        public HashCodeAttribute(Type equalityComparer = null)
-            : this(equalityComparer?.FullName)
+        public HashCodeAttribute() 
+            : this(default(string), NullSafety.Auto) 
         { }
 
-        private HashCodeAttribute(string equalityComparer)
+        public HashCodeAttribute(Type equalityComparer, NullSafety nullSafety = NullSafety.Auto)
+            : this(equalityComparer?.FullName, nullSafety)
+        { }
+
+        private HashCodeAttribute(string equalityComparer, NullSafety nullSafety = NullSafety.Auto)
         {
             EqualityComparer = equalityComparer;
+            NullSafety = nullSafety;
         }
 
         public string EqualityComparer { get; }
+
+        public NullSafety NullSafety { get; }
     }
 
     /// <summary>

@@ -29,6 +29,8 @@ namespace Aspects.SourceGenerators
         protected override string TypeBody(TypeInfo typeInfo)
         {
             var config = GetConfigAttribute(typeInfo);
+            var symbols = GetSymbols(typeInfo, typeInfo.Symbol.GetMembers(), config.DataMemberKind)
+                .ToArray();
 
             var sb = new StringBuilder();
             AppendMethodStart(typeInfo, sb);
@@ -39,16 +41,13 @@ namespace Aspects.SourceGenerators
 
             sb.Append($" {argName} is {typeInfo.Name}");
 
-            var symbols = GetSymbols(typeInfo, typeInfo.Symbol.GetMembers(), config.DataMemberKind)
-                .ToArray();
-
             if (symbols.Length > 0)
                 sb.Append($" {otherName}");
 
             if (ShouldIncludeBase(typeInfo, config))
             {
                 sb.AppendLine();
-                sb.Append(Code.Indent($"&& base.{Name}({argName})", 2));
+                sb.Append(Code.Indent($"&& base.{nameof(Equals)}({argName})", 2));
             }
 
             foreach (var symbol in symbols)
@@ -71,7 +70,7 @@ namespace Aspects.SourceGenerators
         {
             if (typeInfo.HasNullableEnabled)
                 sb.AppendLine("#nullable enable");
-            sb.Append($"public override bool {Name}(object");
+            sb.Append($"public override bool {nameof(Equals)}(object");
             if (typeInfo.HasNullableEnabled)
                 sb.Append('?');
             sb.AppendLine($" {argName})");
@@ -97,22 +96,27 @@ namespace Aspects.SourceGenerators
 
         private string MemberEquals(DataMemberSymbolInfo symbolInfo, bool nullableEnabled, IAutoEqualsAttribute config)
         {
-            var memberConfig = GetMemberConfigAttribute(symbolInfo);
+            var memberConfig = GetEqualityConfigAttribute(symbolInfo);
             var nullSafety = GetNullSafety(symbolInfo, config, memberConfig);
 
             var type = symbolInfo.Type;
             var nullSafe = nullSafety == NullSafety.On ||
                 nullSafety == NullSafety.Auto && (!nullableEnabled || type.HasNullableAnnotation());
 
-            var memberName = symbolInfo.Name;
-
-            if (string.IsNullOrEmpty(memberConfig.EqualityComparer))
-                return Comparison(type, memberName, nullSafe);
-
-            return Code.ComparerEqualityCheck(memberConfig.EqualityComparer, memberName, $"{otherName}.{memberName}", nullSafe && type.IsReferenceType);
+            return Comparison(type, symbolInfo.Name, nullSafe , memberConfig.EqualityComparer);
         }
 
-        private static NullSafety GetNullSafety(DataMemberSymbolInfo symbol, IAutoEqualsAttribute config, IEqualsAttribute memberConfig)
+        private IEqualityComparerAttribute GetEqualityConfigAttribute(DataMemberSymbolInfo symbolInfo)
+        {
+            var attribute = symbolInfo.AttributesOfType<EqualityComparerAttribute>()
+                .FirstOrDefault();
+
+            if (attribute != null && AttributeFactory.TryCreate<EqualityComparerAttribute>(attribute, out var config))
+                return config;
+            return GetMemberConfigAttribute(symbolInfo);
+        }
+
+        private static NullSafety GetNullSafety(DataMemberSymbolInfo symbol, IAutoEqualsAttribute config, IEqualityComparerAttribute memberConfig)
         {
             if (memberConfig.NullSafety != NullSafety.Auto)
                 return memberConfig.NullSafety;
@@ -123,9 +127,9 @@ namespace Aspects.SourceGenerators
             return config.NullSafety;
         }
 
-        private static string Comparison(ITypeSymbol type, string memberName, bool nullSafe)
+        private static string Comparison(ITypeSymbol type, string memberName, bool nullSafe, string comparer)
         {
-            var snippet = Code.EqualityCheck(type, memberName, $"{otherName}.{memberName}", nullSafe);
+            var snippet = Code.EqualityCheck(type, memberName, $"{otherName}.{memberName}", nullSafe, comparer);
             return snippet.Contains("||")
                 ? $"({snippet})"
                 : snippet;

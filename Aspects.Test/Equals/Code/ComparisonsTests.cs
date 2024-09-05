@@ -10,16 +10,16 @@ namespace Aspects.Test.Equals.Code
         private const string propertyName = "Property";
 
         private static bool IsNullSafe(IMethod m, string name = propertyName) 
-            => m.Body.Contains(EqualsMethod.NullSafeMemberEqualization(name));
+            => m.Body.Contains(EqualsMethod.NullSafeEqualsEqualization(name));
 
         private static bool IsNotNullSafe(IMethod m, string name = propertyName) 
-            => m.Body.Contains(EqualsMethod.MemberEqualization(name));
+            => m.Body.Contains(EqualsMethod.EqualsEqualization(name));
 
         private static bool DoesNotCallBase(IMethod m) 
             => !m.Body.Contains("base");
 
         private static bool UsesOperatorEqualization(IMethod m, string name) 
-            => m.Body.Contains(EqualsMethod.MemberOperatorEqualization(name));
+            => m.Body.Contains(EqualsMethod.OperatorEqualization(name));
 
         private static bool CallsBase(IMethod m)
             => m.Body.Contains($"&& base.Equals({m.Parameters[0].Name})");

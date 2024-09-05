@@ -29,9 +29,10 @@
 
         public string MethodEquality(bool nullSafe)
         {
+            var methodCode = $"{_nameA}.{nameof(Equals)}({_nameB})";
             return nullSafe
-                ? NullSafeMethodEquality()
-                : MayInversed($"{_nameA}.{nameof(Equals)}({_nameB})");
+                ? Equality(methodCode)
+                : MayInversed(methodCode);
         }
 
         public string AspectsArrayEquality(bool nullSafe)
@@ -48,22 +49,31 @@
                 : $"{_nameA} == {_nameB}";
         }
 
-        private string NullSafeMethodEquality()
+        public string ComparerEquality(string comparer, bool nullSafe)
         {
-            return _isInequality
-                ? $"{_nameA} != null && !{_nameA}.{nameof(Equals)}({_nameB}) || {_nameA} == null && {_nameB} != null"
-                : $"{_nameA} == null && {_nameB} == null || {_nameA}?.{nameof(Equals)}({_nameB}) == true";
+            var comparerCode = $"new {comparer}().Equals({_nameA}, {_nameB})";
+            return nullSafe
+                ? Equality(comparerCode)
+                : MayInversed(comparerCode);
         }
 
         private string MayInversed(string s) => _isInequality ? '!' + s : s;
 
+        private string SequenceEquality(string method) => MayInversed($"{method}({_nameA}, {_nameB})");
+
         private string NullSafeSequenceEquality(string method)
         {
+            var methodCode = $"{method}({_nameA}, {_nameB})";
             return _isInequality
-                ? $"!({_nameA} == {_nameB}) || {_nameA} != null && {_nameB} != null && !{method}({_nameA}, {_nameB})"
-                : $"{_nameA} == {_nameB} || {_nameA} != null && {_nameB} != null && {method}({_nameA}, {_nameB})";
+                ? $"{_nameA} == null ^ {_nameB} == null || {_nameA} != null && {_nameA} != {_nameB} && !{methodCode}"
+                : $"{_nameA} == {_nameB} || {_nameA} != null && {_nameB} != null && {methodCode}";
         }
 
-        private string SequenceEquality(string method) => MayInversed($"{method}({_nameA}, {_nameB})");
+        private string Equality(string methodComparison)
+        {
+            return _isInequality
+                ? $"{_nameA} == null ^ {_nameB} == null || {_nameA} != null && !{methodComparison}"
+                : $"{_nameA} == null && {_nameB} == null || {_nameA} != null && {_nameB} != null && {methodComparison}";
+        }
     }
 }

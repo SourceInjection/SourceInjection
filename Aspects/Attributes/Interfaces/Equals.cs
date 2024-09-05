@@ -9,12 +9,7 @@
         NullSafety NullSafety { get; }
     }
 
-    public interface IEqualsAttribute
-    { 
-        NullSafety NullSafety { get; }
-
-        string EqualityComparer { get; }
-    }
+    public interface IEqualsAttribute : IEqualityComparerAttribute { }
 
     public interface IEqualsExcludeAttribute { }
 }

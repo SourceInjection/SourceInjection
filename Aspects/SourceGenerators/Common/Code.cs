@@ -1,5 +1,7 @@
-﻿using Aspects.Util;
+﻿using Aspects.Attributes.Interfaces;
+using Aspects.Util;
 using Microsoft.CodeAnalysis;
+using System.Linq;
 using System.Text;
 
 namespace Aspects.SourceGenerators.Common
@@ -95,10 +97,10 @@ namespace Aspects.SourceGenerators.Common
         /// <param name="nameB">The second identifier.</param>
         /// <param name="nullSafe">Enables null safety</param>
         /// <returns>The inequality code.</returns>
-        public static string InequalityCheck(ITypeSymbol type, string nameA, string nameB, bool nullSafe)
+        public static string InequalityCheck(ITypeSymbol type, string nameA, string nameB, bool nullSafe, string comparer)
         {
             var info = new EqualityCodeInfo(nameA, nameB, true);
-            return EqualityFromInfo(type, info, nullSafe);
+            return EqualityFromInfo(type, info, nullSafe, comparer);
         }
 
         /// <summary>
@@ -114,14 +116,17 @@ namespace Aspects.SourceGenerators.Common
         /// <param name="nameB">The second identifier.</param>
         /// <param name="nullSafe">Enables null safety</param>
         /// <returns>The equality code.</returns>
-        public static string EqualityCheck(ITypeSymbol type, string nameA, string nameB, bool nullSafe)
+        public static string EqualityCheck(ITypeSymbol type, string nameA, string nameB, bool nullSafe, string comparer)
         {
             var info = new EqualityCodeInfo(nameA, nameB);
-            return EqualityFromInfo(type, info, nullSafe);
+            return EqualityFromInfo(type, info, nullSafe, comparer);
         }
 
-        private static string EqualityFromInfo(ITypeSymbol type, EqualityCodeInfo codeInfo, bool nullSafe)
+        private static string EqualityFromInfo(ITypeSymbol type, EqualityCodeInfo codeInfo, bool nullSafe, string comparer)
         {
+            if(!string.IsNullOrEmpty(comparer))
+                return codeInfo.ComparerEquality(comparer, type.IsReferenceType && nullSafe);
+
             if (type.CanUseEqualityOperatorsByDefault())
                 return codeInfo.OperatorEquality();
 
@@ -139,20 +144,21 @@ namespace Aspects.SourceGenerators.Common
             return codeInfo.MethodEquality(type.IsReferenceType && nullSafe);
         }
 
-        public static string ComparerEqualityCheck(string comparer, string nameA, string nameB, bool nullSafe)
+        public static string GetHashCode(ITypeSymbol type, string name, bool nullSafe, string comparer)
         {
-            var s = $"new {comparer}().Equals({nameA}, {nameB})";
-            if (!nullSafe)
-                return s;
-            return $"{nameA} == null && {nameB} == null || {nameA} != null && {nameB} != null && {s}";
-        }
+            if (!string.IsNullOrEmpty(comparer))
+                return new HashCodeCodeInfo(name).ComparerHashCode(comparer, type.IsReferenceType && nullSafe);
 
-        public static string ComparerGetHashCode(string comparer, string name, bool nullSafe)
-        {
-            var s = $"new {comparer}().GetHashCode({name})";
-            if (!nullSafe)
-                return s;
-            return $"{name} == null ? 0 : {s}";
+            if (!type.OverridesGetHashCode())
+            {
+                var info = new HashCodeCodeInfo(name);
+
+                if (type.CanUseCombinedHashCode())
+                    return info.CombinedHashCode(nullSafe);
+                if (type.IsEnumerable())
+                    return info.DeepCombinedHashCode(nullSafe);
+            }
+            return name;
         }
     }
 }

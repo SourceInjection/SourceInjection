@@ -1,4 +1,5 @@
 ﻿using Aspects.SourceGenerators;
+using Aspects.SourceGenerators.Common;
 using CompileUnits.CSharp;
 using CompileUnit = Aspects.Test.CodeAnalysis.CompileUnit;
 
@@ -26,25 +27,25 @@ namespace Aspects.Test.Equals
                 && m.Parameters[0].Type.FormatedText is "object" or "object?";
         }
 
-        public static string MemberOperatorEqualization(string memberName) 
-            => $"&& {memberName} == #i.{memberName}";
+        public static string OperatorEqualization(string memberName) 
+            => new EqualityCodeInfo(memberName, $"#i.{memberName}").OperatorEquality();
 
-        public static string MemberEqualization(string memberName) 
-            => $"&& {memberName}.Equals(#i.{memberName})";
+        public static string EqualsEqualization(string memberName)
+            => new EqualityCodeInfo(memberName, $"#i.{memberName}").MethodEquality(false);
 
-        public static string NullSafeMemberEqualization(string memberName) 
-            => $"&& ({memberName} == null && #i.{memberName} == null || {memberName}?.Equals(#i.{memberName}) == true)";
+        public static string NullSafeEqualsEqualization(string memberName)
+            => new EqualityCodeInfo(memberName, $"#i.{memberName}").MethodEquality(true);
 
-        public static string LinqCollectionEqualization(string memberName) 
-            => $"&& {LinqSequenceEqual}({memberName}, #i.{memberName})";
+        public static string LinqCollectionEqualization(string memberName)
+            => new EqualityCodeInfo(memberName, $"#i.{memberName}").LinqSequenceEquality(false);
 
-        public static string NullSafeLinqCollectionEqualization(string memberName) 
-            => $"&& ({memberName} == #i.{memberName} || {memberName} != null && #i.{memberName} != null && {LinqSequenceEqual}({memberName}, #i.{memberName}))";
+        public static string NullSafeLinqCollectionEqualization(string memberName)
+            => new EqualityCodeInfo(memberName, $"#i.{memberName}").LinqSequenceEquality(true);
 
-        public static string AspectsCollectionEqualization(string memberName) 
-            => $"&& {AspectsDeepSequenceEqual}({memberName}, #i.{memberName})";
+        public static string AspectsCollectionEqualization(string memberName)
+            => new EqualityCodeInfo(memberName, $"#i.{memberName}").AspectsSequenceEquality(false);
 
         public static string AspectsArrayEqualization(string memberName)
-            => $"&& {AspectsArraySequenceEqual}({memberName}, #i.{memberName})";
+            => new EqualityCodeInfo(memberName, $"#i.{memberName}").AspectsArrayEquality(false);
     }
 }

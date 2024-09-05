@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Collections;
-using System.Security.Cryptography;
 
 namespace Aspects.Util
 {
@@ -17,7 +16,12 @@ namespace Aspects.Util
         /// <returns><see langword="true"/> if the given <see cref="ITypeSymbol"/> can be compared with SequenceEqual else <see langword="false"/>.</returns>
         public static bool CanUseSequenceEquals(this ITypeSymbol type)
         {
-            return CanUse(type, CanUseEquals);
+            if (type is IArrayTypeSymbol ats)
+                return ats.Rank == 1 && CanUseEquals(ats.ElementType);
+
+            return type is INamedTypeSymbol nts
+                && IsKnownGenericCollection(type)
+                && nts.TypeArguments.All(ta => CanUseEquals(ta));
         }
 
         /// <summary>
@@ -27,7 +31,12 @@ namespace Aspects.Util
         /// <returns><see langword="true"/> if the the hashcode of the given <see cref="ITypeSymbol"/> can be evaluated with CombinedHashCode else <see langword="false"/>.</returns>
         public static bool CanUseCombinedHashCode(this ITypeSymbol type)
         {
-            return CanUse(type, CanUseCombinedHashCode);
+            if (type is IArrayTypeSymbol ats)
+                return CanUseCombinedHashCode(ats.ElementType);
+
+            return type is INamedTypeSymbol nts
+                && IsKnownGenericCollection(type)
+                && nts.TypeArguments.All(ta => CanUseCombinedHashCode(ta));
         }
 
         /// <summary>
@@ -382,16 +391,6 @@ namespace Aspects.Util
             if (name.Contains('<') && name.Contains('>'))
                 name = name.Substring(0, name.IndexOf('<') + 1) + name.Substring(name.LastIndexOf('>'));
             return KnownTypes.GenericCollections.Contains(name);
-        }
-
-        private static bool CanUse(ITypeSymbol type, Func<ITypeSymbol, bool> elementCanUse)
-        {
-            if (type is IArrayTypeSymbol ats)
-                return ats.Rank == 1 && elementCanUse(ats.ElementType);
-
-            return type is INamedTypeSymbol nts
-                && IsKnownGenericCollection(type)
-                && nts.TypeArguments.All(ta => elementCanUse(ta));
         }
     }
 }

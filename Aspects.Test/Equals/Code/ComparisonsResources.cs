@@ -163,9 +163,9 @@ namespace Aspects.Test.Equals.Code
         public static readonly string[] Properties
             = typeof(ReferenceType_WithMultiDimensionalArrays).GetProperties().Select(p => p.Name).ToArray();
 
-        public int[,] IntDim2 { get; }
+        public int[,] IntDim2 { get; } = null!;
 
-        public object[,,] ObjectDim3 { get; }
+        public object[,,] ObjectDim3 { get; } = null!;
     }
 
     [AutoEquals]
