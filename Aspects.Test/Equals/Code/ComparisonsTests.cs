@@ -197,6 +197,17 @@ namespace Aspects.Test.Equals.Code
             Assert.That(sut.Body.Contains(EqualsMethod.AspectsCollectionEqualization(propertyName)));
         }
 
+
+        [Test]
+        [TestCaseSource(
+            typeof(ReferenceType_WithMultiDimensionalArrays),
+            nameof(ReferenceType_WithMultiDimensionalArrays.Properties))]
+        public void PropertyEqualization_WithMultiDimensionalArray_UsesAspectsArraySequenceEqual(string propertyName)
+        {
+            var sut = EqualsMethod.FromType<ReferenceType_WithMultiDimensionalArrays>();
+            Assert.That(sut.Body.Contains(EqualsMethod.AspectsArrayEqualization(propertyName)));
+        }
+
         [Test]
         public void PropertyEqualization_WithCollection_ThatIsNullableAndCanBeComparedWithSequenceEqual_UsesNullsafeLinqSequenceEqual()
         {

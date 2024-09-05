@@ -8,6 +8,7 @@ namespace Aspects.Test.Equals
     {
         private static readonly string LinqSequenceEqual = $"{typeof(Enumerable).FullName}.{nameof(Enumerable.SequenceEqual)}";
         private static readonly string AspectsDeepSequenceEqual = $"{typeof(Collections.Enumerable).FullName}.{nameof(Collections.Enumerable.DeepSequenceEqual)}";
+        private static readonly string AspectsArraySequenceEqual = $"{typeof(Collections.Array).FullName}.{nameof(Collections.Array.SequenceEqual)}";
 
         public static IMethod FromType<T>()
         {
@@ -42,5 +43,8 @@ namespace Aspects.Test.Equals
 
         public static string AspectsCollectionEqualization(string memberName) 
             => $"&& {AspectsDeepSequenceEqual}({memberName}, #i.{memberName})";
+
+        public static string AspectsArrayEqualization(string memberName)
+            => $"&& {AspectsArraySequenceEqual}({memberName}, #i.{memberName})";
     }
 }

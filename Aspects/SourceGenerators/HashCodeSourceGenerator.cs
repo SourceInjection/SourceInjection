@@ -18,6 +18,10 @@ namespace Aspects.SourceGenerators
 
         protected override DataMemberPriority Priority { get; } = DataMemberPriority.Field;
 
+        protected override IAutoHashCodeAttribute DefaultConfigAttribute => new AutoHashCodeAttribute();
+
+        protected override IHashCodeAttribute DefaultMemberConfigAttribute => new HashCodeAttribute();
+
         protected override string TypeBody(TypeInfo typeInfo)
         {
             const int hashCodeCombineMaxArgs = 8;
@@ -95,7 +99,7 @@ namespace Aspects.SourceGenerators
         {
             if (!symbol.Type.OverridesGetHashCode())
             {
-                if (symbol.Type.CanUseLinqExtensions())
+                if (symbol.Type.CanUseCombinedHashCode())
                     return $"{NameOf.AspectsCombinedHashCode}({symbol.Name})";
                 if (symbol.Type.IsEnumerable())
                     return $"{NameOf.AspectsDeepCombinedHashCode}({symbol.Name})";
@@ -111,14 +115,6 @@ namespace Aspects.SourceGenerators
                         syBase.HasAttributeOfType<IAutoHashCodeAttribute>() 
                         || syBase.OverridesGetHashCode() 
                         || syBase.GetMembers().Any(m => m.HasAttributeOfType<IHashCodeAttribute>())));
-        }
-
-        private static IAutoHashCodeAttribute GetConfigAttribute(TypeInfo typeInfo)
-        {
-            var attData = typeInfo.Symbol.AttributesOfType<IAutoHashCodeAttribute>().FirstOrDefault();
-            if (attData is null || !AttributeFactory.TryCreate<IAutoHashCodeAttribute>(attData, out var config))
-                return new AutoHashCodeAttribute();
-            return config;
         }
     }
 }

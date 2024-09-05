@@ -152,11 +152,20 @@ namespace Aspects.Test.Equals.Code
         public static readonly string[] Properties
             = typeof(ReferenceType_WithCollectionsNotEquatableBySequenceEqual).GetProperties().Select(p => p.Name).ToArray();
 
-        public int[,] Int2DArray { get; } = null!;
-
         public IEnumerable Enumerable { get; } = null!;
 
         public IList<IEnumerable> CollectionList { get; } = null!;
+    }
+
+    [AutoEquals]
+    public partial class ReferenceType_WithMultiDimensionalArrays
+    {
+        public static readonly string[] Properties
+            = typeof(ReferenceType_WithMultiDimensionalArrays).GetProperties().Select(p => p.Name).ToArray();
+
+        public int[,] IntDim2 { get; }
+
+        public object[,,] ObjectDim3 { get; }
     }
 
     [AutoEquals]

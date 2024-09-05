@@ -32,12 +32,12 @@ namespace Aspects.Collections
         /// <summary>
         /// Compares two <see cref="IEnumerable"/> on equality.
         /// </summary>
-        /// <param name="a">The first collect<see cref="IEnumerable"/>.ion</param>
-        /// <param name="b">The second <see cref="IEnumerable"/>.</param>
+        /// <param name="en">The first collect<see cref="IEnumerable"/>.ion</param>
+        /// <param name="other">The second <see cref="IEnumerable"/>.</param>
         /// <returns><see langword="true"/> if the <see cref="IEnumerable"/>s are equal else <see langword="false"/>.</returns>
-        public static bool DeepSequenceEqual(IEnumerable a, IEnumerable b)
+        public static bool DeepSequenceEqual(this IEnumerable en, IEnumerable other)
         {
-            return EnumerableExtensions.DeepSequenceEqual(a, b);
+            return EnumerableExtensions.DeepSequenceEqual(en, other);
         }
     }
 }

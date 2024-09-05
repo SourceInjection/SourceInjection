@@ -5,18 +5,21 @@ using TypeInfo = Aspects.SourceGenerators.Common.TypeInfo;
 using Aspects.Attributes.Interfaces;
 using Aspects.SourceGenerators.Common;
 using Aspects.Attributes;
-using Aspects.Util;
 using System.Linq;
 
 namespace Aspects.SourceGenerators
 {
     [Generator]
-    internal class ToStringSourceGenerator 
+    internal class ToStringSourceGenerator
         : ObjectMethodSourceGeneratorBase<IAutoToStringAttribute, IToStringAttribute, IToStringExcludeAttribute>
     {
         protected internal override string Name { get; } = nameof(ToString);
 
         protected override DataMemberPriority Priority { get; } = DataMemberPriority.Property;
+
+        protected override IAutoToStringAttribute DefaultConfigAttribute => new AutoToStringAttribute();
+
+        protected override IToStringAttribute DefaultMemberConfigAttribute => new ToStringAttribute();
 
         protected override string TypeBody(TypeInfo typeInfo)
         {
@@ -44,14 +47,6 @@ namespace Aspects.SourceGenerators
             sb.Append('}');
 
             return sb.ToString();
-        }
-
-        private static IAutoToStringAttribute GetConfigAttribute(TypeInfo typeInfo)
-        {
-            var attData = typeInfo.Symbol.AttributesOfType<IAutoToStringAttribute>().FirstOrDefault();
-            if (attData is null || !AttributeFactory.TryCreate<IAutoToStringAttribute>(attData, out var config))
-                return new AutoToStringAttribute();
-            return config;
         }
     }
 }

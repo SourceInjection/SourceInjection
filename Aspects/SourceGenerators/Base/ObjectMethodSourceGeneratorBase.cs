@@ -10,12 +10,20 @@ using Microsoft.CodeAnalysis;
 using System.Collections.Generic;
 using System.Linq;
 using TypeInfo = Aspects.SourceGenerators.Common.TypeInfo;
+using PropertyInfo = Aspects.SourceGenerators.Common.PropertyInfo;
 
 namespace Aspects.SourceGenerators.Base
 {
-    internal abstract class ObjectMethodSourceGeneratorBase<TConfigAttribute, TAttribute, TExcludeAttribute> : TypeSourceGeneratorBase
+    internal abstract class ObjectMethodSourceGeneratorBase<TConfigAttribute, TAttribute, TExcludeAttribute> : TypeSourceGeneratorBase 
+        where TConfigAttribute : class 
+        where TAttribute : class
+        where TExcludeAttribute : class
     {
         protected enum DataMemberPriority { Field, Property };
+
+        protected abstract TConfigAttribute DefaultConfigAttribute { get; }
+
+        protected abstract TAttribute DefaultMemberConfigAttribute { get; }
 
         protected override TypeSyntaxReceiver SyntaxReceiver { get; } = new TypeSyntaxReceiver(
                 Types.WithAttributeOfType<TConfigAttribute>()
@@ -83,6 +91,26 @@ namespace Aspects.SourceGenerators.Base
         {
             return propertyInfos.FirstOrDefault(
                 pi => pi.Symbol.Equals(property, SymbolEqualityComparer.Default))?.IsDataMember == true;
+        }
+
+        protected TAttribute GetMemberConfigAttribute(DataMemberSymbolInfo symbol)
+        {
+            return GetFirstOrNull<TAttribute>(symbol.AttributesOfType<TAttribute>())
+                ?? DefaultMemberConfigAttribute;
+        }
+
+        protected TConfigAttribute GetConfigAttribute(TypeInfo typeInfo)
+        {
+            return GetFirstOrNull<TConfigAttribute>(typeInfo.Symbol.AttributesOfType<TConfigAttribute>())
+                ?? DefaultConfigAttribute;
+        }
+
+        private static T GetFirstOrNull<T>(IEnumerable<AttributeData> attributes) where T : class
+        {
+            var attData = attributes.FirstOrDefault();
+            if (attData is null)
+                return null;
+            return AttributeFactory.Create<T>(attData);
         }
     }
 }

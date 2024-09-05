@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Collections;
+using System.Security.Cryptography;
 
 namespace Aspects.Util
 {
@@ -14,14 +15,43 @@ namespace Aspects.Util
         /// </summary>
         /// <param name="type">The <see cref="ITypeSymbol"/> which is checked.</param>
         /// <returns><see langword="true"/> if the given <see cref="ITypeSymbol"/> can be compared with SequenceEqual else <see langword="false"/>.</returns>
-        public static bool CanUseLinqExtensions(this ITypeSymbol type)
+        public static bool CanUseSequenceEquals(this ITypeSymbol type)
         {
-            if (type is IArrayTypeSymbol ats)
-                return ats.Rank == 1 && (!ats.ElementType.IsEnumerable() || ats.ElementType.IsString());
+            return CanUse(type, CanUseEquals);
+        }
 
-            return type is INamedTypeSymbol nts
-                && IsKnownGenericCollection(type)
-                && nts.TypeArguments.All(ta => !ta.IsEnumerable() || ta.IsString());
+        /// <summary>
+        /// Checks if the hash code of <see cref="ITypeSymbol"/> can be evaluated with CombinedHashCode.
+        /// </summary>
+        /// <param name="type">The <see cref="ITypeSymbol"/> which is checked.</param>
+        /// <returns><see langword="true"/> if the the hashcode of the given <see cref="ITypeSymbol"/> can be evaluated with CombinedHashCode else <see langword="false"/>.</returns>
+        public static bool CanUseCombinedHashCode(this ITypeSymbol type)
+        {
+            return CanUse(type, CanUseCombinedHashCode);
+        }
+
+        /// <summary>
+        /// Checks if the type is equatable by object Equals.
+        /// </summary>
+        /// <param name="type">The type to be checked.</param>
+        /// <returns><see langword="true"/> if the type can use Equals else <see langword="false"/>.</returns>
+        public static bool CanUseEquals(this ITypeSymbol type)
+        {
+            return !type.IsEnumerable()
+                || type.CanUseEqualityOperatorsByDefault()
+                || type.OverridesEquals();
+        }
+
+        /// <summary>
+        /// Checks if the type can use object GetHashCode.
+        /// </summary>
+        /// <param name="type">The type to be checked.</param>
+        /// <returns><see langword="true"/> if the type can use GetHashCode else <see langword="false"/>.</returns>
+        public static bool CanUseGetHashCode(this ITypeSymbol type)
+        {
+            return !type.IsEnumerable()
+                || type.CanUseEqualityOperatorsByDefault()
+                || type.OverridesGetHashCode();
         }
 
         /// <summary>
@@ -352,6 +382,16 @@ namespace Aspects.Util
             if (name.Contains('<') && name.Contains('>'))
                 name = name.Substring(0, name.IndexOf('<') + 1) + name.Substring(name.LastIndexOf('>'));
             return KnownTypes.GenericCollections.Contains(name);
+        }
+
+        private static bool CanUse(ITypeSymbol type, Func<ITypeSymbol, bool> elementCanUse)
+        {
+            if (type is IArrayTypeSymbol ats)
+                return ats.Rank == 1 && elementCanUse(ats.ElementType);
+
+            return type is INamedTypeSymbol nts
+                && IsKnownGenericCollection(type)
+                && nts.TypeArguments.All(ta => elementCanUse(ta));
         }
     }
 }

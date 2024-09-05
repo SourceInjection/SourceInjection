@@ -120,31 +120,39 @@ namespace Aspects.SourceGenerators.Common
             return EqualityFromInfo(type, info, nullSafe);
         }
 
-        private static string EqualityFromInfo(ITypeSymbol type, EqualityCodeInfo info, bool nullSafe)
+        private static string EqualityFromInfo(ITypeSymbol type, EqualityCodeInfo codeInfo, bool nullSafe)
         {
             if (type.CanUseEqualityOperatorsByDefault())
-                return info.OperatorEquality();
+                return codeInfo.OperatorEquality();
 
             if (!type.OverridesEquals())
             {
-                if (type.CanUseLinqExtensions())
-                {
-                    return nullSafe
-                        ? info.NullSafeLinqSequenceEquality()
-                        : info.LinqSequenceEquality();
-                }
+                if (type.CanUseSequenceEquals())
+                    return codeInfo.LinqSequenceEquality(nullSafe);
+
+                if (type is IArrayTypeSymbol arrayType && arrayType.Rank > 1)
+                    return codeInfo.AspectsArrayEquality(nullSafe);
+
                 if (type.IsEnumerable())
-                {
-                    return nullSafe 
-                        ? info.NullSafeAspectsSequenceEquality() 
-                        : info.AspectsSequenceEquality();
-                }
+                    return codeInfo.AspectsSequenceEquality(nullSafe);
             }
+            return codeInfo.MethodEquality(type.IsReferenceType && nullSafe);
+        }
 
-            if (!type.IsReferenceType || !nullSafe)
-                return info.MethodEquality();
+        public static string ComparerEqualityCheck(string comparer, string nameA, string nameB, bool nullSafe)
+        {
+            var s = $"new {comparer}().Equals({nameA}, {nameB})";
+            if (!nullSafe)
+                return s;
+            return $"{nameA} == null && {nameB} == null || {nameA} != null && {nameB} != null && {s}";
+        }
 
-            return info.NullSafeMethodEquality();
+        public static string ComparerGetHashCode(string comparer, string name, bool nullSafe)
+        {
+            var s = $"new {comparer}().GetHashCode({name})";
+            if (!nullSafe)
+                return s;
+            return $"{name} == null ? 0 : {s}";
         }
     }
 }

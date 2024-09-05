@@ -5,7 +5,6 @@ using Aspects.SourceGenerators.Base.DataMembers;
 using Aspects.SourceGenerators.Common;
 using Aspects.Util;
 using Microsoft.CodeAnalysis;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using TypeInfo = Aspects.SourceGenerators.Common.TypeInfo;
@@ -22,6 +21,10 @@ namespace Aspects.SourceGenerators
         protected internal override string Name { get; } = nameof(Equals);
 
         protected override DataMemberPriority Priority { get; } = DataMemberPriority.Field;
+
+        protected override IAutoEqualsAttribute DefaultConfigAttribute => new AutoEqualsAttribute();
+
+        protected override IEqualsAttribute DefaultMemberConfigAttribute => new EqualsAttribute();
 
         protected override string TypeBody(TypeInfo typeInfo)
         {
@@ -92,9 +95,9 @@ namespace Aspects.SourceGenerators
                         || syBase.GetMembers().Any(m => m.HasAttributeOfType<IEqualsAttribute>())));
         }
 
-        private static string MemberEquals(DataMemberSymbolInfo symbolInfo, bool nullableEnabled, IAutoEqualsAttribute config)
+        private string MemberEquals(DataMemberSymbolInfo symbolInfo, bool nullableEnabled, IAutoEqualsAttribute config)
         {
-            var memberConfig = GetMemberAttribute(symbolInfo);
+            var memberConfig = GetMemberConfigAttribute(symbolInfo);
             var nullSafety = GetNullSafety(symbolInfo, config, memberConfig);
 
             var type = symbolInfo.Type;
@@ -106,7 +109,7 @@ namespace Aspects.SourceGenerators
             if (string.IsNullOrEmpty(memberConfig.EqualityComparer))
                 return Comparison(type, memberName, nullSafe);
 
-            return ComparerComparison(memberConfig.EqualityComparer, memberName, nullSafe && type.IsReferenceType);
+            return Code.ComparerEqualityCheck(memberConfig.EqualityComparer, memberName, $"{otherName}.{memberName}", nullSafe && type.IsReferenceType);
         }
 
         private static NullSafety GetNullSafety(DataMemberSymbolInfo symbol, IAutoEqualsAttribute config, IEqualsAttribute memberConfig)
@@ -120,40 +123,12 @@ namespace Aspects.SourceGenerators
             return config.NullSafety;
         }
 
-        private static string ComparerComparison(string comparer, string memberName, bool nullSafe)
-        {
-            var s = $"new {comparer}().Equals({memberName}, {otherName}.{memberName})";
-            if (!nullSafe)
-                return s;
-            return $"{memberName} == null && {otherName}.{memberName} == null || {memberName} != null && {otherName}.{memberName} != null && {s}";
-        }
-
         private static string Comparison(ITypeSymbol type, string memberName, bool nullSafe)
         {
             var snippet = Code.EqualityCheck(type, memberName, $"{otherName}.{memberName}", nullSafe);
             return snippet.Contains("||")
                 ? $"({snippet})"
                 : snippet;
-        }
-
-        private static IEqualsAttribute GetMemberAttribute(DataMemberSymbolInfo symbol)
-        {
-            return GetFirstOrNull<IEqualsAttribute>(symbol.AttributesOfType<IEqualsAttribute>())
-                ?? new EqualsAttribute();
-        }
-
-        private static IAutoEqualsAttribute GetConfigAttribute(TypeInfo typeInfo)
-        {
-            return GetFirstOrNull<IAutoEqualsAttribute>(typeInfo.Symbol.AttributesOfType<IAutoEqualsAttribute>())
-                ?? new AutoEqualsAttribute();
-        }
-
-        private static T GetFirstOrNull<T>(IEnumerable<AttributeData> attributes) where T : class
-        {
-            var attData = attributes.FirstOrDefault();
-            if (attData is null)
-                return null;
-            return AttributeFactory.Create<T>(attData);
         }
     }
 }

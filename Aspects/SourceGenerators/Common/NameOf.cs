@@ -18,11 +18,15 @@
 
         public static string AspectsEnumerable { get; } = typeof(Collections.Enumerable).FullName;
 
+        public static string AspectsArray { get; } = typeof(Collections.Array).FullName;
+
         public static string AspectsDeepSequenceEqual { get; } = $"{AspectsEnumerable}.{nameof(Collections.Enumerable.DeepSequenceEqual)}";
 
         public static string AspectsCombinedHashCode { get; } = $"{AspectsEnumerable}.{nameof(Collections.Enumerable.CombinedHashCode)}";
 
         public static string AspectsDeepCombinedHashCode { get; } = $"{AspectsEnumerable}.{nameof(Collections.Enumerable.DeepCombinedHashCode)}";
+
+        public static string AspectsArraySequenceEqual { get; } = $"{AspectsArray}.{nameof(Collections.Array.SequenceEqual)}";
 
         public static string MaybeNullAttribute { get; } = "System.Diagnostics.CodeAnalysis.MaybeNullAttribute";
 
