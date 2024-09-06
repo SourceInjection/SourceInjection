@@ -1,6 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 
-namespace Aspects.Util
+namespace Aspects.Util.SymbolExtensions
 {
     internal static class FieldSymbolExtensions
     {

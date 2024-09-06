@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Aspects.SourceGenerators.Common.LoadingBehaviors
+namespace Aspects.Common.LoadingBehaviors
 {
     internal class Lazy<T>
     {

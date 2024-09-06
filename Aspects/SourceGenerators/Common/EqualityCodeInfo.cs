@@ -1,4 +1,6 @@
-﻿namespace Aspects.SourceGenerators.Common
+﻿using Aspects.Common.Paths;
+
+namespace Aspects.SourceGenerators.Common
 {
     internal class EqualityCodeInfo
     {

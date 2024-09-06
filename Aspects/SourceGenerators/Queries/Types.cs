@@ -1,5 +1,5 @@
 ﻿using Aspects.SourceGenerators.Common;
-using Aspects.Util;
+using Aspects.Util.SymbolExtensions;
 using System;
 using System.Linq;
 

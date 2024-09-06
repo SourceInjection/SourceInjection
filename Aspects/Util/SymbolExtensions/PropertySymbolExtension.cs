@@ -1,7 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using System.Linq;
 
-namespace Aspects.Util
+namespace Aspects.Util.SymbolExtensions
 {
     internal static class PropertySymbolExtension
     {

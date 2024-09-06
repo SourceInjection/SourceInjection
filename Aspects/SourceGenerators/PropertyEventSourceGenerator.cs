@@ -4,6 +4,7 @@ using Aspects.SourceGenerators.Common;
 using Aspects.SourceGenerators.Queries;
 using Aspects.SyntaxReceivers;
 using Aspects.Util;
+using Aspects.Util.SymbolExtensions;
 using Microsoft.CodeAnalysis;
 using System;
 using System.Collections.Generic;

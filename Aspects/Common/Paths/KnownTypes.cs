@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Aspects.Util
+namespace Aspects.Common.Paths
 {
     internal class KnownTypes
     {

@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TypeInfo = Aspects.SourceGenerators.Common.TypeInfo;
 using PropertyInfo = Aspects.SourceGenerators.Common.PropertyInfo;
+using Aspects.Util.SymbolExtensions;
 
 namespace Aspects.SourceGenerators.Base
 {

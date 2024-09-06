@@ -1,4 +1,4 @@
-﻿namespace Aspects.SourceGenerators.Common
+﻿namespace Aspects.Common.Paths
 {
     internal class NameOf
     {

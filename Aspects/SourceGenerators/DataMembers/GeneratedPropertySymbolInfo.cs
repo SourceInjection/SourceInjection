@@ -1,7 +1,7 @@
 ﻿using Aspects.Attributes.Interfaces;
 using Aspects.SourceGenerators.Base.DataMembers;
 using Aspects.SourceGenerators.Common;
-using Aspects.Util;
+using Aspects.Util.SymbolExtensions;
 using Microsoft.CodeAnalysis;
 using System.Collections.Immutable;
 using System.Linq;

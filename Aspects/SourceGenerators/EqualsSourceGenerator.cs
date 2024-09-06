@@ -4,6 +4,7 @@ using Aspects.SourceGenerators.Base;
 using Aspects.SourceGenerators.Base.DataMembers;
 using Aspects.SourceGenerators.Common;
 using Aspects.Util;
+using Aspects.Util.SymbolExtensions;
 using Microsoft.CodeAnalysis;
 using System.Linq;
 using System.Text;

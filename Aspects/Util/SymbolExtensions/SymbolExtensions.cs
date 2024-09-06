@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Collections;
 using System.Linq;
 using System;
-using Aspects.SourceGenerators.Common;
+using Aspects.Common.Paths;
 
-namespace Aspects.Util
+namespace Aspects.Util.SymbolExtensions
 {
     internal static class SymbolExtensions
     {
