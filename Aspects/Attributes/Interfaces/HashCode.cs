@@ -5,6 +5,8 @@
         DataMemberKind DataMemberKind { get; }
 
         BaseCall BaseCall { get; }
+
+        bool StoreHashCode { get; }
     }
 
     public interface IHashCodeAttribute : IEqualityComparerAttribute { }

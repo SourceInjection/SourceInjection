@@ -29,10 +29,11 @@ namespace Aspects.Attributes
         /// <param name="baseCall">
         /// Determines if <see langword="base"/>.GetHashCode() is called.
         /// </param>
-        public AutoHashCodeAttribute(DataMemberKind dataMemberKind = DataMemberKind.DataMember, BaseCall baseCall = BaseCall.Auto)
+        public AutoHashCodeAttribute(DataMemberKind dataMemberKind = DataMemberKind.DataMember, BaseCall baseCall = BaseCall.Auto, bool storeHashCode = false)
         {
             BaseCall = baseCall;
             DataMemberKind = dataMemberKind;
+            StoreHashCode = storeHashCode;
         }
 
         /// <summary>
@@ -44,6 +45,8 @@ namespace Aspects.Attributes
         /// Determines if <see langword="base"/>.GetHashCode() is called.
         /// </summary>
         public BaseCall BaseCall { get; }
+
+        public bool StoreHashCode { get; }
     }
 
     /// <summary>

@@ -14,6 +14,8 @@ namespace Aspects.SourceGenerators
     [Generator]
     internal class HashCodeSourceGenerator : ObjectMethodSourceGeneratorBase<IAutoHashCodeAttribute, IHashCodeAttribute, IHashCodeExcludeAttribute>
     {
+        private const string StoredHashCode = "_storedHashCode";
+
         protected internal override string Name { get; } = nameof(GetHashCode);
 
         protected override DataMemberPriority Priority { get; } = DataMemberPriority.Field;
@@ -35,20 +37,31 @@ namespace Aspects.SourceGenerators
 
             var sb = new StringBuilder();
 
+            if(config.StoreHashCode)
+            {
+                sb.AppendLine($"private int? {StoredHashCode};");
+                sb.AppendLine();
+            }
+
             sb.AppendLine($"public override int {nameof(GetHashCode)}()");
             sb.AppendLine("{");
 
             if (length <= hashCodeCombineMaxArgs)
-                sb.AppendLine(HashCodeCombine(name, symbols, includeBase, typeInfo.HasNullableEnabled));
-            else sb.AppendLine(HashCodeAppend(name, symbols, includeBase, typeInfo.HasNullableEnabled));
+                sb.AppendLine(HashCodeCombine(name, symbols, includeBase, typeInfo.HasNullableEnabled, config.StoreHashCode));
+            else sb.AppendLine(HashCodeAppend(name, symbols, includeBase, typeInfo.HasNullableEnabled, config.StoreHashCode));
 
             sb.Append('}');
             return sb.ToString();
         }
 
-        private string HashCodeAppend(string name, DataMemberSymbolInfo[] symbols, bool includeBase, bool nullableEnabled)
+        private string HashCodeAppend(string name, DataMemberSymbolInfo[] symbols, bool includeBase, bool nullableEnabled, bool storeHashCode)
         {
             var sb = new StringBuilder();
+            if (storeHashCode)
+            {
+                sb.AppendLine(Code.Indent($"if({StoredHashCode}.HasValue)"));
+                sb.AppendLine(Code.Indent($"return {StoredHashCode}.Value;", 2));
+            }
             sb.AppendLine(Code.Indent("var hash = new System.HashCode();"));
             sb.AppendLine(Code.Indent($"hash.Add(\"{name}\");"));
 
@@ -58,16 +71,26 @@ namespace Aspects.SourceGenerators
             for (int i = 0; i < symbols.Length; i++)
                 sb.AppendLine(Code.Indent($"hash.Add({MemberHash(symbols[i], nullableEnabled)});"));
 
-            sb.Append(Code.Indent("return hash.ToHashCode();"));
+            if(!storeHashCode)
+                sb.Append(Code.Indent("return hash.ToHashCode();"));
+            else
+            {
+                sb.AppendLine(Code.Indent($"{StoredHashCode} = hash.ToHashCode();"));
+                sb.Append(Code.Indent($"return {StoredHashCode}.Value;"));
+            }
             return sb.ToString();
         }
 
-        private string HashCodeCombine(string name, DataMemberSymbolInfo[] symbols, bool includeBase, bool nullableEnabled)
+        private string HashCodeCombine(string name, DataMemberSymbolInfo[] symbols, bool includeBase, bool nullableEnabled, bool storeHashCode)
         {
             const int tabs = 2;
 
             var sb = new StringBuilder();
-            sb.Append(Code.Indent("return System.HashCode.Combine("));
+            if (!storeHashCode)
+                sb.Append("return");
+            else sb.Append($"{StoredHashCode} ??=");
+
+            sb.Append(Code.Indent(" System.HashCode.Combine("));
 
             sb.AppendLine();
             sb.Append(Code.Indent($"\"{name}\"", tabs));
@@ -93,6 +116,11 @@ namespace Aspects.SourceGenerators
                 }
             }
             sb.Append(");");
+            if (storeHashCode)
+            {
+                sb.AppendLine();
+                sb.Append($"return {StoredHashCode}.Value;");
+            }
             return sb.ToString();
         }
 
