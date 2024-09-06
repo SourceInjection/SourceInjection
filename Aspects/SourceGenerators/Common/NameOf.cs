@@ -2,14 +2,8 @@
 {
     internal class NameOf
     {
-        /// <summary>
-        /// System.Collections.Generic.IEnumerable
-        /// </summary>
         public static string GenericIEnumerable { get; } = "System.Collections.Generic.IEnumerable";
 
-        /// <summary>
-        /// System.Collections.IEnumerable.
-        /// </summary>
         public static string IEnumerable { get; } = typeof(System.Collections.IEnumerable).FullName;
 
         public static string LinqEnumerable { get; } = typeof(System.Linq.Enumerable).FullName;

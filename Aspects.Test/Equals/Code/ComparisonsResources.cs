@@ -192,6 +192,49 @@ namespace Aspects.Test.Equals.Code
         [Equals(equalityComparer: typeof(IntComparer))]
         public int Property { get; }
     }
+
+    [AutoEquals]
+    public partial class ReferenceType_WithDefaultSettings_WithQueryProperty
+    {
+        public int Property => 3;
+    }
+
+    [AutoEquals(dataMemberKind: DataMemberKind.Property)]
+    public partial class ReferenceType_WithDataMemberKindProperty_WithQueryProperty
+    {
+        public int Property => 3;
+    }
+
+
+    public partial class ReferenceType_WithQueryProperty_WithEqualsInclude
+    {
+        [Equals]
+        public int Property => 3;
+    }
+
+    [AutoEquals]
+    public partial class ReferenceType_WithConstantField
+    {
+        public const int _int = 3;
+    }
+
+    public partial class ReferenceType_WithConstantField_WithEqualsInclude
+    {
+        [Equals]
+        public const int _int = 3;
+    }
+
+    [AutoEquals]
+    public partial class ReferenceType_WithStaticField
+    {
+        static int s_int = 3;
+    }
+
+    public partial class ReferenceType_WithStaticField_WithEqualsInclude
+    {
+        [Equals]
+        static int s_int = 3;
+    }
 }
 
 #pragma warning restore CS0659, S3249, S2094, S3887, CA2231

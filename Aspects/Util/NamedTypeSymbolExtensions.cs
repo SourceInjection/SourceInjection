@@ -6,11 +6,6 @@ namespace Aspects.Util
 {
     internal static class NamedTypeSymbolExtensions
     {
-        /// <summary>
-        /// Computes the inheritance ordered from bottom to top of a <see cref="INamedTypeSymbol"/>.
-        /// </summary>
-        /// <param name="symbol">The <see cref="INamedTypeSymbol"/> for wich the inheritance is evaluated.</param>
-        /// <returns>A <see cref="IEnumerable"/> that represents the inheritance ordered from bottom to top.</returns>
         public static IEnumerable<INamedTypeSymbol> InheritanceFromBottomToTop(this INamedTypeSymbol symbol)
         {
             var stack = new Stack<INamedTypeSymbol>();
@@ -25,11 +20,6 @@ namespace Aspects.Util
                 yield return stack.Pop();
         }
 
-        /// <summary>
-        /// Gets all local visible <see cref="IFieldSymbol"/>s within a <see cref="INamedTypeSymbol"/>.
-        /// </summary>
-        /// <param name="symbol">The <see cref="INamedTypeSymbol"/> for which the <see cref="IFieldSymbol"/>s are evaluated.</param>
-        /// <returns>A <see cref="IEnumerable"/> of the local visible <see cref="IFieldSymbol"/>s.</returns>
         public static IEnumerable<IFieldSymbol> LocalVisibleFields(this INamedTypeSymbol symbol)
         {
             var result = symbol.GetMembers().OfType<IFieldSymbol>();

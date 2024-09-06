@@ -66,25 +66,23 @@ namespace Aspects.SourceGenerators.Base
 
         private static bool IsTargeted(IFieldSymbol field, DataMemberKind dataMemberKind)
         {
-            return !field.HasAttributeOfType<TExcludeAttribute>() && (
-                    dataMemberKind != DataMemberKind.Property
+            return field.IsInstanceMember() 
+                && !field.HasAttributeOfType<TExcludeAttribute>() 
+                && (dataMemberKind != DataMemberKind.Property 
                     && !field.IsImplicitlyDeclared 
-                    && !field.IsConst 
-                    && !field.IsStatic
-                || field.HasAttributeOfType<TAttribute>());
+                    || field.HasAttributeOfType<TAttribute>());
         }
 
         private static bool IsTargeted(IPropertySymbol property, DataMemberKind dataMemberKind, IEnumerable<PropertyInfo> propertyInfos)
         {
-            return !property.HasAttributeOfType<TExcludeAttribute>() && (
-                    dataMemberKind != DataMemberKind.Field
-                    && !property.IsImplicitlyDeclared
-                    && !property.IsStatic
-                    && property.GetMethod != null
-                    && !property.GetMethod.IsStatic
-                    && !property.IsOverride
+            return property.IsInstanceMember() 
+                && property.GetMethod != null
+                && !property.HasAttributeOfType<TExcludeAttribute>() 
+                && (dataMemberKind != DataMemberKind.Field
+                    && !property.IsImplicitlyDeclared 
+                    && !property.IsOverride 
                     && IsDataMember(property, propertyInfos)
-                || property.HasAttributeOfType<TAttribute>());
+                    || property.HasAttributeOfType<TAttribute>());
         }
 
         private static bool IsDataMember(IPropertySymbol property, IEnumerable<PropertyInfo> propertyInfos)

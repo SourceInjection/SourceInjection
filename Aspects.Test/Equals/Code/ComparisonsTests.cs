@@ -225,5 +225,42 @@ namespace Aspects.Test.Equals.Code
 
             Assert.That(sut.Body.Contains($"&& new {comparerName}().Equals({propertyName}, #i.{propertyName});"));
         }
+
+        [Test]
+        public void ClassEqualization_WithDefaultSettings_IgnoresQueryProperty()
+        {
+            var sut = EqualsMethod.FromType<ReferenceType_WithDefaultSettings_WithQueryProperty>();
+            Assert.That(!sut.Body.Contains(propertyName));
+        }
+
+        [Test]
+        public void ClassEqualization_WithDataMemberKindProperty_IgnoresQueryProperty()
+        {
+            var sut = EqualsMethod.FromType<ReferenceType_WithDataMemberKindProperty_WithQueryProperty>();
+            Assert.That(!sut.Body.Contains(propertyName));
+        }
+
+        [Test]
+        public void ClassEqualization_WithQueryProperty_WithEqualsInclude_IncludesQueryProperty()
+        {
+            var sut = EqualsMethod.FromType<ReferenceType_WithQueryProperty_WithEqualsInclude>();
+            Assert.That(sut.Body.Contains(propertyName));
+        }
+
+        [Test]
+        public void ClassEqualization_WithDefaultSettings_IgnoresConstantField()
+        {
+            var sut = EqualsMethod.FromType<ReferenceType_WithConstantField>();
+            var field = typeof(ReferenceType_WithConstantField).GetFields(BindingFlags.NonPublic | BindingFlags.Instance).Single().Name;
+            Assert.That(!sut.Body.Contains(field));
+        }
+
+        [Test]
+        public void ClassEqualization_WithDefaultSettings_IgnoresStaticField()
+        {
+            var sut = EqualsMethod.FromType<ReferenceType_WithStaticField>();
+            var field = typeof(ReferenceType_WithStaticField).GetFields(BindingFlags.NonPublic | BindingFlags.Instance).Single().Name;
+            Assert.That(!sut.Body.Contains(field));
+        }
     }
 }

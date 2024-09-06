@@ -5,11 +5,6 @@ namespace Aspects.Util
 {
     internal static class EnumerableExtensions
     {
-        /// <summary>
-        /// Computes the hash code of nested <see cref="IEnumerable"/>s.
-        /// </summary>
-        /// <param name="col">The <see cref="IEnumerable"/> for which the hash code is computed.</param>
-        /// <returns>The hash code of the <see cref="IEnumerable"/>.</returns>
         public static int DeepCombinedHashCode(this IEnumerable col)
         {
             var hash = new HashCode();
@@ -25,11 +20,6 @@ namespace Aspects.Util
             return hash.ToHashCode();
         }
 
-        /// <summary>
-        /// Computes the hash code of <see cref="IEnumerable"/>s.
-        /// </summary>
-        /// <param name="col">The <see cref="IEnumerable"/> for which the hash code is computed.</param>
-        /// <returns>The hash code of the <see cref="IEnumerable"/>.</returns>
         public static int CombinedHashCode(this IEnumerable col)
         {
             var hash = new HashCode();
@@ -38,12 +28,6 @@ namespace Aspects.Util
             return hash.ToHashCode();
         }
 
-        /// <summary>
-        /// Compares two <see cref="IEnumerable"/> on equality.
-        /// </summary>
-        /// <param name="col">The first collect<see cref="IEnumerable"/>.ion</param>
-        /// <param name="other">The second <see cref="IEnumerable"/>.</param>
-        /// <returns><see langword="true"/> if the <see cref="IEnumerable"/>s are equal else <see langword="false"/>.</returns>
         public static bool DeepSequenceEqual(this IEnumerable col, IEnumerable other)
         {
             var colIt = col.GetEnumerator();
