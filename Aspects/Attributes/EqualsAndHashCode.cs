@@ -30,11 +30,13 @@ namespace Aspects.Attributes
         public AutoEqualsAndHashCodeAttribute(
             DataMemberKind dataMemberKind = DataMemberKind.DataMember,
             BaseCall baseCall = BaseCall.Auto,
-            NullSafety nullSafety = NullSafety.Auto)
+            NullSafety nullSafety = NullSafety.Auto,
+            bool storeHashCode = false)
         { 
             DataMemberKind = dataMemberKind;
             BaseCall = baseCall;
             NullSafety = nullSafety;
+            StoreHashCode = storeHashCode;
         }
 
         /// <summary>
@@ -51,6 +53,8 @@ namespace Aspects.Attributes
         /// Determines if the equalization is generated nullsafe.
         /// </summary>
         public NullSafety NullSafety { get; }
+
+        public bool StoreHashCode { get; }
     }
 
     /// <summary>
