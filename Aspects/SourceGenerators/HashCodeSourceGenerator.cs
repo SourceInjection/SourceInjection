@@ -88,10 +88,10 @@ namespace Aspects.SourceGenerators
 
             var sb = new StringBuilder();
             if (!storeHashCode)
-                sb.Append("return");
-            else sb.Append($"{StoredHashCode} ??=");
+                sb.Append(Code.Indent("return"));
+            else sb.Append(Code.Indent($"{StoredHashCode} ??="));
 
-            sb.Append(Code.Indent(" System.HashCode.Combine("));
+            sb.Append(" System.HashCode.Combine(");
 
             sb.AppendLine();
             sb.Append(Code.Indent($"\"{name}\"", tabs));
@@ -107,7 +107,6 @@ namespace Aspects.SourceGenerators
 
             if (symbols.Length > 0)
             {
-                sb.AppendLine();
                 sb.Append(Code.Indent($"{MemberHash(symbols[0], nullableEnabled)}", tabs));
 
                 for (var i = 1; i < symbols.Length; i++)
