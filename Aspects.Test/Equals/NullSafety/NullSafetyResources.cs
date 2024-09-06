@@ -1,10 +1,13 @@
 ﻿using Aspects.Attributes;
-using Aspects.Test.Equals.Comparisons;
 using System.Diagnostics.CodeAnalysis;
+
+#pragma warning disable
 
 namespace Aspects.Test.Equals.NullSafety
 {
     using NullSafety = Attributes.NullSafety;
+
+    public class ClassEmpty { }
 
     [AutoEquals]
     public partial class ClassWithNullableProperty
@@ -58,3 +61,5 @@ namespace Aspects.Test.Equals.NullSafety
         public ClassEmpty Property { get; }
     }
 }
+
+#pragma warning restore

@@ -1,4 +1,5 @@
 ﻿using Aspects.Attributes;
+#pragma warning disable
 
 namespace Aspects.Test.Equals.Comparer
 {
@@ -21,3 +22,5 @@ namespace Aspects.Test.Equals.Comparer
         public int Property { get; }
     }
 }
+
+#pragma warning restore

@@ -1,5 +1,7 @@
 ﻿using Aspects.Attributes;
 
+#pragma warning disable
+
 namespace Aspects.Test.HashCode.BaseCall
 {
     using BaseCall = Attributes.BaseCall;
@@ -19,10 +21,11 @@ namespace Aspects.Test.HashCode.BaseCall
     [AutoHashCode(baseCall: BaseCall.On)]
     public partial struct StructEmpty_WithBaseCallOn { }
 
-
     [AutoHashCode(baseCall: BaseCall.On)]
     public partial class SubClassOfClassEmpty_WithBaseCallOn : ClassEmpty { }
 
     [AutoHashCode(baseCall: BaseCall.Off)]
     public partial class SubClassOfClassEmpty_WithBaseCallOff : ClassEmpty { }
 }
+
+#pragma warning restore

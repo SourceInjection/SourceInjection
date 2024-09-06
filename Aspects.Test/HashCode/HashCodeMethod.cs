@@ -55,7 +55,7 @@ namespace Aspects.Test.HashCode
             return sb.ToString();
         }
 
-        public static string HashCodeHash(string typeName, bool includeBase = false, bool storeHashCode = false, params string[] memberHashs)
+        public static string HashCodeAdd(string typeName, bool includeBase = false, bool storeHashCode = false, params string[] memberHashs)
         {
             var sb = new StringBuilder("{ ");
             if (storeHashCode)
@@ -69,15 +69,15 @@ namespace Aspects.Test.HashCode
             if (includeBase)
                 sb.AppendLine("#i.Add(base.GetHashCode());");
 
-            foreach(var member in memberHashs)
-                sb.AppendLine(member);
+            foreach(var memberHash in memberHashs)
+                sb.AppendLine($"#i.Add({memberHash});");
 
             if(!storeHashCode)
                 sb.Append("return #i.ToHashCode(); }");
             else
             {
                 sb.AppendLine("#i = #i.ToHashCode();");
-                sb.AppendLine("return #i; }");
+                sb.AppendLine("return #i.Value; }");
             }
             return sb.ToString();
         }
