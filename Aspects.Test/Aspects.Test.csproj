@@ -24,10 +24,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Aspects\Aspects.csproj" OutputItemType="Analyzer" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="HashCode\Comparer\" />
-  </ItemGroup>
   <Target Name="Cleanup" AfterTargets="Clean">
     <RemoveDir Directories="$(ProjectDir)$(BaseIntermediateOutputPath)$(Configuration)\net8.0\generated\Aspects" />
   </Target>

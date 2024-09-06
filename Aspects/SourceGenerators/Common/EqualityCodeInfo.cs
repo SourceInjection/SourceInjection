@@ -59,6 +59,15 @@ namespace Aspects.SourceGenerators.Common
                 : MayInversed(comparerCode);
         }
 
+        public string ComparerNullableNonReferenceTypeEquality(string comparer, bool nullSafe)
+        {
+            var comparerCode = $"new {comparer}().Equals({_nameA}.Value, {_nameB}.Value)";
+            return nullSafe
+                ? Equality(comparerCode)
+                : MayInversed(comparerCode);
+        }
+        
+
         private string MayInversed(string s) => _isInequality ? '!' + s : s;
 
         private string SequenceEquality(string method) => MayInversed($"{method}({_nameA}, {_nameB})");

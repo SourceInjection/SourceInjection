@@ -1,4 +1,5 @@
 ﻿using Aspects.Common.Paths;
+using System;
 
 namespace Aspects.SourceGenerators.Common
 {
@@ -19,6 +20,9 @@ namespace Aspects.SourceGenerators.Common
 
         public string DeepCombinedHashCode(bool nullSafe) 
             => HashCode($"{NameOf.AspectsDeepCombinedHashCode}({_name})", nullSafe);
+
+        internal string ComparerNullableNonReferenceTypeHashCode(string comparer, bool nullSafe)
+            => HashCode($"new {comparer}().GetHashCode({_name}.Value)", nullSafe);
 
         private string HashCode(string hashCodeCode, bool nullSafe)
         {

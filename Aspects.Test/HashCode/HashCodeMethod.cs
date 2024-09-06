@@ -1,5 +1,7 @@
 ﻿using Aspects.SourceGenerators;
+using Aspects.SourceGenerators.Common;
 using CompileUnits.CSharp;
+using System.Reflection;
 using System.Text;
 
 namespace Aspects.Test.HashCode
@@ -21,14 +23,29 @@ namespace Aspects.Test.HashCode
                 && m.Parameters.Count == 0;
         }
 
-        public static string CombinedHashCode(string memberName)
-            => $"Aspects.Collections.Enumerable.CombinedHashCode({memberName})";
+        public static string ComparerHashCode(Type containingType, string memberName)
+            => new HashCodeCodeInfo(memberName).ComparerHashCode(GetComparer(containingType, memberName), false);
 
         public static string DeepCombinedHashCode(string memberName)
-            => $"Aspects.Collections.Enumerable.DeepCombinedHashCode({memberName})";
+            => new HashCodeCodeInfo(memberName).DeepCombinedHashCode(false);
 
-        public static string HashCodeCombine(string typeName, bool includeBase = false, bool storehashCode = false, params string[] memberHashs)
+        public static string CombinedHashCode(string memberName)
+            => new HashCodeCodeInfo(memberName).CombinedHashCode(false);
+
+        public static string NullSafeComparerHashCode(Type containingType, string memberName)
+            => new HashCodeCodeInfo(memberName).ComparerHashCode(GetComparer(containingType, memberName), true);
+
+        public static string NullSafeDeepCombinedHashCode(string memberName)
+            => new HashCodeCodeInfo(memberName).DeepCombinedHashCode(true);
+
+        public static string NullSafeCombinedHashCode(string memberName)
+            => new HashCodeCodeInfo(memberName).CombinedHashCode(true);
+
+
+        public static string HashCodeCombine(Type type, bool includeBase = false, bool storehashCode = false, params string[] memberHashs)
         {
+            var typeName = type.FullName;
+
             var sb = new StringBuilder($"{{ ");
             if (!storehashCode)
                 sb.Append("return ");
@@ -55,8 +72,10 @@ namespace Aspects.Test.HashCode
             return sb.ToString();
         }
 
-        public static string HashCodeAdd(string typeName, bool includeBase = false, bool storeHashCode = false, params string[] memberHashs)
+        public static string HashCodeAdd(Type type, bool includeBase = false, bool storeHashCode = false, params string[] memberHashs)
         {
+            var typeName = type.FullName;
+
             var sb = new StringBuilder("{ ");
             if (storeHashCode)
             {
@@ -80,6 +99,19 @@ namespace Aspects.Test.HashCode
                 sb.AppendLine("return #i.Value; }");
             }
             return sb.ToString();
+        }
+
+        private static string GetComparer(Type type, string member)
+        {
+            var comparerName = type.GetMember(member, BindingFlags.Instance | BindingFlags.Public)![0].GetCustomAttributesData()
+                .First(attData => attData.ConstructorArguments.Any(ca => ca.ArgumentType == typeof(Type)))!.ConstructorArguments
+                .First(ca => ca.ArgumentType == typeof(Type)).ToString();
+
+            if (comparerName.StartsWith("typeof("))
+                comparerName = comparerName[7..];
+            comparerName = comparerName.TrimEnd(')');
+
+            return comparerName.Replace('+', '.');
         }
     }
 }

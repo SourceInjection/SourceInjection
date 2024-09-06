@@ -56,8 +56,12 @@ namespace Aspects.SourceGenerators.Common
 
         private static string EqualityFromInfo(ITypeSymbol type, EqualityCodeInfo codeInfo, bool nullSafe, string comparer)
         {
-            if(!string.IsNullOrEmpty(comparer))
-                return codeInfo.ComparerEquality(comparer, type.IsReferenceType && nullSafe);
+            if (!string.IsNullOrEmpty(comparer))
+            {
+                if (!type.IsReferenceType && type.HasNullableAnnotation())
+                    return codeInfo.ComparerNullableNonReferenceTypeEquality(comparer, nullSafe);
+                return codeInfo.ComparerEquality(comparer, nullSafe && type.IsReferenceType);
+            }
 
             if (type.CanUseEqualityOperatorsByDefault())
                 return codeInfo.OperatorEquality();
@@ -76,10 +80,16 @@ namespace Aspects.SourceGenerators.Common
             return codeInfo.MethodEquality(type.IsReferenceType && nullSafe);
         }
 
+
+
         public static string GetHashCode(ITypeSymbol type, string name, bool nullSafe, string comparer)
         {
             if (!string.IsNullOrEmpty(comparer))
-                return new HashCodeCodeInfo(name).ComparerHashCode(comparer, type.IsReferenceType && nullSafe);
+            {
+                if (!type.IsReferenceType && type.HasNullableAnnotation())
+                    return new HashCodeCodeInfo(name).ComparerNullableNonReferenceTypeHashCode(comparer, nullSafe);
+                return new HashCodeCodeInfo(name).ComparerHashCode(comparer, nullSafe && type.IsReferenceType);
+            }
 
             if (!type.OverridesGetHashCode())
             {

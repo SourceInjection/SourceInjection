@@ -10,7 +10,7 @@ namespace Aspects.Test.HashCode.BaseCall
         public void ClassTypeEmpty_DoesNotCallBase()
         {
             var sut = HashCodeMethod.FromType<ClassEmpty>();
-            var expectedCode = HashCodeMethod.HashCodeCombine(typeof(ClassEmpty).FullName!);
+            var expectedCode = HashCodeMethod.HashCodeCombine(typeof(ClassEmpty));
 
             Assert.That(sut.Body.IsEquivalentTo(expectedCode));
         }
@@ -19,7 +19,7 @@ namespace Aspects.Test.HashCode.BaseCall
         public void ClassTypeEmpty_WithBaseCallOn_DoesCallBase()
         {
             var sut = HashCodeMethod.FromType<ClassEmpty_WithBaseCallOn>();
-            var expectedCode = HashCodeMethod.HashCodeCombine(typeof(ClassEmpty_WithBaseCallOn).FullName!, true);
+            var expectedCode = HashCodeMethod.HashCodeCombine(typeof(ClassEmpty_WithBaseCallOn), true);
 
             Assert.That(sut.Body.IsEquivalentTo(expectedCode));
         }
@@ -28,7 +28,7 @@ namespace Aspects.Test.HashCode.BaseCall
         public void StructTypeEmpty_DoesNotCallBase()
         {
             var sut = HashCodeMethod.FromType<StructEmpty>();
-            var expectedCode = HashCodeMethod.HashCodeCombine(typeof(StructEmpty).FullName!);
+            var expectedCode = HashCodeMethod.HashCodeCombine(typeof(StructEmpty));
 
             Assert.That(sut.Body.IsEquivalentTo(expectedCode));
         }
@@ -37,7 +37,7 @@ namespace Aspects.Test.HashCode.BaseCall
         public void StructTypeEmpty_WithBaseCallOn_DoesNotCallBase()
         {
             var sut = HashCodeMethod.FromType<StructEmpty_WithBaseCallOn>();
-            var expectedCode = HashCodeMethod.HashCodeCombine(typeof(StructEmpty_WithBaseCallOn).FullName!);
+            var expectedCode = HashCodeMethod.HashCodeCombine(typeof(StructEmpty_WithBaseCallOn));
 
             Assert.That(sut.Body.IsEquivalentTo(expectedCode));
         }
@@ -46,7 +46,7 @@ namespace Aspects.Test.HashCode.BaseCall
         public void SubClassOfClassEmpty_WithDefaultConfig_DoesCallBase()
         {
             var sut = HashCodeMethod.FromType<SubClassOfClassEmpty>();
-            var expectedCode = HashCodeMethod.HashCodeCombine(typeof(SubClassOfClassEmpty).FullName!, true);
+            var expectedCode = HashCodeMethod.HashCodeCombine(typeof(SubClassOfClassEmpty), true);
 
             Assert.That(sut.Body.IsEquivalentTo(expectedCode));
         }
@@ -55,7 +55,7 @@ namespace Aspects.Test.HashCode.BaseCall
         public void SubClassOfClassEmpty_WithBaseCallOn_DoesCallBase()
         {
             var sut = HashCodeMethod.FromType<SubClassOfClassEmpty_WithBaseCallOn>();
-            var expectedCode = HashCodeMethod.HashCodeCombine(typeof(SubClassOfClassEmpty_WithBaseCallOn).FullName!, true);
+            var expectedCode = HashCodeMethod.HashCodeCombine(typeof(SubClassOfClassEmpty_WithBaseCallOn), true);
 
             Assert.That(sut.Body.IsEquivalentTo(expectedCode));
         }
@@ -64,7 +64,7 @@ namespace Aspects.Test.HashCode.BaseCall
         public void SubClassOfClassEmpty_WithBaseCallOff_DoesNotCallBase()
         {
             var sut = HashCodeMethod.FromType<SubClassOfClassEmpty_WithBaseCallOff>();
-            var expectedCode = HashCodeMethod.HashCodeCombine(typeof(SubClassOfClassEmpty_WithBaseCallOff).FullName!);
+            var expectedCode = HashCodeMethod.HashCodeCombine(typeof(SubClassOfClassEmpty_WithBaseCallOff));
 
             Assert.That(sut.Body.IsEquivalentTo(expectedCode));
         }

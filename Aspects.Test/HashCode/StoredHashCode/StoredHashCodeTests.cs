@@ -34,7 +34,7 @@ namespace Aspects.Test.HashCode.StoredHashCode
         public void ClassWithStoredHashCode_GeneratesOptimizedMethod()
         {
             var sut = HashCodeMethod.FromType<ClassEmptyWithStoredHashCode>();
-            var expectedMethod = HashCodeMethod.HashCodeCombine(typeof(ClassEmptyWithStoredHashCode).FullName!, false, true);
+            var expectedMethod = HashCodeMethod.HashCodeCombine(typeof(ClassEmptyWithStoredHashCode), false, true);
 
             Assert.That(sut.Body.IsEquivalentTo(expectedMethod));
         }
@@ -44,7 +44,7 @@ namespace Aspects.Test.HashCode.StoredHashCode
         {
             var sut = HashCodeMethod.FromType<ClassWith10Members_WithStoredHashCode>();
             var members = typeof(ClassWith10Members_WithStoredHashCode).GetProperties().Select(p => p.Name).ToArray();
-            var expectedMethod = HashCodeMethod.HashCodeAdd(typeof(ClassWith10Members_WithStoredHashCode).FullName!, false, true, members);
+            var expectedMethod = HashCodeMethod.HashCodeAdd(typeof(ClassWith10Members_WithStoredHashCode), false, true, members);
 
             Assert.That(sut.Body.IsEquivalentTo(expectedMethod));
         }
