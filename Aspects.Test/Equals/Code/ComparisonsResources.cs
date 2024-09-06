@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 
-#pragma warning disable CS0659, S3249, S2094, S3887, CA2231
+#pragma warning disable
 
 namespace Aspects.Test.Equals.Code
 {
@@ -235,6 +235,12 @@ namespace Aspects.Test.Equals.Code
         [Equals]
         static int s_int = 3;
     }
+
+    [AutoEquals]
+    public partial class ReferenceType_WithEvent
+    {
+        public event EventHandler Event;
+    }
 }
 
-#pragma warning restore CS0659, S3249, S2094, S3887, CA2231
+#pragma warning restore

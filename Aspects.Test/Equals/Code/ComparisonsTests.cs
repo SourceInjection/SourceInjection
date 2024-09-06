@@ -251,7 +251,15 @@ namespace Aspects.Test.Equals.Code
         public void ClassEqualization_WithDefaultSettings_IgnoresConstantField()
         {
             var sut = EqualsMethod.FromType<ReferenceType_WithConstantField>();
-            var field = typeof(ReferenceType_WithConstantField).GetFields(BindingFlags.NonPublic | BindingFlags.Instance).Single().Name;
+            var field = nameof(ReferenceType_WithConstantField._int);
+            Assert.That(!sut.Body.Contains(field));
+        }
+
+        [Test]
+        public void ClassEqualization_IgnoresConstantField_EvenIfIncluded()
+        {
+            var sut = EqualsMethod.FromType<ReferenceType_WithConstantField_WithEqualsInclude>();
+            var field = nameof(ReferenceType_WithConstantField_WithEqualsInclude._int);
             Assert.That(!sut.Body.Contains(field));
         }
 
@@ -259,8 +267,24 @@ namespace Aspects.Test.Equals.Code
         public void ClassEqualization_WithDefaultSettings_IgnoresStaticField()
         {
             var sut = EqualsMethod.FromType<ReferenceType_WithStaticField>();
-            var field = typeof(ReferenceType_WithStaticField).GetFields(BindingFlags.NonPublic | BindingFlags.Instance).Single().Name;
+            var field = typeof(ReferenceType_WithStaticField).GetFields(BindingFlags.Static | BindingFlags.NonPublic).Single().Name;
             Assert.That(!sut.Body.Contains(field));
+        }
+
+        [Test]
+        public void ClassEqualization_IgnoresStaticFiel_EvenIfIncluded()
+        {
+            var sut = EqualsMethod.FromType<ReferenceType_WithStaticField_WithEqualsInclude>();
+            var field = typeof(ReferenceType_WithStaticField_WithEqualsInclude).GetFields(BindingFlags.Static | BindingFlags.NonPublic).Single().Name;
+            Assert.That(!sut.Body.Contains(field));
+        }
+
+        [Test]
+        public void ClassEqualization_IgnoresEvents()
+        {
+            var sut = EqualsMethod.FromType<ReferenceType_WithEvent>();
+            var ev = typeof(ReferenceType_WithEvent).GetEvents().Single().Name;
+            Assert.That(!sut.Body.Contains(ev));
         }
     }
 }

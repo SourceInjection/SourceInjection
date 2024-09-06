@@ -77,6 +77,7 @@ namespace Aspects.SourceGenerators.Base
         {
             return property.IsInstanceMember() 
                 && property.GetMethod != null
+                && !property.IsIndexer
                 && !property.HasAttributeOfType<TExcludeAttribute>() 
                 && (dataMemberKind != DataMemberKind.Field
                     && !property.IsImplicitlyDeclared 
