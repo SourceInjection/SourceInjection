@@ -7,6 +7,8 @@ namespace Aspects.Test.Equals.DataMembers
     [TestFixture]
     internal class DataMembersTests
     {
+        private const string propertyName = "Property";
+
         private static (IMethod Method, string PropertyName) GetTypeInfo<T>(string fieldName)
         {
             var flags = BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public;
@@ -124,6 +126,67 @@ namespace Aspects.Test.Equals.DataMembers
                 Assert.That(sut.Body.Contains(EqualsMethod.NullSafeEqualsEqualization(property)));
                 Assert.That(!sut.Body.Contains(field));
             });
+        }
+
+        [Test]
+        public void ClassEqualization_WithDefaultSettings_IgnoresQueryProperty()
+        {
+            var sut = EqualsMethod.FromType<ClassWithQueryProperty_WithDefaultSettings>();
+            Assert.That(!sut.Body.Contains(propertyName));
+        }
+
+        [Test]
+        public void ClassEqualization_WithDataMemberKindProperty_IgnoresQueryProperty()
+        {
+            var sut = EqualsMethod.FromType<ClassWithQueryProperty_WithDataMemberKindProperty>();
+            Assert.That(!sut.Body.Contains(propertyName));
+        }
+
+        [Test]
+        public void ClassEqualization_WithQueryProperty_WithEqualsInclude_IncludesQueryProperty()
+        {
+            var sut = EqualsMethod.FromType<ClassWithQueryProperty_WithEqualsInclude>();
+            Assert.That(sut.Body.Contains(propertyName));
+        }
+
+        [Test]
+        public void ClassEqualization_WithDefaultSettings_IgnoresConstantField()
+        {
+            var sut = EqualsMethod.FromType<ClassWithConstantField>();
+            var field = nameof(ClassWithConstantField._int);
+            Assert.That(!sut.Body.Contains(field));
+        }
+
+        [Test]
+        public void ClassEqualization_IgnoresConstantField_EvenIfIncluded()
+        {
+            var sut = EqualsMethod.FromType<ClassWithConstantField_WithEqualsInclude>();
+            var field = nameof(ClassWithConstantField_WithEqualsInclude._int);
+            Assert.That(!sut.Body.Contains(field));
+        }
+
+        [Test]
+        public void ClassEqualization_WithDefaultSettings_IgnoresStaticField()
+        {
+            var sut = EqualsMethod.FromType<ClassWithStaticField>();
+            var field = typeof(ClassWithStaticField).GetFields(BindingFlags.Static | BindingFlags.NonPublic).Single().Name;
+            Assert.That(!sut.Body.Contains(field));
+        }
+
+        [Test]
+        public void ClassEqualization_IgnoresStaticFiel_EvenIfIncluded()
+        {
+            var sut = EqualsMethod.FromType<ClassWithStaticField_WithEqualsInclude>();
+            var field = typeof(ClassWithStaticField_WithEqualsInclude).GetFields(BindingFlags.Static | BindingFlags.NonPublic).Single().Name;
+            Assert.That(!sut.Body.Contains(field));
+        }
+
+        [Test]
+        public void ClassEqualization_IgnoresEvents()
+        {
+            var sut = EqualsMethod.FromType<ClassWithEvent>();
+            var ev = typeof(ClassWithEvent).GetEvents().Single().Name;
+            Assert.That(!sut.Body.Contains(ev));
         }
     }
 }

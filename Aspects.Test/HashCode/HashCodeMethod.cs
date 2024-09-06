@@ -27,9 +27,14 @@ namespace Aspects.Test.HashCode
         public static string DeepCombinedHashCode(string memberName)
             => $"Aspects.Collections.Enumerable.DeepCombinedHashCode({memberName})";
 
-        public static string HashCodeCombine(string typeName, bool includeBase = false, params string[] memberHashs)
+        public static string HashCodeCombine(string typeName, bool includeBase = false, bool storehashCode = false, params string[] memberHashs)
         {
-            var sb = new StringBuilder($"{{ return System.HashCode.Combine(\"{typeName}\"");
+            var sb = new StringBuilder($"{{ ");
+            if (!storehashCode)
+                sb.Append("return ");
+            else sb.Append("#i ??= ");
+
+            sb.Append($"System.HashCode.Combine(\"{typeName}\"");
             if (includeBase || memberHashs.Length > 0)
                 sb.Append(',');
 
@@ -41,14 +46,23 @@ namespace Aspects.Test.HashCode
             }
 
             sb.Append(string.Join(", ", memberHashs));
-            sb.Append("); }");
+            sb.Append("); ");
 
+            if (storehashCode)
+                sb.Append("return #i.Value; ");
+
+            sb.Append('}');
             return sb.ToString();
         }
 
-        public static string HashCodeHash(string typeName, bool includeBase = false, params string[] memberHashs)
+        public static string HashCodeHash(string typeName, bool includeBase = false, bool storeHashCode = false, params string[] memberHashs)
         {
-            var sb = new StringBuilder("{");
+            var sb = new StringBuilder("{ ");
+            if (storeHashCode)
+            {
+                sb.AppendLine("if(#i.HasValue)");
+                sb.AppendLine("return #i.Value;");
+            }
             sb.AppendLine("var #i = new System.HashCode();");
             sb.AppendLine($"#i.Add(\"{typeName}\");");
 
@@ -58,8 +72,13 @@ namespace Aspects.Test.HashCode
             foreach(var member in memberHashs)
                 sb.AppendLine(member);
 
-            sb.Append("return #i.ToHashCode(); }");
-
+            if(!storeHashCode)
+                sb.Append("return #i.ToHashCode(); }");
+            else
+            {
+                sb.AppendLine("#i = #i.ToHashCode();");
+                sb.AppendLine("return #i; }");
+            }
             return sb.ToString();
         }
     }
