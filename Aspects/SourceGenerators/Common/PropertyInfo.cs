@@ -1,6 +1,6 @@
 ﻿using Aspects.Common.LoadingBehaviors;
-using Aspects.Util;
 using Aspects.Util.SymbolExtensions;
+using Aspects.Util.DeclarationSyntaxExtensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Linq;
