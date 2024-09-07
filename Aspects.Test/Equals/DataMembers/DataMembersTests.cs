@@ -74,7 +74,7 @@ namespace Aspects.Test.Equals.DataMembers
         [Test]
         public void ClassEqualization_WithDataMemberKindProperty_WithArrowFunctionPropertyThatUsesCoalesceOperator_UsesProperty()
         {
-            var (sut, field, property) = GetTypeInfo<ClassWithPropertyLinkedField_ArrowFunction_CoalesceOperator_DataMemberKind_Property>();
+            var (sut, field, property) = GetTypeInfo<ClassWithPropertyLinkedField_ArrowFunction_Coalesce_DataMemberKind_Property>();
             Assert.Multiple(() =>
             {
                 Assert.That(sut.Body.Contains(EqualsMethod.OperatorEqualization(property)));
