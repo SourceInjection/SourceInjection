@@ -10,14 +10,14 @@ namespace Aspects.Common
     {
         private readonly static Dictionary<string, INamedTypeSymbol> _allTypes = new Dictionary<string, INamedTypeSymbol>(1024);
 
-        public static INamedTypeSymbol GetType(string name)
+        public static INamedTypeSymbol Get(string name)
         {
             if (_allTypes.TryGetValue(name, out var value))
                 return value;
             return null;
         }
 
-        public static void AddType(string name, INamedTypeSymbol type)
+        public static void Add(string name, INamedTypeSymbol type)
         {
             _allTypes.Add(name, type);
         }

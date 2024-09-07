@@ -25,8 +25,8 @@ namespace Aspects.SyntaxReceivers
             if (context.Node is TypeDeclarationSyntax node && context.SemanticModel.GetDeclaredSymbol(node) is INamedTypeSymbol symbol)
             {
                 var name = symbol.ToDisplayString();
-                if (Types.GetType(name) == null)
-                    Types.AddType(name, symbol);
+                if (Types.Get(name) == null)
+                    Types.Add(name, symbol);
 
                 if (_predicate(symbol))
                     _identifiedTypes.Add(new TypeInfo(context, node, symbol));
