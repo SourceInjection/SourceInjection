@@ -29,26 +29,61 @@ namespace Aspects
 
         protected override string TypeBody(TypeInfo typeInfo)
         {
+            var sb = new StringBuilder();
+            AppendEquals(typeInfo, sb);
+            sb.AppendLines(2);
+            AppendEquatableEquals(typeInfo, sb);
+
+            return sb.ToString();
+        }
+
+        private void AppendEqualsHead(TypeInfo typeInfo, StringBuilder sb, string type, string argName, bool isOverride)
+        {
+            if (typeInfo.HasNullableEnabled)
+                sb.AppendLine("#nullable enable");
+            sb.Append("public ");
+            if (isOverride)
+                sb.Append("override ");
+            sb.Append($"bool {nameof(Equals)}({type}");
+            if (typeInfo.HasNullableEnabled)
+                sb.Append('?');
+            sb.AppendLine($" {argName})");
+            sb.AppendLine("{");
+        }
+
+        private void AppendEquals(TypeInfo typeInfo, StringBuilder sb)
+        {
+            AppendEqualsHead(typeInfo, sb, "object", argName, true);
+            sb.AppendLine(Code.Indent($"return {argName} is {typeInfo.Name} {otherName}"));
+            sb.AppendLine(Code.Indent($"&& {nameof(Equals)}({otherName});", 2));
+            AppendMethodEnd(typeInfo, sb);
+        }
+
+        private void AppendEquatableEquals(TypeInfo typeInfo, StringBuilder sb)
+        {
             var config = GetConfigAttribute(typeInfo);
             var symbols = GetSymbols(typeInfo, typeInfo.Symbol.GetMembers(), config.DataMemberKind)
                 .ToArray();
 
-            var sb = new StringBuilder();
-            AppendMethodStart(typeInfo, sb);
+            AppendEqualsHead(typeInfo, sb, typeInfo.Name, otherName, false);
 
-            sb.Append(Code.Indent("return"));
+            sb.Append(Code.Indent("return "));
             if (typeInfo.Symbol.IsReferenceType)
-                sb.Append($" {argName} == this ||");
+                sb.Append($"{otherName} == this || ");
 
-            sb.Append($" {argName} is {typeInfo.Name}");
-
-            if (symbols.Length > 0)
-                sb.Append($" {otherName}");
+            if (typeInfo.Symbol.IsReferenceType || typeInfo.HasNullableEnabled)
+                sb.Append($"{otherName} != null");
+            else if(symbols.Length == 0)
+            {
+                sb.AppendLine("true;");
+                AppendMethodEnd(typeInfo, sb);
+                return;
+            }
 
             if (ShouldIncludeBase(typeInfo, config))
             {
                 sb.AppendLine();
-                sb.Append(Code.Indent($"&& base.{nameof(Equals)}({argName})", 2));
+                sb.Append(Code.Indent($"&& base.{nameof(Equals)}({otherName})", 2));
             }
 
             foreach (var symbol in symbols)
@@ -62,20 +97,7 @@ namespace Aspects
             }
 
             sb.AppendLine(";");
-
             AppendMethodEnd(typeInfo, sb);
-            return sb.ToString();
-        }
-
-        private void AppendMethodStart(TypeInfo typeInfo, StringBuilder sb)
-        {
-            if (typeInfo.HasNullableEnabled)
-                sb.AppendLine("#nullable enable");
-            sb.Append($"public override bool {nameof(Equals)}(object");
-            if (typeInfo.HasNullableEnabled)
-                sb.Append('?');
-            sb.AppendLine($" {argName})");
-            sb.AppendLine("{");
         }
 
         private static void AppendMethodEnd(TypeInfo typeInfo, StringBuilder sb)
