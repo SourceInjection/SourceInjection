@@ -10,7 +10,7 @@ namespace Aspects.Test.Equals.Comparisons
 
 
         private static bool UsesOperatorEqualization(IMethod m, string name) 
-            => m.Body.Contains(EqualsMethod.OperatorEqualization(name));
+            => m.Body.Contains(Equalization.Operator(name));
 
 
         [Test]
@@ -39,7 +39,7 @@ namespace Aspects.Test.Equals.Comparisons
         public void PropertyEqualization_WithCollection_ThatIsComparableBySequenceEqual_UsesLinqSequenceEqual(string propertyName)
         {
             var sut = EqualsMethod.FromType<ClassWithCollections_ThatAreEquatableBySequenceEqual>();
-            Assert.That(sut.Body.Contains(EqualsMethod.LinqCollectionEqualization(propertyName)));
+            Assert.That(sut.Body.Contains(Equalization.LinqCollection(propertyName, false)));
         }
 
         [Test]
@@ -49,7 +49,7 @@ namespace Aspects.Test.Equals.Comparisons
         public void PropertyEqualization_WithCollection_ThatIsNotComparableBySequenceEqual_UsesAspectsSequenceEqual(string propertyName)
         {
             var sut = EqualsMethod.FromType<ClassWithCollections_ThatAreNotEquatableBySequenceEqual>();
-            Assert.That(sut.Body.Contains(EqualsMethod.AspectsCollectionEqualization(propertyName)));
+            Assert.That(sut.Body.Contains(Equalization.AspectsCollection(propertyName, false)));
         }
 
 
@@ -60,14 +60,14 @@ namespace Aspects.Test.Equals.Comparisons
         public void PropertyEqualization_WithMultiDimensionalArray_UsesAspectsArraySequenceEqual(string propertyName)
         {
             var sut = EqualsMethod.FromType<ClassWithMultiDimensionalArrays>();
-            Assert.That(sut.Body.Contains(EqualsMethod.AspectsArrayEqualization(propertyName)));
+            Assert.That(sut.Body.Contains(Equalization.AspectsArray(propertyName, false)));
         }
 
         [Test]
         public void PropertyEqualization_WithCollection_ThatIsNullableAndCanBeComparedWithSequenceEqual_UsesNullsafeLinqSequenceEqual()
         {
             var sut = EqualsMethod.FromType<ClassWithNullableCollection_ThatIsEquatableBySequenceEqual>();
-            Assert.That(sut.Body.Contains(EqualsMethod.NullSafeLinqCollectionEqualization(propertyName)));
+            Assert.That(sut.Body.Contains(Equalization.LinqCollection(propertyName, true)));
         }
     }
 }

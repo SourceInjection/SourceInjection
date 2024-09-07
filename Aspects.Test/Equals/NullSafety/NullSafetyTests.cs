@@ -8,10 +8,10 @@ namespace Aspects.Test.Equals.NullSafety
         private const string propertyName = "Property";
 
         private static bool IsNullSafe(IMethod m, string name = propertyName)
-            => m.Body.Contains(EqualsMethod.NullSafeEqualsEqualization(name));
+            => m.Body.Contains(Equalization.Equals(name, true));
 
         private static bool IsNotNullSafe(IMethod m, string name = propertyName)
-            => m.Body.Contains(EqualsMethod.EqualsEqualization(name));
+            => m.Body.Contains(Equalization.Equals(name, false));
 
         [Test]
         public void NullablePropertyEqualization_IsNullSafe()

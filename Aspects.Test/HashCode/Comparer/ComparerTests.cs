@@ -12,9 +12,9 @@ namespace Aspects.Test.HashCode.Comparer
         {
             var sut = HashCodeMethod.FromType<ClassWithIntPropertyAndDefaultComparer>();
             var property = nameof(ClassWithIntPropertyAndDefaultComparer.Int);
-            var memberHash = HashCodeMethod.ComparerHashCode(typeof(ClassWithIntPropertyAndDefaultComparer), property);
+            var memberHash = HashCode.Comparer(typeof(ClassWithIntPropertyAndDefaultComparer), property, false);
 
-            var expectedCode = HashCodeMethod.HashCodeCombine(typeof(ClassWithIntPropertyAndDefaultComparer), memberHashs: memberHash);
+            var expectedCode = HashCode.CombineMethodBody(typeof(ClassWithIntPropertyAndDefaultComparer), memberHashs: memberHash);
 
             Assert.That(sut.Body.IsEquivalentTo(expectedCode));
         }
