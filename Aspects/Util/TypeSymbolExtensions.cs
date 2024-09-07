@@ -13,35 +13,21 @@ namespace Aspects.Util
         public static bool CanUseSequenceEquals(this ITypeSymbol type)
         {
             if (type is IArrayTypeSymbol ats)
-                return ats.Rank == 1 && CanUseEquals(ats.ElementType);
+                return ats.Rank == 1 && CanUseObjectMethods(ats.ElementType);
 
             return type is INamedTypeSymbol nts
                 && IsKnownGenericCollection(type)
-                && nts.TypeArguments.All(ta => CanUseEquals(ta));
+                && nts.TypeArguments.All(ta => CanUseObjectMethods(ta));
         }
 
         public static bool CanUseCombinedHashCode(this ITypeSymbol type)
         {
             if (type is IArrayTypeSymbol ats)
-                return CanUseCombinedHashCode(ats.ElementType);
+                return CanUseObjectMethods(ats.ElementType);
 
             return type is INamedTypeSymbol nts
                 && IsKnownGenericCollection(type)
-                && nts.TypeArguments.All(ta => CanUseCombinedHashCode(ta));
-        }
-
-        public static bool CanUseEquals(this ITypeSymbol type)
-        {
-            return !type.IsEnumerable()
-                || type.CanUseEqualityOperatorsByDefault()
-                || type.OverridesEquals();
-        }
-
-        public static bool CanUseGetHashCode(this ITypeSymbol type)
-        {
-            return !type.IsEnumerable()
-                || type.CanUseEqualityOperatorsByDefault()
-                || type.OverridesGetHashCode();
+                && nts.TypeArguments.All(ta => CanUseObjectMethods(ta));
         }
 
         public static IEnumerable<ITypeSymbol> Inheritance(this ITypeSymbol symbol)
@@ -229,6 +215,13 @@ namespace Aspects.Util
             if (name.Contains('<') && name.Contains('>'))
                 name = name.Substring(0, name.IndexOf('<') + 1) + name.Substring(name.LastIndexOf('>'));
             return KnownTypes.GenericCollections.Contains(name);
+        }
+
+        private static bool CanUseObjectMethods(ITypeSymbol type)
+        {
+            return !type.IsEnumerable()
+                || type.CanUseEqualityOperatorsByDefault()
+                || type.OverridesEquals();
         }
     }
 }
