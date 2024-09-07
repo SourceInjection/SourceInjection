@@ -110,11 +110,8 @@ namespace Aspects
         private static bool ShouldIncludeBase(TypeInfo typeInfo, IAutoEqualsAttribute configAttribute)
         {
             return typeInfo.Symbol.IsReferenceType && (
-                configAttribute.BaseCall == BaseCall.On || configAttribute.BaseCall == BaseCall.Auto 
-                    && typeInfo.Symbol.BaseType is ITypeSymbol syBase && (
-                        syBase.HasAttributeOfType<IAutoEqualsAttribute>() 
-                        || syBase.OverridesEquals() 
-                        || syBase.GetMembers().Any(m => m.HasAttributeOfType<IEqualsAttribute>())));
+                configAttribute.BaseCall == BaseCall.On
+                || configAttribute.BaseCall == BaseCall.Auto && typeInfo.Symbol.BaseType is ITypeSymbol syBase && syBase.OverridesEquals());
         }
 
         private string MemberEquals(DataMemberSymbolInfo symbolInfo, bool nullableEnabled, IAutoEqualsAttribute config)

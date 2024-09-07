@@ -167,11 +167,8 @@ namespace Aspects
         private static bool ShouldIncludeBase(TypeInfo typeInfo, IAutoHashCodeAttribute config)
         {
             return typeInfo.Symbol.IsReferenceType && (
-                config.BaseCall == BaseCall.On || config.BaseCall == BaseCall.Auto
-                    && typeInfo.Symbol.BaseType is ITypeSymbol syBase && (
-                        syBase.HasAttributeOfType<IAutoHashCodeAttribute>()
-                        || syBase.OverridesGetHashCode()
-                        || syBase.GetMembers().Any(m => m.HasAttributeOfType<IHashCodeAttribute>())));
+                config.BaseCall == BaseCall.On 
+                || config.BaseCall == BaseCall.Auto && typeInfo.Symbol.BaseType is ITypeSymbol syBase && syBase.OverridesGetHashCode());
         }
     }
 }

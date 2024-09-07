@@ -1,4 +1,6 @@
-﻿using Aspects.Common.Paths;
+﻿using Aspects.Attributes.Interfaces;
+using Aspects.Common.Paths;
+using Aspects.Util.SymbolExtensions;
 using Microsoft.CodeAnalysis;
 using System;
 using System.Collections.Generic;
@@ -76,8 +78,10 @@ namespace Aspects.Util
 
         public static bool OverridesEquals(this ITypeSymbol symbol)
         {
-            return symbol.GetMembers().OfType<IMethodSymbol>().Any(
-                m => m.Name == nameof(Equals)
+            return symbol.HasAttributeOfType<IAutoEqualsAttribute>()
+                || symbol.GetMembers().Any(m => m.HasAttributeOfType<IEqualsAttribute>())
+                || symbol.GetMembers().OfType<IMethodSymbol>().Any(m => 
+                    m.Name == nameof(Equals)
                     && m.IsOverride
                     && m.ReturnType.IsBoolean()
                     && m.Parameters.Length == 1
@@ -86,10 +90,13 @@ namespace Aspects.Util
 
         public static bool OverridesGetHashCode(this ITypeSymbol symbol)
         {
-            return symbol.Inheritance().Any(cl => cl.GetMembers().OfType<IMethodSymbol>().Any(m =>
-                m.Name == nameof(GetHashCode)
-                && m.IsOverride
-                && m.ReturnType.ToDisplayString() == "int"));
+            return symbol.HasAttributeOfType<IAutoHashCodeAttribute>()
+                || symbol.GetMembers().Any(m => m.HasAttributeOfType<IHashCodeAttribute>())
+                || symbol.Inheritance().Any(cl => cl.GetMembers().OfType<IMethodSymbol>().Any(m =>
+                    m.Name == nameof(GetHashCode)
+                    && m.IsOverride
+                    && m.Parameters.Length == 0
+                    && m.ReturnType.IsInt32()));
         }
 
         public static bool IsPrimitive(this ITypeSymbol symbol, bool allowNullable)
