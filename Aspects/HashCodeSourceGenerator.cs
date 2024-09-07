@@ -4,7 +4,6 @@ using Aspects.SourceGenerators.Base;
 using Aspects.SourceGenerators.Base.DataMembers;
 using Aspects.SourceGenerators.Common;
 using Aspects.Util;
-using Aspects.Util.SymbolExtensions;
 using Microsoft.CodeAnalysis;
 using System.Linq;
 using System.Text;
@@ -124,44 +123,44 @@ namespace Aspects
             return sb.ToString();
         }
 
-        private string MemberHash(DataMemberSymbolInfo symbolInfo, bool nullableEnabled)
+        private string MemberHash(DataMemberSymbolInfo member, bool nullableEnabled)
         {
-            var memberConfig = GetEqualityConfigAttribute(symbolInfo);
-            var nullSafe = HasNullSafeConfig(symbolInfo, memberConfig, nullableEnabled);
+            var memberConfig = GetEqualityConfigAttribute(member);
+            var nullSafe = HasNullSafeConfig(member, memberConfig, nullableEnabled);
 
-            return Code.GetHashCode(symbolInfo.Type, symbolInfo.Name, nullSafe, memberConfig.EqualityComparer);
+            return Code.GetHashCode(member, nullSafe, memberConfig.EqualityComparer);
         }
 
-        private static bool HasNullSafeConfig(DataMemberSymbolInfo symbol, IEqualityComparerAttribute memberConfig, bool nullableEnabled)
+        private static bool HasNullSafeConfig(DataMemberSymbolInfo member, IEqualityComparerAttribute memberConfig, bool nullableEnabled)
         {
-            var nullSafe = GetNullSafety(symbol, memberConfig);
+            var nullSafe = GetNullSafety(member, memberConfig);
             if (nullSafe == NullSafety.Off)
                 return false;
             if (nullSafe == NullSafety.On)
-                return symbol.Type.IsReferenceType;
+                return member.Type.IsReferenceType;
 
-            return !nullableEnabled || symbol.Type.HasNullableAnnotation();
+            return !nullableEnabled || member.Type.HasNullableAnnotation();
         }
 
-        private static NullSafety GetNullSafety(DataMemberSymbolInfo symbol, IEqualityComparerAttribute memberConfig)
+        private static NullSafety GetNullSafety(DataMemberSymbolInfo member, IEqualityComparerAttribute memberConfig)
         {
             if (memberConfig.NullSafety != NullSafety.Auto)
                 return memberConfig.NullSafety;
-            if (symbol.HasNotNullAttribute())
+            if (member.HasNotNullAttribute())
                 return NullSafety.Off;
-            if (symbol.HasMaybeNullAttribute())
+            if (member.HasMaybeNullAttribute())
                 return NullSafety.On;
             return NullSafety.Auto;
         }
 
-        private IEqualityComparerAttribute GetEqualityConfigAttribute(DataMemberSymbolInfo symbolInfo)
+        private IEqualityComparerAttribute GetEqualityConfigAttribute(DataMemberSymbolInfo member)
         {
-            var attribute = symbolInfo.AttributesOfType<EqualityComparerAttribute>()
+            var attribute = member.AttributesOfType<EqualityComparerAttribute>()
                 .FirstOrDefault();
 
             if (attribute != null && AttributeFactory.TryCreate<EqualityComparerAttribute>(attribute, out var config))
                 return config;
-            return GetMemberConfigAttribute(symbolInfo);
+            return GetMemberConfigAttribute(member);
         }
 
         private static bool ShouldIncludeBase(TypeInfo typeInfo, IAutoHashCodeAttribute config)

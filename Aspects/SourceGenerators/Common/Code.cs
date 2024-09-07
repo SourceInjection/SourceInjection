@@ -82,25 +82,25 @@ namespace Aspects.SourceGenerators.Common
         }
 
 
-        public static string GetHashCode(ITypeSymbol type, string name, bool nullSafe, string comparer)
+        public static string GetHashCode(DataMemberSymbolInfo member, bool nullSafe, string comparer)
         {
             if (!string.IsNullOrEmpty(comparer))
             {
-                if (!type.IsReferenceType && type.HasNullableAnnotation())
-                    return new HashCodeCodeInfo(name).ComparerNullableNonReferenceTypeHashCode(comparer, nullSafe);
-                return new HashCodeCodeInfo(name).ComparerHashCode(comparer, nullSafe && type.IsReferenceType);
+                if (!member.Type.IsReferenceType && member.Type.HasNullableAnnotation())
+                    return new HashCodeCodeInfo(member.Name).ComparerNullableNonReferenceTypeHashCode(comparer, nullSafe);
+                return new HashCodeCodeInfo(member.Name).ComparerHashCode(comparer, nullSafe && member.Type.IsReferenceType);
             }
 
-            if (!type.OverridesGetHashCode())
+            if (!member.Type.OverridesGetHashCode())
             {
-                var info = new HashCodeCodeInfo(name);
+                var info = new HashCodeCodeInfo(member.Name);
 
-                if (type.CanUseCombinedHashCode())
+                if (member.Type.CanUseCombinedHashCode())
                     return info.CombinedHashCode(nullSafe);
-                if (type.IsEnumerable())
+                if (member.Type.IsEnumerable())
                     return info.DeepCombinedHashCode(nullSafe);
             }
-            return name;
+            return member.Name;
         }
     }
 }

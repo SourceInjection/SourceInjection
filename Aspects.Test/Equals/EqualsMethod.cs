@@ -1,6 +1,4 @@
-﻿using Aspects.SourceGenerators;
-using Aspects.SourceGenerators.Common;
-using CompileUnits.CSharp;
+﻿using CompileUnits.CSharp;
 using CompileUnit = Aspects.Test.CodeAnalysis.CompileUnit;
 
 namespace Aspects.Test.Equals

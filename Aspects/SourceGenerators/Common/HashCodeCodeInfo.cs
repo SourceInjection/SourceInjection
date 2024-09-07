@@ -1,5 +1,4 @@
 ﻿using Aspects.Common.Paths;
-using System;
 
 namespace Aspects.SourceGenerators.Common
 {
