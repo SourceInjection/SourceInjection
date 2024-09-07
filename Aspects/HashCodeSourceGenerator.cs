@@ -10,7 +10,7 @@ using System.Linq;
 using System.Text;
 using TypeInfo = Aspects.SourceGenerators.Common.TypeInfo;
 
-namespace Aspects.SourceGenerators
+namespace Aspects
 {
     [Generator]
     internal class HashCodeSourceGenerator : ObjectMethodSourceGeneratorBase<IAutoHashCodeAttribute, IHashCodeAttribute, IHashCodeExcludeAttribute>
@@ -38,7 +38,7 @@ namespace Aspects.SourceGenerators
 
             var sb = new StringBuilder();
 
-            if(config.StoreHashCode)
+            if (config.StoreHashCode)
             {
                 sb.AppendLine($"private int? {StoredHashCode};");
                 sb.AppendLine();
@@ -72,7 +72,7 @@ namespace Aspects.SourceGenerators
             for (int i = 0; i < symbols.Length; i++)
                 sb.AppendLine(Code.Indent($"hash.Add({MemberHash(symbols[i], nullableEnabled)});"));
 
-            if(!storeHashCode)
+            if (!storeHashCode)
                 sb.Append(Code.Indent("return hash.ToHashCode();"));
             else
             {
@@ -166,11 +166,11 @@ namespace Aspects.SourceGenerators
 
         private static bool ShouldIncludeBase(TypeInfo typeInfo, IAutoHashCodeAttribute config)
         {
-            return typeInfo.Symbol.IsReferenceType && ( 
-                config.BaseCall == BaseCall.On || config.BaseCall == BaseCall.Auto 
+            return typeInfo.Symbol.IsReferenceType && (
+                config.BaseCall == BaseCall.On || config.BaseCall == BaseCall.Auto
                     && typeInfo.Symbol.BaseType is ITypeSymbol syBase && (
-                        syBase.HasAttributeOfType<IAutoHashCodeAttribute>() 
-                        || syBase.OverridesGetHashCode() 
+                        syBase.HasAttributeOfType<IAutoHashCodeAttribute>()
+                        || syBase.OverridesGetHashCode()
                         || syBase.GetMembers().Any(m => m.HasAttributeOfType<IHashCodeAttribute>())));
         }
     }

@@ -1,22 +1,41 @@
 ﻿using CompileUnits.CSharp;
 using NUnit.Framework;
-using System.Reflection;
 
 namespace Aspects.Test.Equals.Comparer
 {
     internal class ComparerTests
     {
+        const string propertyName = "Property";
+
         [Test]
-        public void PropertyEqualization_WithCustomComparer_UsesComparer()
+        public void ComparerEqualization_UsesComparer()
         {
-            const string propertyName = "Property";
-
             var sut = EqualsMethod.FromType<ClassWithMember_ThatHasCustomComparer>();
-            var comparerName = typeof(ClassWithMember_ThatHasCustomComparer).FullName + "."
-                + typeof(ClassWithMember_ThatHasCustomComparer)
-            .GetNestedTypes(BindingFlags.NonPublic).First().Name;
+            var comparerCode = Equalization.Comparer(typeof(ClassWithMember_ThatHasCustomComparer), propertyName, false);
 
-            Assert.That(sut.Body.Contains($"&& new {comparerName}().Equals({propertyName}, #i.{propertyName});"));
+            Assert.That(sut.Body.Contains(comparerCode));
+        }
+
+        [Test]
+        public void ComparerEqualization_WithNullableNonReferenceType_WithComparerThatDoesNotSupportNullable_IsNullSafe()
+        {
+            var sut = EqualsMethod.FromType<ClassWithNullableNonReferenceTypeMember_ThatHasNonNullableComparer>();
+            var comparerCode = Equalization.ComparerNullableNonReferenceType(typeof(ClassWithNullableNonReferenceTypeMember_ThatHasNonNullableComparer), propertyName, true);
+
+            Assert.That(sut.Body.Contains(comparerCode));
+        }
+
+        [Test]
+        public void ComparerEqualization_WithNullableNonReferenceType_WithComparerThatDoesSupportNullable_IsNotNullSafe()
+        {
+            var sut = EqualsMethod.FromType<ClassWithNullableNonReferenceTypeMember_ThatHasNullableComparer>();
+            var comparerCode = Equalization.ComparerNullableNonReferenceType(typeof(ClassWithNullableNonReferenceTypeMember_ThatHasNullableComparer), propertyName, false);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(sut.Body.Contains(comparerCode));
+                Assert.That(!sut.Body.Contains("null"));
+            });
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using Aspects.SourceGenerators;
-using CompileUnits.CSharp;
+﻿using CompileUnits.CSharp;
 
 namespace Aspects.Test.HashCode
 {
