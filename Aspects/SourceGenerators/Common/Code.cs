@@ -1,4 +1,5 @@
-﻿using Aspects.Util;
+﻿using Aspects.SourceGenerators.Base.DataMembers;
+using Aspects.Util;
 using Microsoft.CodeAnalysis;
 using System.Text;
 
@@ -42,44 +43,43 @@ namespace Aspects.SourceGenerators.Common
             return sb.ToString();
         }
 
-        public static string InequalityCheck(ITypeSymbol type, string nameA, string nameB, bool nullSafe, string comparer)
+        public static string InequalityCheck(DataMemberSymbolInfo member, string otherName, bool nullSafe, string comparer)
         {
-            var info = new EqualityCodeInfo(nameA, nameB, true);
-            return EqualityFromInfo(type, info, nullSafe, comparer);
+            var info = new EqualityCodeInfo(member.Name, otherName, true);
+            return EqualityFromInfo(member, info, nullSafe, comparer);
         }
 
-        public static string EqualityCheck(ITypeSymbol type, string nameA, string nameB, bool nullSafe, string comparer)
+        public static string EqualityCheck(DataMemberSymbolInfo member, string otherName, bool nullSafe, string comparer)
         {
-            var info = new EqualityCodeInfo(nameA, nameB);
-            return EqualityFromInfo(type, info, nullSafe, comparer);
+            var info = new EqualityCodeInfo(member.Name, otherName);
+            return EqualityFromInfo(member, info, nullSafe, comparer);
         }
 
-        private static string EqualityFromInfo(ITypeSymbol type, EqualityCodeInfo codeInfo, bool nullSafe, string comparer)
+        private static string EqualityFromInfo(DataMemberSymbolInfo member, EqualityCodeInfo codeInfo, bool nullSafe, string comparer)
         {
             if (!string.IsNullOrEmpty(comparer))
             {
-                if (!type.IsReferenceType && type.HasNullableAnnotation())
+                if (!member.Type.IsReferenceType && member.Type.HasNullableAnnotation())
                     return codeInfo.ComparerNullableNonReferenceTypeEquality(comparer, nullSafe);
-                return codeInfo.ComparerEquality(comparer, nullSafe && type.IsReferenceType);
+                return codeInfo.ComparerEquality(comparer, nullSafe && member.Type.IsReferenceType);
             }
 
-            if (type.CanUseEqualityOperatorsByDefault())
+            if (member.Type.CanUseEqualityOperatorsByDefault())
                 return codeInfo.OperatorEquality();
 
-            if (!type.OverridesEquals())
+            if (!member.Type.OverridesEquals())
             {
-                if (type.CanUseSequenceEquals())
+                if (member.Type.CanUseSequenceEquals())
                     return codeInfo.LinqSequenceEquality(nullSafe);
 
-                if (type is IArrayTypeSymbol arrayType && arrayType.Rank > 1)
+                if (member.Type is IArrayTypeSymbol arrayType && arrayType.Rank > 1)
                     return codeInfo.AspectsArrayEquality(nullSafe);
 
-                if (type.IsEnumerable())
+                if (member.Type.IsEnumerable())
                     return codeInfo.AspectsSequenceEquality(nullSafe);
             }
-            return codeInfo.MethodEquality(type.IsReferenceType && nullSafe);
+            return codeInfo.MethodEquality(member.Type.IsReferenceType && nullSafe);
         }
-
 
 
         public static string GetHashCode(ITypeSymbol type, string name, bool nullSafe, string comparer)

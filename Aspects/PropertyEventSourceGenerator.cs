@@ -1,5 +1,6 @@
 ﻿using Aspects.Attributes.Interfaces;
 using Aspects.SourceGenerators.Base;
+using Aspects.SourceGenerators.Base.DataMembers;
 using Aspects.SourceGenerators.Common;
 using Aspects.SourceGenerators.Queries;
 using Aspects.SyntaxReceivers;
@@ -272,8 +273,9 @@ $@"protected virtual void {PropertyChangingNotifyMethod}(string propertyName)
 
         private static string InequalityConditionCode(IFieldSymbol symbol, bool nullSafe, string other = "value")
         {
+            var member = FieldSymbolInfo.Create(symbol);
             return Code.Indent(
-                $"if ({Code.InequalityCheck(symbol.Type, symbol.Name, other, nullSafe, null)})", 2);
+                $"if ({Code.InequalityCheck(member, other, nullSafe, null)})", 2);
         }
 
         private static T GetAttribute<T>(IFieldSymbol field)

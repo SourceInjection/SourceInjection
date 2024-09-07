@@ -4,7 +4,6 @@ using Aspects.SourceGenerators.Base;
 using Aspects.SourceGenerators.Base.DataMembers;
 using Aspects.SourceGenerators.Common;
 using Aspects.Util;
-using Aspects.Util.SymbolExtensions;
 using Microsoft.CodeAnalysis;
 using System.Linq;
 using System.Text;
@@ -90,7 +89,7 @@ namespace Aspects
             {
                 var memberEquals = MemberEquals(
                     symbol,
-                    typeInfo.HasNullableEnabled,
+                    typeInfo,
                     config);
 
                 sb.AppendLine().Append(Code.Indent($"&& {memberEquals}", 2));
@@ -114,16 +113,19 @@ namespace Aspects
                 || configAttribute.BaseCall == BaseCall.Auto && typeInfo.Symbol.BaseType is ITypeSymbol syBase && syBase.OverridesEquals());
         }
 
-        private string MemberEquals(DataMemberSymbolInfo symbolInfo, bool nullableEnabled, IAutoEqualsAttribute config)
+        private string MemberEquals(DataMemberSymbolInfo member, TypeInfo containingType, IAutoEqualsAttribute config)
         {
-            var memberConfig = GetEqualityConfigAttribute(symbolInfo);
-            var nullSafety = GetNullSafety(symbolInfo, config, memberConfig);
+            var memberConfig = GetEqualityConfigAttribute(member);
+            var nullSafety = GetNullSafety(member, config, memberConfig);
 
-            var type = symbolInfo.Type;
-            var nullSafe = nullSafety == NullSafety.On ||
-                nullSafety == NullSafety.Auto && (!nullableEnabled || type.HasNullableAnnotation());
+            var isNullSafe = nullSafety == NullSafety.On ||
+                nullSafety == NullSafety.Auto && (!containingType.HasNullableEnabled || member.Type.HasNullableAnnotation());
 
-            return Comparison(type, symbolInfo.Name, nullSafe , memberConfig.EqualityComparer);
+            var snippet = Code.EqualityCheck(member, $"{otherName}.{member.Name}", isNullSafe, memberConfig.EqualityComparer);
+
+            return snippet.Contains("||")
+                ? $"({snippet})"
+                : snippet;
         }
 
         private IEqualityComparerAttribute GetEqualityConfigAttribute(DataMemberSymbolInfo symbolInfo)
@@ -136,23 +138,15 @@ namespace Aspects
             return GetMemberConfigAttribute(symbolInfo);
         }
 
-        private static NullSafety GetNullSafety(DataMemberSymbolInfo symbol, IAutoEqualsAttribute config, IEqualityComparerAttribute memberConfig)
+        private static NullSafety GetNullSafety(DataMemberSymbolInfo member, IAutoEqualsAttribute config, IEqualityComparerAttribute memberConfig)
         {
             if (memberConfig.NullSafety != NullSafety.Auto)
                 return memberConfig.NullSafety;
-            if (symbol.HasNotNullAttribute())
+            if (member.HasNotNullAttribute())
                 return NullSafety.Off;
-            if (symbol.HasMaybeNullAttribute())
+            if (member.HasMaybeNullAttribute())
                 return NullSafety.On;
             return config.NullSafety;
-        }
-
-        private static string Comparison(ITypeSymbol type, string memberName, bool nullSafe, string comparer)
-        {
-            var snippet = Code.EqualityCheck(type, memberName, $"{otherName}.{memberName}", nullSafe, comparer);
-            return snippet.Contains("||")
-                ? $"({snippet})"
-                : snippet;
         }
     }
 }

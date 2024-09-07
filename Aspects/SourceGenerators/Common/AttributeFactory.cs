@@ -21,7 +21,6 @@ namespace Aspects.SourceGenerators.Common
             }
         }
 
-
         public static T Create<T>(AttributeData data)
         {
             if (data is null)
@@ -39,7 +38,9 @@ namespace Aspects.SourceGenerators.Common
             }
             catch
             {
+#pragma warning disable S3011
                 return (T)Activator.CreateInstance(type, BindingFlags.Instance | BindingFlags.NonPublic, null, args, null);
+#pragma warning restore S3011
             }
         }
 
