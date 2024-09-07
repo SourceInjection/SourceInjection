@@ -31,15 +31,14 @@ namespace Aspects
 
             sb.Append(Code.Indent($"return $\"({typeInfo.Name})"));
 
-            var symbols = GetSymbols(typeInfo, typeInfo.Members(true), config.DataMemberKind)
-                .ToArray();
+            var symbols = GetSymbols(typeInfo, typeInfo.Members(true), config.DataMemberKind);
 
-            if (symbols.Length > 0)
+            if (symbols.Count > 0)
             {
                 sb.Append("{{");
                 sb.Append($"{symbols[0].Name}: {{{symbols[0].Name}}}");
 
-                for(int i = 1; i < symbols.Length; i++)
+                for(int i = 1; i < symbols.Count; i++)
                     sb.Append($", {symbols[i].Name}: {{{symbols[i].Name}}}");
                 sb.Append("}}");
             }

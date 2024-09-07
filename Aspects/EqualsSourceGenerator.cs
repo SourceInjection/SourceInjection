@@ -61,8 +61,7 @@ namespace Aspects
         private void AppendEquatableEquals(TypeInfo typeInfo, StringBuilder sb)
         {
             var config = GetConfigAttribute(typeInfo);
-            var symbols = GetSymbols(typeInfo, typeInfo.Symbol.GetMembers(), config.DataMemberKind)
-                .ToArray();
+            var symbols = GetSymbols(typeInfo, typeInfo.Symbol.GetMembers(), config.DataMemberKind);
 
             AppendEqualsHead(typeInfo, sb, typeInfo.Name, otherName, false);
 
@@ -72,7 +71,7 @@ namespace Aspects
 
             if (typeInfo.Symbol.IsReferenceType || typeInfo.HasNullableEnabled)
                 sb.Append($"{otherName} != null");
-            else if(symbols.Length == 0)
+            else if(symbols.Count == 0)
             {
                 sb.AppendLine("true;");
                 AppendMethodEnd(typeInfo, sb);

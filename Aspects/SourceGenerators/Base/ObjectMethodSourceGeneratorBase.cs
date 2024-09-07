@@ -3,7 +3,6 @@ using Aspects.Attributes.Interfaces;
 using Aspects.SourceGenerators.Base.DataMembers;
 using Aspects.SourceGenerators.Common;
 using Aspects.SourceGenerators.DataMembers;
-using Aspects.SourceGenerators.Queries;
 using Aspects.SyntaxReceivers;
 using Aspects.Util;
 using Microsoft.CodeAnalysis;
@@ -12,6 +11,7 @@ using System.Linq;
 using TypeInfo = Aspects.SourceGenerators.Common.TypeInfo;
 using PropertyInfo = Aspects.SourceGenerators.Common.PropertyInfo;
 using Aspects.Util.SymbolExtensions;
+using Aspects.Common;
 
 namespace Aspects.SourceGenerators.Base
 {
@@ -34,8 +34,9 @@ namespace Aspects.SourceGenerators.Base
 
         protected override IEnumerable<string> Dependencies(TypeInfo typeInfo) => Enumerable.Empty<string>();
 
-        protected IEnumerable<DataMemberSymbolInfo> GetSymbols(TypeInfo typeInfo, IEnumerable<ISymbol> members, DataMemberKind dataMemberKind)
+        protected IList<DataMemberSymbolInfo> GetSymbols(TypeInfo typeInfo, IEnumerable<ISymbol> members, DataMemberKind dataMemberKind)
         {
+            var result = new List<DataMemberSymbolInfo>(32);
             var conflicts = typeInfo.LocalPropertyInfos
                 .Where(pi => pi.LinkedField != null
                     && IsTargeted(pi.LinkedField, dataMemberKind)
@@ -48,15 +49,16 @@ namespace Aspects.SourceGenerators.Base
             foreach (var member in members.Where(m => !blockedSymbols.Contains(m, SymbolEqualityComparer.Default)))
             {
                 if (member is IPropertySymbol p && IsTargeted(p, dataMemberKind, typeInfo.LocalPropertyInfos))
-                    yield return PropertySymbolInfo.Create(p);
+                    result.Add(PropertySymbolInfo.Create(p));
                 else if(member is IFieldSymbol f)
                 {
                     if (MustUseGeneratedProperty(f, dataMemberKind))
-                        yield return GeneratedPropertySymbolInfo.Create(f, Accessibility.Public);
+                        result.Add(GeneratedPropertySymbolInfo.Create(f, Accessibility.Public));
                     else if (IsTargeted(f, dataMemberKind))
-                        yield return FieldSymbolInfo.Create(f);
+                        result.Add(FieldSymbolInfo.Create(f));
                 }
             }
+            return result;
         }
 
         private bool MustUseGeneratedProperty(IFieldSymbol f, DataMemberKind dataMemberKind)

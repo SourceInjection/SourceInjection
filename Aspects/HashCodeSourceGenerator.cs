@@ -5,6 +5,7 @@ using Aspects.SourceGenerators.Base.DataMembers;
 using Aspects.SourceGenerators.Common;
 using Aspects.Util;
 using Microsoft.CodeAnalysis;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using TypeInfo = Aspects.SourceGenerators.Common.TypeInfo;
@@ -30,9 +31,8 @@ namespace Aspects
 
             var config = GetConfigAttribute(typeInfo);
             var includeBase = ShouldIncludeBase(typeInfo, config);
-            var symbols = GetSymbols(typeInfo, typeInfo.Symbol.GetMembers(), config.DataMemberKind)
-                .ToArray();
-            var length = symbols.Length + 1 + (includeBase ? 1 : 0);
+            var symbols = GetSymbols(typeInfo, typeInfo.Symbol.GetMembers(), config.DataMemberKind);
+            var length = symbols.Count + 1 + (includeBase ? 1 : 0);
             var name = typeInfo.Symbol.ToDisplayString();
 
             var sb = new StringBuilder();
@@ -54,7 +54,7 @@ namespace Aspects
             return sb.ToString();
         }
 
-        private string HashCodeAppend(string name, DataMemberSymbolInfo[] symbols, bool includeBase, bool nullableEnabled, bool storeHashCode)
+        private string HashCodeAppend(string name, IList<DataMemberSymbolInfo> symbols, bool includeBase, bool nullableEnabled, bool storeHashCode)
         {
             var sb = new StringBuilder();
             if (storeHashCode)
@@ -68,7 +68,7 @@ namespace Aspects
             if (includeBase)
                 sb.AppendLine(Code.Indent($"hash.Add(base.{nameof(GetHashCode)}());"));
 
-            for (int i = 0; i < symbols.Length; i++)
+            for (int i = 0; i < symbols.Count; i++)
                 sb.AppendLine(Code.Indent($"hash.Add({MemberHash(symbols[i], nullableEnabled)});"));
 
             if (!storeHashCode)
@@ -81,7 +81,7 @@ namespace Aspects
             return sb.ToString();
         }
 
-        private string HashCodeCombine(string name, DataMemberSymbolInfo[] symbols, bool includeBase, bool nullableEnabled, bool storeHashCode)
+        private string HashCodeCombine(string name, IList<DataMemberSymbolInfo> symbols, bool includeBase, bool nullableEnabled, bool storeHashCode)
         {
             const int tabs = 2;
 
@@ -94,21 +94,21 @@ namespace Aspects
 
             sb.AppendLine();
             sb.Append(Code.Indent($"\"{name}\"", tabs));
-            if (includeBase || symbols.Length > 0)
+            if (includeBase || symbols.Count > 0)
                 sb.AppendLine(",");
 
             if (includeBase)
             {
                 sb.Append(Code.Indent($"base.{nameof(GetHashCode)}()", tabs));
-                if (symbols.Length > 0)
+                if (symbols.Count > 0)
                     sb.Append(',');
             }
 
-            if (symbols.Length > 0)
+            if (symbols.Count > 0)
             {
                 sb.Append(Code.Indent($"{MemberHash(symbols[0], nullableEnabled)}", tabs));
 
-                for (var i = 1; i < symbols.Length; i++)
+                for (var i = 1; i < symbols.Count; i++)
                 {
                     sb.AppendLine(",");
                     sb.Append(Code.Indent($"{MemberHash(symbols[i], nullableEnabled)}", tabs));

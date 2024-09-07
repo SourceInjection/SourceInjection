@@ -1,8 +1,8 @@
 ﻿using Aspects.Attributes.Interfaces;
+using Aspects.Common;
 using Aspects.SourceGenerators.Base;
 using Aspects.SourceGenerators.Base.DataMembers;
 using Aspects.SourceGenerators.Common;
-using Aspects.SourceGenerators.Queries;
 using Aspects.SyntaxReceivers;
 using Aspects.Util;
 using Aspects.Util.SymbolExtensions;

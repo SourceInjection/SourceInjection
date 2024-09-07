@@ -1,21 +1,36 @@
-﻿using Aspects.SourceGenerators.Common;
-using Aspects.Util.SymbolExtensions;
+﻿using Aspects.Util.SymbolExtensions;
+using Microsoft.CodeAnalysis;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
-namespace Aspects.SourceGenerators.Queries
+namespace Aspects.Common
 {
     internal static class Types
     {
+        private readonly static Dictionary<string, INamedTypeSymbol> _allTypes = new Dictionary<string, INamedTypeSymbol>(1024);
+
+        public static INamedTypeSymbol GetType(string name)
+        {
+            if (_allTypes.TryGetValue(name, out var value))
+                return value;
+            return null;
+        }
+
+        public static void AddType(string name, INamedTypeSymbol type)
+        {
+            _allTypes.Add(name, type);
+        }
+
         /// <summary>
         /// Matches all <see cref="TypeInfo"/>s which have an <see cref="Attribute"/> of type T.
         /// </summary>
         /// <typeparam name="T">The type of the <see cref="Attribute"/>.</typeparam>
         /// <returns>A <see cref="Predicate{T}"/> for <see cref="TypeInfo"/> which is fullfilled when 
         /// the <see cref="Type"/> has an <see cref="Attribute"/> of type T.</returns>
-        public static Predicate<TypeInfo> WithAttributeOfType<T>()
+        public static Predicate<INamedTypeSymbol> WithAttributeOfType<T>()
         {
-            return (type) => type.Symbol.HasAttributeOfType<T>();
+            return (symbol) => symbol.HasAttributeOfType<T>();
         }
 
         /// <summary>
@@ -24,9 +39,9 @@ namespace Aspects.SourceGenerators.Queries
         /// <typeparam name="T">The <see cref="Type"/> of the <see cref="Attribute"/>.</typeparam>
         /// <returns>A <see cref="Predicate{T}"/> for <see cref="TypeInfo"/> which is fullfilled when 
         /// the <see cref="Type"/> has at least one <see cref="Attribute"/> of type T at any member.</returns>
-        public static Predicate<TypeInfo> WithMembersWithAttributeOfType<T>()
+        public static Predicate<INamedTypeSymbol> WithMembersWithAttributeOfType<T>()
         {
-            return (type) => type.Symbol.GetMembers().Any(m => m.HasAttributeOfType<T>());
+            return (symbol) => symbol.GetMembers().Any(m => m.HasAttributeOfType<T>());
         }
     }
 }
