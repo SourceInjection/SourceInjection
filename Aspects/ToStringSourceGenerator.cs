@@ -7,7 +7,7 @@ using Aspects.SourceGenerators.Common;
 using Aspects.Attributes;
 using System.Linq;
 
-namespace Aspects.SourceGenerators
+namespace Aspects
 {
     [Generator]
     internal class ToStringSourceGenerator

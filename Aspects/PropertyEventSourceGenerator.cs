@@ -13,7 +13,7 @@ using System.Linq;
 using System.Text;
 using TypeInfo = Aspects.SourceGenerators.Common.TypeInfo;
 
-namespace Aspects.SourceGenerators
+namespace Aspects
 {
     [Generator]
     internal class PropertyEventSourceGenerator : TypeSourceGeneratorBase
