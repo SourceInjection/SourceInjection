@@ -33,6 +33,11 @@ namespace Aspects.Util.SymbolExtensions
             return result;
         }
 
+        public static IEnumerable<ISymbol> GetAllMembers(this INamedTypeSymbol symbol)
+        {
+            return symbol.Inheritance().SelectMany(sy => sy.GetMembers());
+        }
+
         private static bool IsVisibleFromDerived(INamedTypeSymbol symbol, IFieldSymbol member)
         {
             if (member.DeclaredAccessibility == Accessibility.Public
