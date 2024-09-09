@@ -23,8 +23,14 @@ namespace Aspects.Test.Equals
         public static string Comparer(Type containingType, string memberName, bool nullSafe)
             => CodeInfo(memberName).ComparerEquality(GetComparer(containingType, memberName), nullSafe);
 
+        public static string Comparer(string comparer, string memberName, bool nullSafe)
+            => CodeInfo(memberName).ComparerEquality(comparer, nullSafe);
+
         public static string ComparerNullableNonReferenceType(Type containingType, string memberName, bool nullSafe)
             => CodeInfo(memberName).ComparerNullableNonReferenceTypeEquality(GetComparer(containingType, memberName), nullSafe);
+
+        public static string ComparerNullableNonReferenceType(string comparer, string memberName, bool nullSafe)
+            => CodeInfo(memberName).ComparerNullableNonReferenceTypeEquality(comparer, nullSafe);
 
         private static EqualityCodeInfo CodeInfo(string memberName) 
             => new (memberName, $"#i.{memberName}");
