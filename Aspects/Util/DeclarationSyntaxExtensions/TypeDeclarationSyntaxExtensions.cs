@@ -52,6 +52,7 @@ namespace Aspects.Util.DeclarationSyntaxExtensions
 
                 if (nodeText[idx] == '<')
                     return nodeText.Substring(0, nodeText.IndexOf('>', idx + 1) + 1);
+                idx++;
             }
             return nodeText.Substring(0, nodeText.IndexOf(node.Identifier.Text) + node.Identifier.Text.Length);
         }
