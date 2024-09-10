@@ -39,6 +39,14 @@ namespace Aspects.Util
             }
         }
 
+        public static bool Is(this ITypeSymbol symbol, ITypeSymbol requiredType)
+        {
+            var name = requiredType.ToDisplayString().TrimEnd('?');
+
+            return symbol.Inheritance().Any(sy => IsType(sy, name, true))
+                || symbol.AllInterfaces.Any(sy => IsType(sy, name, true));
+        }
+
         public static bool HasNullableAnnotation(this ITypeSymbol symbol)
         {
             return symbol.NullableAnnotation == NullableAnnotation.Annotated;
@@ -47,7 +55,8 @@ namespace Aspects.Util
         public static bool Implements<T>(this ITypeSymbol symbol)
         {
             var name = typeof(T).FullName;
-            return symbol.AllInterfaces.Any(i => i.ToDisplayString() == name);
+            return symbol.ToDisplayString() == name
+                || symbol.AllInterfaces.Any(i => i.ToDisplayString() == name);
         }
 
         public static bool IsEnumerable(this ITypeSymbol symbol)

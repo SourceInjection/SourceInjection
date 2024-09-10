@@ -1,4 +1,5 @@
-﻿using Aspects.SyntaxReceivers;
+﻿
+using Aspects.SyntaxReceivers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 using System.Text;

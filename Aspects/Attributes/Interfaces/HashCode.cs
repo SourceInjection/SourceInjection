@@ -9,7 +9,7 @@
         bool StoreHashCode { get; }
     }
 
-    public interface IHashCodeAttribute : IEqualityComparerAttribute { }
+    public interface IHashCodeAttribute : IEqualityComparisonConfigAttribute { }
 
     public interface IHashCodeExcludeAttribute { }
 }

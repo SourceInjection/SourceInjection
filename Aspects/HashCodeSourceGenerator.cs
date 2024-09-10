@@ -131,7 +131,7 @@ namespace Aspects
             return Code.GetHashCode(member, nullSafe, memberConfig.EqualityComparer);
         }
 
-        private static bool HasNullSafeConfig(DataMemberSymbolInfo member, IEqualityComparerAttribute memberConfig, bool nullableEnabled)
+        private static bool HasNullSafeConfig(DataMemberSymbolInfo member, IEqualityComparisonConfigAttribute memberConfig, bool nullableEnabled)
         {
             var nullSafe = GetNullSafety(member, memberConfig);
             if (nullSafe == NullSafety.Off)
@@ -142,7 +142,7 @@ namespace Aspects
             return !nullableEnabled || member.Type.HasNullableAnnotation();
         }
 
-        private static NullSafety GetNullSafety(DataMemberSymbolInfo member, IEqualityComparerAttribute memberConfig)
+        private static NullSafety GetNullSafety(DataMemberSymbolInfo member, IEqualityComparisonConfigAttribute memberConfig)
         {
             if (memberConfig.NullSafety != NullSafety.Auto)
                 return memberConfig.NullSafety;
@@ -153,12 +153,12 @@ namespace Aspects
             return NullSafety.Auto;
         }
 
-        private IEqualityComparerAttribute GetEqualityConfigAttribute(DataMemberSymbolInfo member)
+        private IEqualityComparisonConfigAttribute GetEqualityConfigAttribute(DataMemberSymbolInfo member)
         {
-            var attribute = member.AttributesOfType<EqualityComparerAttribute>()
+            var attribute = member.AttributesOfType<IEqualityComparerAttribute>()
                 .FirstOrDefault();
 
-            if (attribute != null && AttributeFactory.TryCreate<EqualityComparerAttribute>(attribute, out var config))
+            if (attribute != null && AttributeFactory.TryCreate<IEqualityComparerAttribute>(attribute, out var config))
                 return config;
             return GetMemberConfigAttribute(member);
         }

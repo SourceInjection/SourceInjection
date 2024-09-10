@@ -127,17 +127,17 @@ namespace Aspects
                 : snippet;
         }
 
-        private IEqualityComparerAttribute GetEqualityConfigAttribute(DataMemberSymbolInfo symbolInfo)
+        private IEqualityComparisonConfigAttribute GetEqualityConfigAttribute(DataMemberSymbolInfo symbolInfo)
         {
-            var attribute = symbolInfo.AttributesOfType<EqualityComparerAttribute>()
+            var attribute = symbolInfo.AttributesOfType<IEqualityComparerAttribute>()
                 .FirstOrDefault();
 
-            if (attribute != null && AttributeFactory.TryCreate<EqualityComparerAttribute>(attribute, out var config))
+            if (attribute != null && AttributeFactory.TryCreate<IEqualityComparerAttribute>(attribute, out var config))
                 return config;
             return GetMemberConfigAttribute(symbolInfo);
         }
 
-        private static NullSafety GetNullSafety(DataMemberSymbolInfo member, IAutoEqualsAttribute config, IEqualityComparerAttribute memberConfig)
+        private static NullSafety GetNullSafety(DataMemberSymbolInfo member, IAutoEqualsAttribute config, IEqualityComparisonConfigAttribute memberConfig)
         {
             if (memberConfig.NullSafety != NullSafety.Auto)
                 return memberConfig.NullSafety;
@@ -145,6 +145,12 @@ namespace Aspects
                 return NullSafety.Off;
             if (member.HasMaybeNullAttribute())
                 return NullSafety.On;
+            if(config.NullSafety == NullSafety.Auto && !string.IsNullOrEmpty(memberConfig.EqualityComparer))
+            {
+                if (new EqualityComparerInfo(memberConfig.EqualityComparer, member.Type).EqualsSupportsNullable)
+                    return NullSafety.Off;
+                return NullSafety.On;
+            }
             return config.NullSafety;
         }
     }

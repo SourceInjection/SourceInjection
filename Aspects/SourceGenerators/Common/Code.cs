@@ -1,12 +1,7 @@
-﻿using Aspects.Common;
-using Aspects.SourceGenerators.Base.DataMembers;
+﻿using Aspects.SourceGenerators.Base.DataMembers;
 using Aspects.Util;
 using Microsoft.CodeAnalysis;
-using System.Linq;
-using System.Reflection;
-using System;
 using System.Text;
-using Aspects.Util.SymbolExtensions;
 
 namespace Aspects.SourceGenerators.Common
 {
@@ -64,14 +59,12 @@ namespace Aspects.SourceGenerators.Common
         {
             if (!string.IsNullOrEmpty(comparer))
             {
-                var comparerSupportsNullable = ComparerEqualsSupportsNullable(comparer);
+                var suportsNullable = new EqualityComparerInfo(comparer, member.Type).EqualsSupportsNullable;
                 comparer = ReduceComparerName(member, comparer);
-                if (comparerSupportsNullable)
-                    nullSafe = false;
 
-                if (!member.Type.IsReferenceType && member.Type.HasNullableAnnotation())
+                if (!member.Type.IsReferenceType && member.Type.HasNullableAnnotation() && !suportsNullable)
                     return codeInfo.ComparerNullableNonReferenceTypeEquality(comparer, nullSafe);
-                return codeInfo.ComparerEquality(comparer, nullSafe && member.Type.IsReferenceType);
+                return codeInfo.ComparerEquality(comparer, nullSafe && (member.Type.IsReferenceType || member.Type.HasNullableAnnotation()));
             }
 
             if (member.Type.CanUseEqualityOperatorsByDefault())
@@ -115,53 +108,18 @@ namespace Aspects.SourceGenerators.Common
         private static string ReduceComparerName(DataMemberSymbolInfo member, string comparerName)
         {
             var containingTypeName = member.ContainingType.ToDisplayString();
-            if(!comparerName.StartsWith(containingTypeName))
-                return comparerName;
 
-            var idx = comparerName.IndexOf('.', containingTypeName.Length) + 1;
-            if(idx <= 0)
-                return comparerName;
+            if (IsMemberOf(containingTypeName, comparerName))
+                return comparerName.Substring(containingTypeName.Length + 1);
 
-            return comparerName.Substring(idx);
+            return comparerName;
         }
 
-        private static bool ComparerEqualsSupportsNullable(string comparerName)
+        private static bool IsMemberOf(string containingTypeName, string typeUsage)
         {
-            var typeSy = Types.Get(comparerName);
-            if (typeSy != null)
-            {
-                var equalsMethod = typeSy.GetAllMembers()
-                    .OfType<IMethodSymbol>()
-                    .FirstOrDefault(m => IsComparerEqualsMethod(m));
-
-                return equalsMethod != null
-                    && equalsMethod.Parameters.All(p => p.Type.HasNullableAnnotation());
-            }
-
-            var type = Type.GetType(comparerName);
-            if (type != null)
-            {
-                var equalsMethod = type.GetMethods()
-                    .FirstOrDefault(m => IsComparerEqualsMethod(m));
-
-                return equalsMethod != null
-                    && equalsMethod.GetParameters().All(p => Nullable.GetUnderlyingType(p.ParameterType) != null);
-            }
-            return false;
-        }
-
-        private static bool IsComparerEqualsMethod(IMethodSymbol method)
-        {
-            return method.Name == nameof(Equals)
-                && method.ReturnType.IsBoolean()
-                && method.Parameters.Length == 2;
-        }
-
-        private static bool IsComparerEqualsMethod(MethodInfo method)
-        {
-            return method.Name == nameof(Equals)
-                && method.ReturnType == typeof(bool)
-                && method.GetParameters().Length == 2;
+            return typeUsage.StartsWith(containingTypeName)
+                && typeUsage.Length > containingTypeName.Length
+                && typeUsage[containingTypeName.Length] == '.';
         }
     }
 }

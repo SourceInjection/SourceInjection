@@ -6,32 +6,52 @@ namespace Aspects.Test.Equals.Comparer
     internal class ComparerTests
     {
         const string propertyName = "Property";
+        const string comparerName = "IntComparer";
+
+        private static Action BuildEqualization<TType>() => BuildEqualization<TType>(propertyName);
+
+        private static Action BuildEqualization<TType>(string propertyName)
+        {
+            return () =>
+            {
+                var lhs = (TType?)Activator.CreateInstance(typeof(TType));
+                var rhs = (TType?)Activator.CreateInstance(typeof(TType));
+
+                var prop = typeof(TType).GetProperty(propertyName);
+
+                if (lhs is null || rhs is null || prop is null)
+                    throw new InvalidOperationException($"could not get necessary information.");
+
+                prop.SetValue(lhs, null);
+                prop.SetValue(rhs, null);
+
+                lhs.Equals(rhs);
+            };
+        }
 
         [Test]
-        public void ComparerEqualization_UsesComparer()
+        public void ComparerEqualization_WithMemberConfig_UsesComparer()
         {
-            var sut = EqualsMethod.FromType<ClassWithMember_ThatHasCustomComparer>();
-            var comparerCode = Equalization.Comparer("IntComparer", propertyName, false);
+            var sut = EqualsMethod.FromType<ClassWithMember_ThatHasCustomComparer_EqualsConfig>();
+            var comparerCode = Equalization.Comparer(comparerName, propertyName, false);
 
             Assert.That(sut.Body.Contains(comparerCode));
         }
 
         [Test]
-        public void ComparerEqualization_WithNullableNonReferenceType_WithComparerThatDoesNotSupportNullable_IsNullSafe()
+        public void ComparerEqualization_WithComparerAttribute_UsesComparer()
         {
-            var sut = EqualsMethod.FromType<ClassWithNullableNonReferenceTypeMember_ThatHasNonNullableComparer>();
-            var comparerCode = Equalization.ComparerNullableNonReferenceType("IntComparer", propertyName, true);
+            var sut = EqualsMethod.FromType<ClassWithMember_ThatHasCustomComparer_ComparerAttribute>();
+            var comparerCode = Equalization.Comparer(comparerName, propertyName, false);
 
             Assert.That(sut.Body.Contains(comparerCode));
         }
 
         [Test]
-        public void ComparerEqualization_WithNullableNonReferenceType_WithComparerThatDoesSupportNullable_IsNotNullSafe()
+        public void ComparerEqualization_WithNonNullableComparer_IsNullSafe()
         {
-            var sut = EqualsMethod.FromType<ClassWithNullableNonReferenceTypeMember_ThatHasNullableComparer>();
-            var comparerCode = Equalization.ComparerNullableNonReferenceType("IntComparer", propertyName, false);
-
-            Assert.That(sut.Body.Contains($"&& {comparerCode}"));
+            var equalization = BuildEqualization<ClassWithNullableNonReferenceTypeMember_ThatHasNonNullableComparer>();
+            Assert.DoesNotThrow(() => equalization());
         }
     }
 }

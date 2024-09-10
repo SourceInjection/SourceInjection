@@ -71,10 +71,10 @@ namespace Aspects.Attributes
         /// </summary>
         /// <param name="nullSafety">Determines if null safe equalizations are used.</param>
         /// <param name="equalityComparer">Determines the comparer which is then used to compare for equalization.</param>
-        public EqualsAttribute(NullSafety nullSafety = NullSafety.Auto, Type equalityComparer = null)
-            : this(nullSafety, equalityComparer?.FullName) { }
+        public EqualsAttribute(Type equalityComparer = null, NullSafety nullSafety = NullSafety.Auto)
+            : this(equalityComparer?.FullName, nullSafety) { }
 
-        private EqualsAttribute(NullSafety nullSafety = NullSafety.Auto, string equalityComparer = null)
+        private EqualsAttribute(string equalityComparer = null, NullSafety nullSafety = NullSafety.Auto)
         {
             NullSafety = nullSafety;
             EqualityComparer = equalityComparer;
