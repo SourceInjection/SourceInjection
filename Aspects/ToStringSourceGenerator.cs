@@ -5,7 +5,6 @@ using TypeInfo = Aspects.SourceGenerators.Common.TypeInfo;
 using Aspects.Attributes.Interfaces;
 using Aspects.SourceGenerators.Common;
 using Aspects.Attributes;
-using System.Linq;
 
 namespace Aspects
 {

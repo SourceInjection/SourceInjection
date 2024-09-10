@@ -44,8 +44,15 @@ namespace Aspects.Util.DeclarationSyntaxExtensions
             nodeText = RemoveAttributes(nodeText).Trim();
             nodeText = RemoveCompilerDirectives(nodeText).Trim();
 
-            if (nodeText.Contains('>'))
-                return nodeText.Substring(0, nodeText.LastIndexOf('>') + 1);
+            var idx = nodeText.IndexOf(node.Identifier.Text) + node.Identifier.Text.Length;
+            while(idx < nodeText.Length)
+            {
+                if (nodeText[idx] == '(' || nodeText[idx] == '{')
+                    break;
+
+                if (nodeText[idx] == '<')
+                    return nodeText.Substring(0, nodeText.IndexOf('>', idx + 1) + 1);
+            }
             return nodeText.Substring(0, nodeText.IndexOf(node.Identifier.Text) + node.Identifier.Text.Length);
         }
 

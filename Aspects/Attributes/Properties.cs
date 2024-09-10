@@ -79,25 +79,15 @@ namespace Aspects.Attributes
         /// Creates an instance of <see cref="NotifyPropertyEventsAttribute"/>.
         /// </summary>
         /// <param name="equalityCheck">When set to <see langword="true"/>, events will just be fired when the value wich is set does not equal the field value.</param>
-        public NotifyPropertyEventsAttribute(bool equalityCheckPropertyChanging = true, bool equalityCheckPropertyChanged = false)
+        public NotifyPropertyEventsAttribute(bool equalityCheck = false)
         {
-            EqualityCheckPropertyChanging = equalityCheckPropertyChanging;
-            EqualityCheckPropertyChanged = equalityCheckPropertyChanged;
+            EqualityCheck = equalityCheck;
         }
 
         /// <summary>
-        /// Determines if a equality check occurs before <see cref="INotifyPropertyChanging.PropertyChanging"/> event is raised.
+        /// Determines if a equality check occurs before <see cref="INotifyPropertyChanged.PropertyChanged"/> and <see cref="INotifyPropertyChanging.PropertyChanging"/> events are raised.
         /// </summary>
-        public bool EqualityCheckPropertyChanging { get; }
-
-        /// <summary>
-        /// Determines if a equality check occurs before <see cref="INotifyPropertyChanged.PropertyChanged"/> event is raised.
-        /// </summary>
-        public bool EqualityCheckPropertyChanged { get; }
-
-        bool INotifyPropertyChangingAttribute.EqualityCheck => EqualityCheckPropertyChanging;
-
-        bool INotifyPropertyChangedAttribute.EqualityCheck => EqualityCheckPropertyChanged;
+        public bool EqualityCheck { get; }
 
         /// <summary>
         /// Evaluates the generated property name from the field name.
