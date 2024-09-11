@@ -42,7 +42,7 @@ namespace Aspects.Test.Equals
                 var prop = typeof(TType).GetProperty(propertyName);
 
                 if (lhs is null || rhs is null || prop is null)
-                    throw new InvalidOperationException($"could not get necessary information.");
+                    throw new TypeLoadException($"could not get necessary information.");
 
                 prop.SetValue(lhs, null);
                 prop.SetValue(rhs, null);

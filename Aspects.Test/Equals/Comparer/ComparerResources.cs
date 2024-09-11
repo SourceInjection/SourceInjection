@@ -1,7 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-
-
-#pragma warning disable
+﻿#pragma warning disable
 
 namespace Aspects.Test.Equals.Comparer
 {
@@ -23,11 +20,14 @@ namespace Aspects.Test.Equals.Comparer
             return x != null && x.Equals(y);
         }
 
-        public int GetHashCode([DisallowNull] T obj)
+        public int GetHashCode(T? obj)
         {
             throw new NotImplementedException();
         }
     }
+
+    [AutoEquals]
+    public partial class ClassEmpty { }
 
     public partial class ClassWithMember_ThatHasCustomComparer_EqualsConfig
     {
@@ -77,6 +77,14 @@ namespace Aspects.Test.Equals.Comparer
 
         [Equals(equalityComparer: typeof(IntComparer), nullSafety: NullSafety.Off)]
         public int? Property { get; set; }
+    }
+
+    public partial class ClassWithNullableMember_ThatHasNullableComparer
+    {
+        private class Comparer : ComparerBase<ClassEmpty?> { }
+
+        [Equals(equalityComparer: typeof(Comparer))]
+        public ClassEmpty? Property { get; set; }
     }
 }
 

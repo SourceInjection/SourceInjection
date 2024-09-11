@@ -19,6 +19,7 @@ namespace Aspects.SourceGeneration.Common
 
         public bool HashCodeSupportsNullable { get; }
 
+
         private static bool ComparerEqualsSupportsNullable(string comparerName, ITypeSymbol argType)
         {
             var types = TypeInfo.GetTypes(comparerName);

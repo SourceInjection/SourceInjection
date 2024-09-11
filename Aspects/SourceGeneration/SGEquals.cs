@@ -145,13 +145,16 @@ namespace Aspects
                 return NullSafety.Off;
             if (member.HasMaybeNullAttribute())
                 return NullSafety.On;
-            if (config.NullSafety == NullSafety.Auto && !string.IsNullOrEmpty(memberConfig.EqualityComparer))
-            {
-                if (new EqualityComparerInfo(memberConfig.EqualityComparer, member.Type).EqualsSupportsNullable)
-                    return NullSafety.Off;
-                return NullSafety.On;
-            }
+            if (config.NullSafety == NullSafety.Auto && ComparerSupportsNullSafe(memberConfig.EqualityComparer, member.Type))
+                return NullSafety.Off;
+            
             return config.NullSafety;
+        }
+
+        private static bool ComparerSupportsNullSafe(string comparer, ITypeSymbol memberType)
+        {
+            return !string.IsNullOrEmpty(comparer) 
+                && new EqualityComparerInfo(comparer, memberType).EqualsSupportsNullable;
         }
     }
 }
