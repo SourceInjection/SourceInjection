@@ -6,7 +6,7 @@ namespace Aspects.Test.HashCode
     {
         public static IMethod FromType<T>()
         {
-            var cu = CodeAnalysis.CompileUnit.FromGeneratedCode<HashCodeSourceGenerator, T>();
+            var cu = CodeAnalysis.CompileUnit.FromGeneratedCode<SGHashCode, T>();
 
             return cu.AllChildren()
                 .OfType<IMethod>()

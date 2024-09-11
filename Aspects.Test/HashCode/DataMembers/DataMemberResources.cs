@@ -1,10 +1,8 @@
-﻿using Aspects.Attributes;
-
-#pragma warning disable
+﻿#pragma warning disable
 
 namespace Aspects.Test.HashCode.DataMembers
 {
-    using NullSafety = Attributes.NullSafety;
+    using NullSafety = NullSafety;
 
     [AutoHashCode]
     public partial class ClassWithPropertyLinkedField_DataMemberKind_DataMember

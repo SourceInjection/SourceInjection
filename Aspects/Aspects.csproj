@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="SourceGenerators\Diagnostics\Errors_en.Designer.cs">
+    <Compile Update="SourceGeneration\Diagnostics\Errors_en.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>Errors_en.resx</DependentUpon>
@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Update="SourceGenerators\Diagnostics\Errors_en.resx">
+    <EmbeddedResource Update="SourceGeneration\Diagnostics\Errors_en.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Errors_en.Designer.cs</LastGenOutput>
     </EmbeddedResource>

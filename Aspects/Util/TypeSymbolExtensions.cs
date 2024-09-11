@@ -1,5 +1,5 @@
-﻿using Aspects.Attributes.Interfaces;
-using Aspects.Common.Paths;
+﻿using Aspects.Interfaces;
+using Aspects.Common;
 using Aspects.Util.SymbolExtensions;
 using Microsoft.CodeAnalysis;
 using System;

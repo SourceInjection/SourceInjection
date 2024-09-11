@@ -1,5 +1,4 @@
-﻿using Aspects.Attributes;
-
+﻿
 #pragma warning disable
 
 namespace Aspects.Test.HashCode.StoredHashCode

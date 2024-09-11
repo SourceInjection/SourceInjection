@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections;
 using System.Linq;
 using System;
-using Aspects.Common.Paths;
+using Aspects.Common;
 
 namespace Aspects.Util.SymbolExtensions
 {

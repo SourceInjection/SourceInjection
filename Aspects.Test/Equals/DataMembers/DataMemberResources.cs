@@ -1,10 +1,8 @@
-﻿using Aspects.Attributes;
-
-#pragma warning disable
+﻿#pragma warning disable
 
 namespace Aspects.Test.Equals.DataMembers
 {
-    using NullSafety = Attributes.NullSafety;
+    using NullSafety = Aspects.NullSafety;
 
     [AutoEquals]
     public partial class ClassWithPropertyLinkedField_DataMemberKind_DataMember

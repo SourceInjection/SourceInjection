@@ -14,7 +14,7 @@ namespace Aspects.Test.Equals.DataMembers
             var flags = BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public;
 
             return (EqualsMethod.FromType<T>(),
-                typeof(T).GetProperty(SourceGenerators.Common.Code.PropertyNameFromField(fieldName), flags)!.Name);
+                typeof(T).GetProperty(SourceGeneration.Common.Snippets.PropertyNameFromField(fieldName), flags)!.Name);
         }
 
         private static (IMethod Method, string FieldName, string PropertyName) GetTypeInfo<T>()

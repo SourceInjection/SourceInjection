@@ -1,11 +1,10 @@
-﻿using Aspects.Attributes;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 
 #pragma warning disable
 
 namespace Aspects.Test.Equals.NullSafety
 {
-    using NullSafety = Attributes.NullSafety;
+    using NullSafety = Aspects.NullSafety;
 
     public class ClassEmpty { }
 

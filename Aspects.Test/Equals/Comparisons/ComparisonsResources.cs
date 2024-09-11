@@ -1,12 +1,11 @@
-﻿using Aspects.Attributes;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Immutable;
 
 #pragma warning disable
 
 namespace Aspects.Test.Equals.Comparisons
 {
-    using NullSafety = Attributes.NullSafety;
+    using NullSafety = Aspects.NullSafety;
 
     [AutoEquals]
     public partial class ClassEmpty { }

@@ -1,4 +1,4 @@
-﻿using Aspects.SourceGenerators.Base;
+﻿using Aspects.SourceGeneration.Base;
 using CompileUnits.CSharp;
 
 namespace Aspects.Test.CodeAnalysis

@@ -1,10 +1,11 @@
-﻿using Aspects.Attributes;
-
+﻿
 #pragma warning disable
+
+using Aspects;
 
 namespace Aspects.Test.Equals.BaseCall
 {
-    using BaseCall = Attributes.BaseCall;
+    using BaseCall = Aspects.BaseCall;
 
     [AutoEquals]
     public partial class ClassEmpty { }

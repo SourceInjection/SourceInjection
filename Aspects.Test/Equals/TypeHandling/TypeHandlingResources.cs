@@ -1,6 +1,4 @@
-﻿using Aspects.Attributes;
-
-#pragma warning disable
+﻿#pragma warning disable
 
 namespace Aspects.Test.Equals.TypeHandling
 {

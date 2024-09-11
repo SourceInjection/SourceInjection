@@ -1,5 +1,4 @@
-﻿using Aspects.Attributes;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 
 #pragma warning disable
 namespace Aspects.Test.HashCode.Comparer

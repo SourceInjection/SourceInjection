@@ -1,10 +1,10 @@
-﻿using Aspects.Attributes;
+﻿#pragma warning disable
 
-#pragma warning disable
+using Aspects;
 
 namespace Aspects.Test.HashCode.BaseCall
 {
-    using BaseCall = Attributes.BaseCall;
+    using BaseCall = Aspects.BaseCall;
 
     [AutoHashCode]
     public partial class ClassEmpty { }

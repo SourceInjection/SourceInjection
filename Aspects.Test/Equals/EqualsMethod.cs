@@ -7,7 +7,7 @@ namespace Aspects.Test.Equals
     {
         public static IMethod FromType<T>(bool useObjectMethod = false)
         {
-            var cu = CompileUnit.FromGeneratedCode<EqualsSourceGenerator, T>();
+            var cu = CompileUnit.FromGeneratedCode<SGEquals, T>();
             var typeName = useObjectMethod ? "object" : typeof(T).Name;
             return cu.AllChildren()
                 .OfType<IMethod>()

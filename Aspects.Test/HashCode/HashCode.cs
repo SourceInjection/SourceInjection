@@ -1,4 +1,4 @@
-﻿using Aspects.SourceGenerators.Common;
+﻿using Aspects.SourceGeneration.Common;
 using System.Reflection;
 using System.Text;
 
