@@ -8,27 +8,9 @@ namespace Aspects.Test.Equals.NullSafety
 
         private static Action BuildEqualization<TType>() 
         {
-            return BuildEqualization<TType>(propertyName);
+            return Equalization.Build<TType>(propertyName);
         }
 
-        private static Action BuildEqualization<TType>(string propertyName)
-        {
-            return () =>
-            {
-                var lhs = (TType?)Activator.CreateInstance(typeof(TType));
-                var rhs = (TType?)Activator.CreateInstance(typeof(TType));
-
-                var prop = typeof(TType).GetProperty(propertyName);
-
-                if (lhs is null || rhs is null || prop is null)
-                    throw new InvalidOperationException($"could not get necessary information.");
-
-                prop.SetValue(lhs, null);
-                prop.SetValue(rhs, null);
-
-                lhs.Equals(rhs);
-            };
-        }
 
         [Test]
         public void NullablePropertyEqualization_IsNullSafe()

@@ -32,6 +32,25 @@ namespace Aspects.Test.Equals
         public static string ComparerNullableNonReferenceType(string comparer, string memberName, bool nullSafe)
             => CodeInfo(memberName).ComparerNullableNonReferenceTypeEquality(comparer, nullSafe);
 
+        public static Action Build<TType>(string propertyName)
+        {
+            return () =>
+            {
+                var lhs = (TType?)Activator.CreateInstance(typeof(TType));
+                var rhs = (TType?)Activator.CreateInstance(typeof(TType));
+
+                var prop = typeof(TType).GetProperty(propertyName);
+
+                if (lhs is null || rhs is null || prop is null)
+                    throw new InvalidOperationException($"could not get necessary information.");
+
+                prop.SetValue(lhs, null);
+                prop.SetValue(rhs, null);
+
+                lhs.Equals(rhs);
+            };
+        }
+
         private static EqualityCodeInfo CodeInfo(string memberName) 
             => new (memberName, $"#i.{memberName}");
 

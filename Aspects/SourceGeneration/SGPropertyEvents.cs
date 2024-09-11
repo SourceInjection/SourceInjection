@@ -42,8 +42,8 @@ $@"protected virtual void {PropertyChangingNotifyMethod}(string propertyName)
         protected internal override string Name { get; } = "PropertyEvent";
 
         protected override TypeSyntaxReceiver SyntaxReceiver { get; } = new TypeSyntaxReceiver(
-                    TypeInfo.WithMembersWithAttributeOfType<INotifyPropertyChangedAttribute>()
-                .Or(TypeInfo.WithMembersWithAttributeOfType<INotifyPropertyChangingAttribute>()));
+                    Types.WithMembersWithAttributeOfType<INotifyPropertyChangedAttribute>()
+                .Or(Types.WithMembersWithAttributeOfType<INotifyPropertyChangingAttribute>()));
 
 
         protected override IEnumerable<string> Dependencies(TypeInfo typeInfo)

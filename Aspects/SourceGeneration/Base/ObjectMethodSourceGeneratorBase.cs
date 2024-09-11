@@ -25,8 +25,8 @@ namespace Aspects.SourceGeneration.Base
         protected abstract TAttribute DefaultMemberConfigAttribute { get; }
 
         protected override TypeSyntaxReceiver SyntaxReceiver { get; } = new TypeSyntaxReceiver(
-                TypeInfo.WithAttributeOfType<TConfigAttribute>()
-            .Or(TypeInfo.WithMembersWithAttributeOfType<TAttribute>()));
+                Types.WithAttributeOfType<TConfigAttribute>()
+            .Or(Types.WithMembersWithAttributeOfType<TAttribute>()));
 
         protected abstract DataMemberPriority Priority { get; }
 

@@ -81,6 +81,7 @@ namespace Aspects.SourceGeneration.Common
         public override bool Equals(object obj)
         {
             return obj is TypeInfo other
+                && Symbol.ToDisplayString() == other.Symbol.ToDisplayString() // speeds up detection process
                 && Symbol.Equals(other.Symbol, SymbolEqualityComparer.Default);
         }
 
@@ -89,29 +90,19 @@ namespace Aspects.SourceGeneration.Common
             return SymbolEqualityComparer.Default.GetHashCode(Symbol);
         }
 
-        public static IReadOnlyList<TypeInfo> Get(string name)
+        public static IReadOnlyList<TypeInfo> GetTypes(string name)
         {
             if (_allTypes.TryGetValue(name, out var value))
                 return value;
             return System.Array.Empty<TypeInfo>();
         }
 
-        public static void Add(string name, TypeInfo type)
+        public static void Consider(string name, TypeInfo type)
         {
             if(!_allTypes.TryGetValue(name, out var list))
                 _allTypes.Add(name, new List<TypeInfo> { type });
             else if(!list.Contains(type))
                 list.Add(type);
-        }
-
-        public static System.Predicate<TypeInfo> WithAttributeOfType<T>()
-        {
-            return (type) => type.Symbol.HasAttributeOfType<T>();
-        }
-
-        public static System.Predicate<TypeInfo> WithMembersWithAttributeOfType<T>()
-        {
-            return (type) => type.Symbol.GetMembers().Any(m => m.HasAttributeOfType<T>());
         }
     }
 }
