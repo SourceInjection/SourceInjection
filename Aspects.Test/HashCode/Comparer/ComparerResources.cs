@@ -3,49 +3,49 @@
 #pragma warning disable
 namespace Aspects.Test.HashCode.Comparer
 {
-    public partial class ClassWithIntPropertyAndDefaultComparer
+    internal class ComparerBase<T> : IEqualityComparer<T>
     {
-        private class Comparer : IEqualityComparer<int>
+        public bool Equals(T? x, T? y)
         {
-            public bool Equals(int x, int y)
-            {
-                throw new NotImplementedException();
-            }
-
-            public int GetHashCode([DisallowNull] int obj)
-            {
-                throw new NotImplementedException();
-            }
+            throw new NotImplementedException();
         }
+
+        public int GetHashCode([DisallowNull] T obj)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public partial class ClassWithIntPropertyAndNonNullableComparer
+    {
+        private class Comparer : ComparerBase<int> { }
 
         [HashCode(typeof(Comparer))]
         public int Int { get; }
     }
 
-
-    public partial class ClassWithNullableIntPropertyAndDefaultComparer
+    public partial class ClassWithIntPropertyAndNullableComparer
     {
-        private class Comparer : IEqualityComparer<int>
-        {
-            public bool Equals(int x, int y)
-            {
-                throw new NotImplementedException();
-            }
+        private class Comparer : ComparerBase<int?> { }
 
-            public int GetHashCode([DisallowNull] int obj)
-            {
-                throw new NotImplementedException();
-            }
-        }
+        [HashCode(typeof(Comparer))]
+        public int Int { get; }
+    }
+
+    public partial class ClassWithNullableIntPropertyAndNullableComparer
+    {
+        private class Comparer : ComparerBase<int?> { }
 
         [HashCode(typeof(Comparer))]
         public int? Int { get; }
+    }
 
+    public partial class ClassWithNullableIntPropertyAndNonNullableComparer
+    {
+        private class Comparer : ComparerBase<int> { }
 
-        public void DoStuff()
-        {
-            int res = Int != null ? new Comparer().GetHashCode(Int.Value) : 0;
-        }
+        [HashCode(typeof(Comparer))]
+        public int? Int { get; }
     }
 }
 

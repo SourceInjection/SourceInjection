@@ -88,9 +88,12 @@ namespace Aspects.SourceGeneration.Common
         {
             if (!string.IsNullOrEmpty(comparer))
             {
-                if (!member.Type.IsReferenceType && member.Type.HasNullableAnnotation())
+                var suportsNullable = new EqualityComparerInfo(comparer, member.Type).HashCodeSupportsNullable;
+                comparer = ReduceComparerName(member, comparer);
+
+                if (!member.Type.IsReferenceType && member.Type.HasNullableAnnotation() && !suportsNullable)
                     return new HashCodeCodeInfo(member.Name).ComparerNullableNonReferenceTypeHashCode(comparer, nullSafe);
-                return new HashCodeCodeInfo(member.Name).ComparerHashCode(comparer, nullSafe && member.Type.IsReferenceType);
+                return new HashCodeCodeInfo(member.Name).ComparerHashCode(comparer, nullSafe && (member.Type.IsReferenceType || member.Type.HasNullableAnnotation()));
             }
 
             if (!member.Type.OverridesGetHashCode())

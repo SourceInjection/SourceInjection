@@ -84,7 +84,7 @@ namespace Aspects.Test.HashCode
                 comparerName = comparerName[7..];
             comparerName = comparerName.TrimEnd(')');
 
-            return comparerName.Replace('+', '.');
+            return comparerName[(comparerName.LastIndexOf('.') + 1)..];
         }
     }
 }
