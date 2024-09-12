@@ -1,7 +1,7 @@
 ﻿using Aspects.Interfaces;
 using Aspects.Common;
 using Aspects.SourceGeneration.Base;
-using Aspects.SourceGeneration.Base.DataMembers;
+using Aspects.SourceGeneration.DataMembers;
 using Aspects.SourceGeneration.Common;
 using Aspects.Util;
 using Microsoft.CodeAnalysis;
@@ -9,6 +9,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using TypeInfo = Aspects.SourceGeneration.Common.TypeInfo;
+
+#pragma warning disable IDE0130
 
 namespace Aspects
 {
@@ -171,3 +173,5 @@ namespace Aspects
         }
     }
 }
+
+#pragma warning restore IDE0130

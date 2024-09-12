@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 
-namespace Aspects.SourceGeneration.Base.DataMembers
+namespace Aspects.SourceGeneration.DataMembers
 {
     internal abstract class DataMemberSymbolInfo
     {

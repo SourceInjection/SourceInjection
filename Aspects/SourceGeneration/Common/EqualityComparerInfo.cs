@@ -7,20 +7,16 @@ using Aspects.Util;
 
 namespace Aspects.SourceGeneration.Common
 {
-    internal class EqualityComparerInfo
+    internal static class EqualityComparerInfo
     {
-        public EqualityComparerInfo(string comparerName, ITypeSymbol typeToCompare)
+        public static bool HashCodeSupportsNullable(string comparerName, ITypeSymbol argType)
         {
-            EqualsSupportsNullable = ComparerEqualsSupportsNullable(comparerName, typeToCompare);
-            HashCodeSupportsNullable = false;
+            // TODO
+            return true;
         }
 
-        public bool EqualsSupportsNullable { get; }
 
-        public bool HashCodeSupportsNullable { get; }
-
-
-        private static bool ComparerEqualsSupportsNullable(string comparerName, ITypeSymbol argType)
+        public static bool EqualsSupportsNullable(string comparerName, ITypeSymbol argType)
         {
             var types = TypeInfo.GetTypes(comparerName);
             if (types.Count > 0)

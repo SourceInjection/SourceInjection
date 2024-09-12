@@ -5,6 +5,8 @@ using System.Text;
 using TypeInfo = Aspects.SourceGeneration.Common.TypeInfo;
 using Aspects.SourceGeneration.Common;
 
+#pragma warning disable IDE0130
+
 namespace Aspects
 {
     [Generator]
@@ -47,3 +49,5 @@ namespace Aspects
         }
     }
 }
+
+#pragma warning restore IDE0130

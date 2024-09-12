@@ -1,6 +1,5 @@
 ﻿using Aspects.Interfaces;
 using Aspects.Common;
-using Aspects.SourceGeneration.Base.DataMembers;
 using Aspects.Util.SymbolExtensions;
 using Microsoft.CodeAnalysis;
 using System.Collections.Immutable;

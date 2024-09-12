@@ -1,4 +1,4 @@
-﻿using Aspects.SourceGeneration.Base.DataMembers;
+﻿using Aspects.SourceGeneration.DataMembers;
 using Aspects.Util;
 using Microsoft.CodeAnalysis;
 using System.Text;
@@ -59,7 +59,7 @@ namespace Aspects.SourceGeneration.Common
         {
             if (!string.IsNullOrEmpty(comparer))
             {
-                var suportsNullable = new EqualityComparerInfo(comparer, member.Type).EqualsSupportsNullable;
+                var suportsNullable = EqualityComparerInfo.EqualsSupportsNullable(comparer, member.Type);
                 comparer = ReduceComparerName(member, comparer);
 
                 if (!member.Type.IsReferenceType && member.Type.HasNullableAnnotation() && !suportsNullable)
@@ -88,7 +88,7 @@ namespace Aspects.SourceGeneration.Common
         {
             if (!string.IsNullOrEmpty(comparer))
             {
-                var suportsNullable = new EqualityComparerInfo(comparer, member.Type).HashCodeSupportsNullable;
+                var suportsNullable = EqualityComparerInfo.HashCodeSupportsNullable(comparer, member.Type);
                 comparer = ReduceComparerName(member, comparer);
 
                 if (!member.Type.IsReferenceType && member.Type.HasNullableAnnotation() && !suportsNullable)

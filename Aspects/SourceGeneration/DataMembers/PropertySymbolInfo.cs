@@ -1,7 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using System.Collections.Immutable;
 
-namespace Aspects.SourceGeneration.Base.DataMembers
+namespace Aspects.SourceGeneration.DataMembers
 {
     internal class PropertySymbolInfo : DataMemberSymbolInfo
     {

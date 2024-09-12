@@ -1,7 +1,6 @@
 ﻿using Aspects.Interfaces;
 using Aspects.Common;
 using Aspects.SourceGeneration.Base;
-using Aspects.SourceGeneration.Base.DataMembers;
 using Aspects.SourceGeneration.Common;
 using Aspects.Util;
 using Aspects.Util.SymbolExtensions;
@@ -13,6 +12,9 @@ using System.Linq;
 using System.Text;
 using TypeInfo = Aspects.SourceGeneration.Common.TypeInfo;
 using Aspects.SourceGeneration.SyntaxReceivers;
+using Aspects.SourceGeneration.DataMembers;
+
+#pragma warning disable IDE0130
 
 namespace Aspects
 {
@@ -304,3 +306,5 @@ $@"protected virtual void {PropertyChangingNotifyMethod}(string propertyName)
         }
     }
 }
+
+#pragma warning restore IDE0130
