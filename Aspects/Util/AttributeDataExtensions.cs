@@ -14,5 +14,15 @@ namespace Aspects.Util
         {
             return attData.AttributeClass?.ToDisplayString() == NameOf.MaybeNullAttribute;
         }
+
+        public static bool IsAllowNullAttribute(this AttributeData attData)
+        {
+            return attData.AttributeClass?.ToDisplayString() == NameOf.AllowNullAttribute;
+        }
+
+        public static bool IsDisallowNullAttribute(this AttributeData attData)
+        {
+            return attData.AttributeClass?.ToDisplayString() == NameOf.DisallowNullAttribute;
+        }
     }
 }

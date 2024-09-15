@@ -1,5 +1,4 @@
 ﻿using Aspects.SourceGeneration.Common;
-using System.Reflection;
 using System.Text;
 
 namespace Aspects.Test.HashCode
@@ -7,7 +6,10 @@ namespace Aspects.Test.HashCode
     internal static class HashCode
     {
         public static string Comparer(Type containingType, string memberName, bool nullSafe)
-            => new HashCodeCodeInfo(memberName).ComparerHashCode(GetComparer(containingType, memberName), nullSafe);
+            => new HashCodeCodeInfo(memberName).ComparerHashCode(Test.Comparer.FromMember(containingType, memberName), nullSafe);
+
+        public static string ComparerNullableNonReferenceType(Type containingType, string memberName, bool nullSafe)
+            => new HashCodeCodeInfo(memberName).ComparerNullableNonReferenceTypeHashCode(Test.Comparer.FromMember(containingType, memberName), nullSafe);
 
         public static string DeepCombined(string memberName, bool nullSafe)
             => new HashCodeCodeInfo(memberName).DeepCombinedHashCode(nullSafe);
@@ -72,19 +74,6 @@ namespace Aspects.Test.HashCode
                 sb.AppendLine("return #i.Value; }");
             }
             return sb.ToString();
-        }
-
-        private static string GetComparer(Type type, string member)
-        {
-            var comparerName = type.GetMember(member, BindingFlags.Instance | BindingFlags.Public)[0].GetCustomAttributesData()
-                .First(attData => attData.ConstructorArguments.Any(ca => ca.ArgumentType == typeof(Type)))!.ConstructorArguments
-                .First(ca => ca.ArgumentType == typeof(Type)).ToString();
-
-            if (comparerName.StartsWith("typeof("))
-                comparerName = comparerName[7..];
-            comparerName = comparerName.TrimEnd(')');
-
-            return comparerName[(comparerName.LastIndexOf('.') + 1)..];
         }
     }
 }

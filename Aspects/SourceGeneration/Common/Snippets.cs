@@ -1,5 +1,5 @@
 ﻿using Aspects.SourceGeneration.DataMembers;
-using Aspects.Util;
+using Aspects.Util.SymbolExtensions;
 using Microsoft.CodeAnalysis;
 using System.Text;
 

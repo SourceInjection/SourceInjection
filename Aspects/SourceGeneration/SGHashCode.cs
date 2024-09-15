@@ -3,12 +3,12 @@ using Aspects.Common;
 using Aspects.SourceGeneration.Base;
 using Aspects.SourceGeneration.DataMembers;
 using Aspects.SourceGeneration.Common;
-using Aspects.Util;
 using Microsoft.CodeAnalysis;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using TypeInfo = Aspects.SourceGeneration.Common.TypeInfo;
+using Aspects.Util.SymbolExtensions;
 
 #pragma warning disable IDE0130
 
@@ -35,7 +35,6 @@ namespace Aspects
             var includeBase = ShouldIncludeBase(typeInfo, config);
             var symbols = GetSymbols(typeInfo, typeInfo.Symbol.GetMembers(), config.DataMemberKind);
             var length = symbols.Count + 1 + (includeBase ? 1 : 0);
-            var name = typeInfo.Symbol.ToDisplayString();
 
             var sb = new StringBuilder();
 
@@ -49,17 +48,19 @@ namespace Aspects
             sb.AppendLine("{");
 
             if (length <= hashCodeCombineMaxArgs)
-                sb.AppendLine(HashCodeCombine(name, symbols, includeBase, typeInfo.HasNullableEnabled, config.StoreHashCode));
-            else sb.AppendLine(HashCodeAppend(name, symbols, includeBase, typeInfo.HasNullableEnabled, config.StoreHashCode));
+                sb.AppendLine(HashCodeCombine(typeInfo, config, symbols, includeBase));
+            else sb.AppendLine(HashCodeAppend(typeInfo, config, symbols, includeBase));
 
             sb.Append('}');
             return sb.ToString();
         }
 
-        private string HashCodeAppend(string name, IList<DataMemberSymbolInfo> symbols, bool includeBase, bool nullableEnabled, bool storeHashCode)
+        private string HashCodeAppend(TypeInfo typeInfo, IAutoHashCodeAttribute config, IList<DataMemberSymbolInfo> symbols, bool includeBase)
         {
             var sb = new StringBuilder();
-            if (storeHashCode)
+            var name = typeInfo.Symbol.ToDisplayString();
+
+            if (config.StoreHashCode)
             {
                 sb.AppendLine(Snippets.Indent($"if({StoredHashCode}.HasValue)"));
                 sb.AppendLine(Snippets.Indent($"return {StoredHashCode}.Value;", 2));
@@ -71,9 +72,9 @@ namespace Aspects
                 sb.AppendLine(Snippets.Indent($"hash.Add(base.{nameof(GetHashCode)}());"));
 
             for (int i = 0; i < symbols.Count; i++)
-                sb.AppendLine(Snippets.Indent($"hash.Add({MemberHash(symbols[i], nullableEnabled)});"));
+                sb.AppendLine(Snippets.Indent($"hash.Add({MemberHash(symbols[i], typeInfo)});"));
 
-            if (!storeHashCode)
+            if (!config.StoreHashCode)
                 sb.Append(Snippets.Indent("return hash.ToHashCode();"));
             else
             {
@@ -83,12 +84,14 @@ namespace Aspects
             return sb.ToString();
         }
 
-        private string HashCodeCombine(string name, IList<DataMemberSymbolInfo> symbols, bool includeBase, bool nullableEnabled, bool storeHashCode)
+        private string HashCodeCombine(TypeInfo typeInfo, IAutoHashCodeAttribute config, IList<DataMemberSymbolInfo> symbols, bool includeBase)
         {
             const int tabs = 2;
 
             var sb = new StringBuilder();
-            if (!storeHashCode)
+            var name = typeInfo.Symbol.ToDisplayString();
+
+            if (!config.StoreHashCode)
                 sb.Append(Snippets.Indent("return"));
             else sb.Append(Snippets.Indent($"{StoredHashCode} ??="));
 
@@ -108,16 +111,16 @@ namespace Aspects
 
             if (symbols.Count > 0)
             {
-                sb.Append(Snippets.Indent($"{MemberHash(symbols[0], nullableEnabled)}", tabs));
+                sb.Append(Snippets.Indent($"{MemberHash(symbols[0], typeInfo)}", tabs));
 
                 for (var i = 1; i < symbols.Count; i++)
                 {
                     sb.AppendLine(",");
-                    sb.Append(Snippets.Indent($"{MemberHash(symbols[i], nullableEnabled)}", tabs));
+                    sb.Append(Snippets.Indent($"{MemberHash(symbols[i], typeInfo)}", tabs));
                 }
             }
             sb.Append(");");
-            if (storeHashCode)
+            if (config.StoreHashCode)
             {
                 sb.AppendLine();
                 sb.Append($"return {StoredHashCode}.Value;");
@@ -125,23 +128,15 @@ namespace Aspects
             return sb.ToString();
         }
 
-        private string MemberHash(DataMemberSymbolInfo member, bool nullableEnabled)
+        private string MemberHash(DataMemberSymbolInfo member, TypeInfo containingType)
         {
             var memberConfig = GetEqualityConfigAttribute(member);
-            var nullSafe = HasNullSafeConfig(member, memberConfig, nullableEnabled);
+            var nullSafety = GetNullSafety(member, memberConfig);
 
-            return Snippets.GetHashCode(member, nullSafe, memberConfig.EqualityComparer);
-        }
+            var isNullSafe = nullSafety == NullSafety.On ||
+                nullSafety == NullSafety.Auto && (!containingType.HasNullableEnabled || member.Type.HasNullableAnnotation());
 
-        private static bool HasNullSafeConfig(DataMemberSymbolInfo member, IEqualityComparisonConfigAttribute memberConfig, bool nullableEnabled)
-        {
-            var nullSafe = GetNullSafety(member, memberConfig);
-            if (nullSafe == NullSafety.Off)
-                return false;
-            if (nullSafe == NullSafety.On)
-                return member.Type.IsReferenceType;
-
-            return !nullableEnabled || member.Type.HasNullableAnnotation();
+            return Snippets.GetHashCode(member, isNullSafe, memberConfig.EqualityComparer);
         }
 
         private static NullSafety GetNullSafety(DataMemberSymbolInfo member, IEqualityComparisonConfigAttribute memberConfig)
@@ -152,6 +147,9 @@ namespace Aspects
                 return NullSafety.Off;
             if (member.HasMaybeNullAttribute())
                 return NullSafety.On;
+            if (ComparerSupportsNullSafe(memberConfig.EqualityComparer, member.Type))
+                return NullSafety.Off;
+
             return NullSafety.Auto;
         }
 
@@ -170,6 +168,12 @@ namespace Aspects
             return typeInfo.Symbol.IsReferenceType && (
                 config.BaseCall == BaseCall.On
                 || config.BaseCall == BaseCall.Auto && typeInfo.Symbol.BaseType is ITypeSymbol syBase && syBase.OverridesGetHashCode());
+        }
+
+        private static bool ComparerSupportsNullSafe(string comparer, ITypeSymbol memberType)
+        {
+            return !string.IsNullOrEmpty(comparer)
+                && EqualityComparerInfo.HashCodeSupportsNullable(comparer, memberType);
         }
     }
 }

@@ -21,13 +21,13 @@ namespace Aspects.Test.Equals
             => CodeInfo(memberName).AspectsArrayEquality(nullSafe);
 
         public static string Comparer(Type containingType, string memberName, bool nullSafe)
-            => CodeInfo(memberName).ComparerEquality(GetComparer(containingType, memberName), nullSafe);
+            => CodeInfo(memberName).ComparerEquality(Test.Comparer.FromMember(containingType, memberName), nullSafe);
 
         public static string Comparer(string comparer, string memberName, bool nullSafe)
             => CodeInfo(memberName).ComparerEquality(comparer, nullSafe);
 
         public static string ComparerNullableNonReferenceType(Type containingType, string memberName, bool nullSafe)
-            => CodeInfo(memberName).ComparerNullableNonReferenceTypeEquality(GetComparer(containingType, memberName), nullSafe);
+            => CodeInfo(memberName).ComparerNullableNonReferenceTypeEquality(Test.Comparer.FromMember(containingType, memberName), nullSafe);
 
         public static string ComparerNullableNonReferenceType(string comparer, string memberName, bool nullSafe)
             => CodeInfo(memberName).ComparerNullableNonReferenceTypeEquality(comparer, nullSafe);
@@ -53,18 +53,5 @@ namespace Aspects.Test.Equals
 
         private static EqualityCodeInfo CodeInfo(string memberName) 
             => new (memberName, $"#i.{memberName}");
-
-        private static string GetComparer(Type type, string member)
-        {
-            var comparerName = type.GetMember(member, BindingFlags.Instance | BindingFlags.Public)[0].GetCustomAttributesData()
-                .First(attData => attData.ConstructorArguments.Any(ca => ca.ArgumentType == typeof(Type)))!.ConstructorArguments
-                .First(ca => ca.ArgumentType == typeof(Type)).ToString();
-
-            if (comparerName.StartsWith("typeof("))
-                comparerName = comparerName[7..];
-            comparerName = comparerName.TrimEnd(')');
-
-            return comparerName.Replace('+', '.');
-        }
     }
 }

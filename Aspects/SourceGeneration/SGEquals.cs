@@ -8,6 +8,7 @@ using Microsoft.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using TypeInfo = Aspects.SourceGeneration.Common.TypeInfo;
+using Aspects.Util.SymbolExtensions;
 
 #pragma warning disable IDE0130
 
@@ -128,6 +129,7 @@ namespace Aspects
                 ? $"({snippet})"
                 : snippet;
         }
+
 
         private IEqualityComparisonConfigAttribute GetEqualityConfigAttribute(DataMemberSymbolInfo symbolInfo)
         {

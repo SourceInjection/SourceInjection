@@ -1,6 +1,6 @@
 ﻿namespace Aspects.Common
 {
-    internal class NameOf
+    internal static class NameOf
     {
         public static string GenericIEnumerable { get; } = "System.Collections.Generic.IEnumerable";
 
@@ -25,5 +25,9 @@
         public static string MaybeNullAttribute { get; } = "System.Diagnostics.CodeAnalysis.MaybeNullAttribute";
 
         public static string NotNullAttribute { get; } = "System.Diagnostics.CodeAnalysis.NotNullAttribute";
+
+        public static string DisallowNullAttribute { get; } = "System.Diagnostics.CodeAnalysis.DisallowNullAttribute";
+
+        public static string AllowNullAttribute { get; } = "System.Diagnostics.CodeAnalysis.AllowNullAttribute";
     }
 }

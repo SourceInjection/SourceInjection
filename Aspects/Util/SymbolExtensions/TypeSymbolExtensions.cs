@@ -1,12 +1,11 @@
 ﻿using Aspects.Interfaces;
 using Aspects.Common;
-using Aspects.Util.SymbolExtensions;
 using Microsoft.CodeAnalysis;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Aspects.Util
+namespace Aspects.Util.SymbolExtensions
 {
     internal static class TypeSymbolExtensions
     {
@@ -16,7 +15,7 @@ namespace Aspects.Util
                 return ats.Rank == 1 && CanUseObjectMethods(ats.ElementType);
 
             return type is INamedTypeSymbol nts
-                && IsKnownGenericCollection(type)
+                && type.IsKnownGenericCollection()
                 && nts.TypeArguments.All(ta => CanUseObjectMethods(ta));
         }
 
@@ -26,7 +25,7 @@ namespace Aspects.Util
                 return CanUseObjectMethods(ats.ElementType);
 
             return type is INamedTypeSymbol nts
-                && IsKnownGenericCollection(type)
+                && type.IsKnownGenericCollection()
                 && nts.TypeArguments.All(ta => CanUseObjectMethods(ta));
         }
 
@@ -43,8 +42,8 @@ namespace Aspects.Util
         {
             var name = requiredType.ToDisplayString().TrimEnd('?');
 
-            return symbol.Inheritance().Any(sy => IsType(sy, name, true))
-                || symbol.AllInterfaces.Any(sy => IsType(sy, name, true));
+            return symbol.Inheritance().Any(sy => sy.IsType(name, true))
+                || symbol.AllInterfaces.Any(sy => sy.IsType(name, true));
         }
 
         public static bool HasNullableAnnotation(this ITypeSymbol symbol)
@@ -75,7 +74,7 @@ namespace Aspects.Util
         {
             return symbol.HasAttributeOfType<IAutoEqualsAttribute>()
                 || symbol.GetMembers().Any(m => m.HasAttributeOfType<IEqualsAttribute>())
-                || symbol.GetMembers().OfType<IMethodSymbol>().Any(m => 
+                || symbol.GetMembers().OfType<IMethodSymbol>().Any(m =>
                     m.Name == nameof(Equals)
                     && m.IsOverride
                     && m.ReturnType.IsBoolean()
@@ -109,7 +108,7 @@ namespace Aspects.Util
                 || symbol.IsDouble(allowNullable)
                 || symbol.IsDecimal(allowNullable)
                 || symbol.IsChar(allowNullable)
-                || (symbol.IsNativeIntegerType || symbol.TypeKind == TypeKind.Pointer) 
+                || (symbol.IsNativeIntegerType || symbol.TypeKind == TypeKind.Pointer)
                     && (!symbol.HasNullableAnnotation() || allowNullable);
         }
 

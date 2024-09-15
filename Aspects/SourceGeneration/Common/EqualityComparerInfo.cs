@@ -11,10 +11,27 @@ namespace Aspects.SourceGeneration.Common
     {
         public static bool HashCodeSupportsNullable(string comparerName, ITypeSymbol argType)
         {
-            // TODO
-            return true;
-        }
+            var types = TypeInfo.GetTypes(comparerName);
+            if (types.Count > 0)
+            {
+                var equalsMethod = types.SelectMany(t => t.Symbol.GetAllMembers())
+                    .OfType<IMethodSymbol>()
+                    .FirstOrDefault(m => IsComparerGetHashCodeMethod(m, argType));
 
+                return equalsMethod != null
+                    && SupportsNullable(equalsMethod.Parameters[0]);
+            }
+
+            var type = Type.GetType(comparerName);
+            if (type != null)
+            {
+                var equalsMethod = Array.Find(type.GetMethods(), m => IsComparerGetHashCodeMethod(m, argType));
+
+                return equalsMethod != null
+                    && SupportsNullable(equalsMethod.GetParameters()[0]);
+            }
+            return false;
+        }
 
         public static bool EqualsSupportsNullable(string comparerName, ITypeSymbol argType)
         {
@@ -26,19 +43,46 @@ namespace Aspects.SourceGeneration.Common
                     .FirstOrDefault(m => IsComparerEqualsMethod(m, argType));
 
                 return equalsMethod != null
-                    && equalsMethod.Parameters.All(p => p.Type.HasNullableAnnotation() || p.Type.HasMaybeNullAttribute());
+                    && equalsMethod.Parameters.All(p => SupportsNullable(p));
             }
 
             var type = Type.GetType(comparerName);
             if (type != null)
             {
-                var equalsMethod = type.GetMethods()
-                    .FirstOrDefault(m => IsComparerEqualsMethod(m, argType));
+                var equalsMethod = Array.Find(type.GetMethods(), m => IsComparerEqualsMethod(m, argType));
 
                 return equalsMethod != null
-                    && equalsMethod.GetParameters().All(p => Nullable.GetUnderlyingType(p.ParameterType) != null);
+                    && Array.TrueForAll(equalsMethod.GetParameters(), p => SupportsNullable(p));
             }
             return false;
+        }
+
+        private static bool SupportsNullable(ParameterInfo parameter)
+        {
+            return !parameter.CustomAttributes.Any(a => a.IsDisallowNullAttribute())
+                && (Nullable.GetUnderlyingType(parameter.ParameterType) != null || parameter.CustomAttributes.Any(a => a.IsAllowNullAttribute()));
+        }
+
+        private static bool SupportsNullable(IParameterSymbol parameter)
+        {
+            return !parameter.Type.HasDisallowNullAttribute()
+                && (parameter.Type.HasNullableAnnotation() || parameter.Type.HasAllowNullAttribute());
+        }
+
+        private static bool IsComparerGetHashCodeMethod(IMethodSymbol method, ITypeSymbol argType)
+        {
+            return method.Name == nameof(GetHashCode)
+                && method.ReturnType.IsInt32()
+                && method.Parameters.Length == 1
+                && argType.Is(method.Parameters[0].Type);
+        }
+
+        private static bool IsComparerGetHashCodeMethod(MethodInfo method, ITypeSymbol argType)
+        {
+            return method.Name == nameof(GetHashCode)
+                && method.ReturnType == typeof(int)
+                && method.GetParameters().Length == 1
+                && IsAssignableFrom(method.GetParameters()[0].ParameterType, argType);
         }
 
         private static bool IsComparerEqualsMethod(IMethodSymbol method, ITypeSymbol argType)
@@ -54,7 +98,7 @@ namespace Aspects.SourceGeneration.Common
             return method.Name == nameof(Equals)
                 && method.ReturnType == typeof(bool)
                 && method.GetParameters().Length == 2
-                && method.GetParameters().All(p => IsAssignableFrom(p.ParameterType, argType));
+                && Array.TrueForAll(method.GetParameters(), p => IsAssignableFrom(p.ParameterType, argType));
         }
 
         private static bool IsAssignableFrom(Type type, ITypeSymbol argType)
@@ -63,7 +107,7 @@ namespace Aspects.SourceGeneration.Common
             if(Nullable.GetUnderlyingType(type) != null)
                 type = Nullable.GetUnderlyingType(type);
 
-            if(type.GetInterfaces().Any(itf => itf.FullName == argTypeName))
+            if(Array.Exists(type.GetInterfaces(), itf => itf.FullName == argTypeName))
                 return true;
 
             do

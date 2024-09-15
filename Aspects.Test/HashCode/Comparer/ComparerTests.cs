@@ -7,6 +7,7 @@ namespace Aspects.Test.HashCode.Comparer
     [TestFixture]
     internal class ComparerTests
     {
+
         [Test]
         public void ClassWithIntPropertyAndNonNullableComparer_IsNotNullSafe()
         {
@@ -53,7 +54,7 @@ namespace Aspects.Test.HashCode.Comparer
             var sut = HashCodeMethod.FromType<ClassWithNullableIntPropertyAndNonNullableComparer>();
             var type = typeof(ClassWithNullableIntPropertyAndNonNullableComparer);
             var property = nameof(ClassWithNullableIntPropertyAndNonNullableComparer.Int);
-            var memberHash = HashCode.Comparer(type, property, true);
+            var memberHash = HashCode.ComparerNullableNonReferenceType(type, property, true);
 
             var expectedCode = HashCode.CombineMethodBody(type, memberHashs: memberHash);
 
