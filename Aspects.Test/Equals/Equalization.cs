@@ -21,13 +21,13 @@ namespace Aspects.Test.Equals
             => CodeInfo(memberName).AspectsArrayEquality(nullSafe);
 
         public static string Comparer(Type containingType, string memberName, bool nullSafe)
-            => CodeInfo(memberName).ComparerEquality(Test.Comparer.FromMember(containingType, memberName), nullSafe);
+            => CodeInfo(memberName).ComparerEquality(Test.EqualityComparer.FromMember(containingType, memberName), nullSafe);
 
         public static string Comparer(string comparer, string memberName, bool nullSafe)
             => CodeInfo(memberName).ComparerEquality(comparer, nullSafe);
 
         public static string ComparerNullableNonReferenceType(Type containingType, string memberName, bool nullSafe)
-            => CodeInfo(memberName).ComparerNullableNonReferenceTypeEquality(Test.Comparer.FromMember(containingType, memberName), nullSafe);
+            => CodeInfo(memberName).ComparerNullableNonReferenceTypeEquality(Test.EqualityComparer.FromMember(containingType, memberName), nullSafe);
 
         public static string ComparerNullableNonReferenceType(string comparer, string memberName, bool nullSafe)
             => CodeInfo(memberName).ComparerNullableNonReferenceTypeEquality(comparer, nullSafe);

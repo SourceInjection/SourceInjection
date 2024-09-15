@@ -2,7 +2,7 @@
 
 namespace Aspects.Test
 {
-    internal static class Comparer
+    internal static class EqualityComparer
     {
         public static string FromMember(Type containingType, string member)
         {
@@ -12,9 +12,12 @@ namespace Aspects.Test
 
             if (comparerName.StartsWith("typeof("))
                 comparerName = comparerName[7..];
-            comparerName = comparerName.TrimEnd(')').Replace('+', '.');
+            comparerName = comparerName.TrimEnd(')');
 
-            return comparerName[(comparerName.LastIndexOf('.') + 1)..];
+            if (comparerName.Contains('+'))
+                return comparerName[(comparerName.LastIndexOf('+') + 1)..];
+
+            return comparerName;
         }
     }
 }

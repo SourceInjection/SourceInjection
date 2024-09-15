@@ -6,10 +6,10 @@ namespace Aspects.Test.HashCode
     internal static class HashCode
     {
         public static string Comparer(Type containingType, string memberName, bool nullSafe)
-            => new HashCodeCodeInfo(memberName).ComparerHashCode(Test.Comparer.FromMember(containingType, memberName), nullSafe);
+            => new HashCodeCodeInfo(memberName).ComparerHashCode(Test.EqualityComparer.FromMember(containingType, memberName), nullSafe);
 
         public static string ComparerNullableNonReferenceType(Type containingType, string memberName, bool nullSafe)
-            => new HashCodeCodeInfo(memberName).ComparerNullableNonReferenceTypeHashCode(Test.Comparer.FromMember(containingType, memberName), nullSafe);
+            => new HashCodeCodeInfo(memberName).ComparerNullableNonReferenceTypeHashCode(Test.EqualityComparer.FromMember(containingType, memberName), nullSafe);
 
         public static string DeepCombined(string memberName, bool nullSafe)
             => new HashCodeCodeInfo(memberName).DeepCombinedHashCode(nullSafe);
