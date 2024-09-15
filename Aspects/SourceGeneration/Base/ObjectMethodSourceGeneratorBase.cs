@@ -1,5 +1,4 @@
 ﻿using Aspects.Interfaces;
-using Aspects.SourceGeneration.Base.DataMembers;
 using Aspects.SourceGeneration.DataMembers;
 using Aspects.Util;
 using Microsoft.CodeAnalysis;
