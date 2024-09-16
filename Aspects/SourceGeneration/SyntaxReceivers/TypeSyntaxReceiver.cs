@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Generic;
-using TypeInfo = Aspects.SourceGeneration.Common.TypeInfo;
+using TypeInfo = Aspects.Common.TypeInfo;
 
 namespace Aspects.SourceGeneration.SyntaxReceivers
 {

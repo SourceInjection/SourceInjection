@@ -7,7 +7,7 @@ using Aspects.Util;
 using Microsoft.CodeAnalysis;
 using System.Linq;
 using System.Text;
-using TypeInfo = Aspects.SourceGeneration.Common.TypeInfo;
+using TypeInfo = Aspects.Common.TypeInfo;
 using Aspects.Util.SymbolExtensions;
 using Aspects.SourceGeneration;
 

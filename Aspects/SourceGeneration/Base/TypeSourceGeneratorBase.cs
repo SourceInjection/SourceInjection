@@ -1,12 +1,12 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 using System.Text;
-using TypeInfo = Aspects.SourceGeneration.Common.TypeInfo;
-using static Aspects.SourceGeneration.Diagnostics.Errors;
+using TypeInfo = Aspects.Common.TypeInfo;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Aspects.SourceGeneration.SyntaxReceivers;
+using Aspects.SourceGeneration.Diagnostics;
 
 namespace Aspects.SourceGeneration.Base
 {
@@ -28,9 +28,9 @@ namespace Aspects.SourceGeneration.Base
                 foreach (var typeInfo in SyntaxReceiver.IdentifiedTypes)
                 {
                     if (typeInfo.SyntaxNode.Parent is TypeDeclarationSyntax)
-                        context.ReportDiagnostic(NestedClassesAreNotSupported(typeInfo.Symbol, Name));
+                        context.ReportDiagnostic(Errors.NestedClassesAreNotSupported(typeInfo.Symbol, Name));
                     else if (!typeInfo.HasPartialModifier)
-                        context.ReportDiagnostic(MissingPartialModifier(typeInfo.Symbol, Name));
+                        context.ReportDiagnostic(Errors.MissingPartialModifier(typeInfo.Symbol, Name));
                     else
                     {
                         var src = GeneratePartialType(typeInfo);

@@ -2,7 +2,7 @@
 using Aspects.SourceGeneration.Base;
 using Microsoft.CodeAnalysis;
 using System.Text;
-using TypeInfo = Aspects.SourceGeneration.Common.TypeInfo;
+using TypeInfo = Aspects.Common.TypeInfo;
 using Aspects.SourceGeneration;
 
 #pragma warning disable IDE0130

@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
-using TypeInfo = Aspects.SourceGeneration.Common.TypeInfo;
+using TypeInfo = Aspects.Common.TypeInfo;
 using Aspects.SourceGeneration.SyntaxReceivers;
 using Aspects.SourceGeneration.DataMembers;
 using Aspects.SourceGeneration;
