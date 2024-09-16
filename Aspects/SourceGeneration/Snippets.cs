@@ -96,6 +96,7 @@ namespace Aspects.SourceGeneration
 
                 if (!member.Type.IsReferenceType && member.Type.HasNullableAnnotation() && !suportsNullable)
                     return HashCodeSnippets.ComparerNullableNonReferenceTypeHashCode(member.Name, comparer, nullSafe);
+
                 nullSafe = nullSafe && (member.Type.IsReferenceType || member.Type.HasNullableAnnotation());
                 return HashCodeSnippets.ComparerHashCode(member.Name, comparer, nullSafe);
             }

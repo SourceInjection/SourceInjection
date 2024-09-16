@@ -22,11 +22,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Aspects.Test.Comparers\Aspects.Test.Comparers.csproj" />
     <ProjectReference Include="..\Aspects\Aspects.csproj" OutputItemType="Analyzer" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="NullableDetection\" />
   </ItemGroup>
   <Target Name="Cleanup" AfterTargets="Clean">
     <RemoveDir Directories="$(ProjectDir)$(BaseIntermediateOutputPath)$(Configuration)\net8.0\generated\Aspects" />

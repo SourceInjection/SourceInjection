@@ -26,9 +26,6 @@ namespace Aspects.Test.Equals.Comparer
         }
     }
 
-    [AutoEquals]
-    public partial class ClassEmpty { }
-
     public partial class ClassWithMember_ThatHasCustomComparer_EqualsConfig
     {
         private class IntComparer : ComparerBase<int> { }
@@ -44,47 +41,6 @@ namespace Aspects.Test.Equals.Comparer
 
         [EqualityComparer(equalityComparer: typeof(IntComparer))]
         public int Property { get; }
-    }
-
-    public partial class ClassWithNullableNonReferenceTypeMember_ThatHasNonNullableComparer
-    {
-        private class IntComparer : ComparerBase<int> { }
-
-        [Equals(equalityComparer: typeof(IntComparer))]
-        public int? Property { get; set; }
-    }
-
-
-    public partial class ClassWithNullableNonReferenceTypeMember_ThatHasNullableComparer
-    {
-        private class IntComparer : NullableComparerBase<int?> { }
-
-        [Equals(equalityComparer: typeof(IntComparer))]
-        public int? Property { get; set; }
-    }
-
-    public partial class ClassWithNullableNonReferenceTypeMember_ThatHasNullableComparer_WithNullsafetyOn
-    {
-        private class IntComparer : NullableComparerBase<int?> { }
-
-        [Equals(equalityComparer: typeof(IntComparer), nullSafety: NullSafety.On)]
-        public int? Property { get; set; }
-    }
-
-    public partial class ClassWithNullableNonReferenceTypeMember_ThatHasNonNullableComparer_WithNullsafetyOff
-    {
-        private class IntComparer : ComparerBase<int> { }
-
-        [Equals(equalityComparer: typeof(IntComparer), nullSafety: NullSafety.Off)]
-        public int? Property { get; set; }
-    }
-
-    public partial class ClassWithNullableMember_ThatHasNullableComparer
-    {
-        private class Comparer : ComparerBase<ClassEmpty?> { }
-
-        [Equals(equalityComparer: typeof(Comparer))]
-        public ClassEmpty? Property { get; set; }
     }
 }
 

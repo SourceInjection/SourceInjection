@@ -7,8 +7,13 @@ namespace Aspects.Test.Equals
     {
         public static IMethod FromType<T>(bool useObjectMethod = false)
         {
-            var cu = CompileUnit.FromGeneratedCode<SGEquals, T>();
-            var typeName = useObjectMethod ? "object" : typeof(T).Name;
+            return FromType(typeof(T), useObjectMethod);
+        }
+
+        public static IMethod FromType(Type type, bool useObjectMethod = false)
+        {
+            var cu = CompileUnit.FromGeneratedCode<SGEquals>(type);
+            var typeName = useObjectMethod ? "object" : type.Name;
             return cu.AllChildren()
                 .OfType<IMethod>()
                 .Single(m => IsTypedEqualsMethod(m, typeName));
