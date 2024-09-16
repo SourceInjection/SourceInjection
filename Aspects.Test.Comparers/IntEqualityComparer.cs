@@ -1,6 +1,6 @@
 ﻿namespace Aspects.Test.Comparers
 {
-    internal class IntEqualityComparer : IEqualityComparer<int>
+    public class IntEqualityComparer : IEqualityComparer<int>
     {
         public bool Equals(int x, int y)
         {

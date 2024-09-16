@@ -4,6 +4,21 @@ namespace Aspects.Test.Equals.Comparer
 {
     using NullSafety = Aspects.NullSafety;
 
+    internal static class ComparerResources
+    {
+        public static readonly Type[] Types =
+        {
+            typeof(ClassWithComparerAsMember_WithEqualsConfig),
+            typeof(ClassWithComparerAsMember_WithComparerAttribute),
+            typeof(ClassWithExternComparer_WithEqualsConfig),
+            typeof(ClassWithExternComparer_WithComparerAttribute),
+            typeof(ClassWithGenericComparer_WithEqualsConfig),
+            typeof(ClassWithGenericComparer_WithComparerAttribute),
+            typeof(ClassWithExternGenericComparer_WithEqualsConfig),
+            typeof(ClassWithExternGenericComparer_WithComparerAttribute),
+        };
+    }
+
     internal class ComparerBase<T> : IEqualityComparer<T>
     {
         public bool Equals(T x, T y) => x.Equals(y);
@@ -26,7 +41,7 @@ namespace Aspects.Test.Equals.Comparer
         }
     }
 
-    public partial class ClassWithMember_ThatHasCustomComparer_EqualsConfig
+    public partial class ClassWithComparerAsMember_WithEqualsConfig
     {
         private class IntComparer : ComparerBase<int> { }
 
@@ -35,11 +50,48 @@ namespace Aspects.Test.Equals.Comparer
     }
 
     [AutoEquals]
-    public partial class ClassWithMember_ThatHasCustomComparer_ComparerAttribute
+    public partial class ClassWithComparerAsMember_WithComparerAttribute
     {
-        private class IntComparer : ComparerBase<int> { }
+        [EqualityComparer(equalityComparer: typeof(Comparers.IntEqualityComparer))]
+        public int Property { get; }
+    }
 
-        [EqualityComparer(equalityComparer: typeof(IntComparer))]
+    public partial class ClassWithExternComparer_WithEqualsConfig
+    {
+        [Equals(equalityComparer: typeof(Comparers.IntEqualityComparer))]
+        public int Property { get; }
+    }
+
+    [AutoEquals]
+    public partial class ClassWithExternComparer_WithComparerAttribute
+    {
+        [EqualityComparer(equalityComparer: typeof(Comparers.IntEqualityComparer))]
+        public int Property { get; }
+    }
+
+    public partial class ClassWithGenericComparer_WithEqualsConfig
+    {
+        [Equals(equalityComparer: typeof(ComparerBase<int>))]
+        public int Property { get; }
+    }
+
+    [AutoEquals]
+    public partial class ClassWithGenericComparer_WithComparerAttribute
+    {
+        [EqualityComparer(equalityComparer: typeof(ComparerBase<int>))]
+        public int Property { get; }
+    }
+
+    public partial class ClassWithExternGenericComparer_WithEqualsConfig
+    {
+        [Equals(equalityComparer: typeof(Comparers.GenericEqualityComparer<int>))]
+        public int Property { get; }
+    }
+
+    [AutoEquals]
+    public partial class ClassWithExternGenericComparer_WithComparerAttribute
+    {
+        [EqualityComparer(equalityComparer: typeof(Comparers.GenericEqualityComparer<int>))]
         public int Property { get; }
     }
 }

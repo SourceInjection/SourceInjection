@@ -1,17 +1,18 @@
 ﻿namespace Aspects.Test.Comparers
 {
-    public class ObjectEqualityComparer : IEqualityComparer<object>
+    public class GenericEqualityComparer<T> : IEqualityComparer<T>
     {
 #pragma warning disable CS8767 // Nullability of reference types in type of parameter doesn't match implicitly implemented member (possibly because of nullability attributes).
-        public new bool Equals(object x, object y)
+        public bool Equals(T x, T y)
 #pragma warning restore CS8767 // Nullability of reference types in type of parameter doesn't match implicitly implemented member (possibly because of nullability attributes).
         {
-            return x.Equals(y);
+            return x is null && y is null
+                || x is not null && y is not null && x.Equals(y);
         }
 
-        public int GetHashCode(object obj)
+        public int GetHashCode(T obj)
         {
-            return obj.GetHashCode();
+            return obj is null ? 0 : obj.GetHashCode();
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace Aspects.Test.Comparers
 {
-    internal class NullableObjectEqualityComparer : IEqualityComparer<object?>
+    public class NullableObjectEqualityComparer : IEqualityComparer<object?>
     {
         public new bool Equals(object? x, object? y)
         {
