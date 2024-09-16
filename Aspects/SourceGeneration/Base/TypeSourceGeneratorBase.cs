@@ -5,7 +5,6 @@ using TypeInfo = Aspects.SourceGeneration.Common.TypeInfo;
 using static Aspects.SourceGeneration.Diagnostics.Errors;
 using System.Collections.Generic;
 using System.Linq;
-using Aspects.SourceGeneration.Common;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Aspects.SourceGeneration.SyntaxReceivers;
 

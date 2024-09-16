@@ -1,5 +1,5 @@
 ﻿using Aspects.Interfaces;
-using Aspects.SourceGeneration.Common;
+using Aspects.SourceGeneration;
 using System;
 using System.ComponentModel;
 

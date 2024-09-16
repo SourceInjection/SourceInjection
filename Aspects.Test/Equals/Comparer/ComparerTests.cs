@@ -6,7 +6,6 @@ namespace Aspects.Test.Equals.Comparer
     internal class ComparerTests
     {
         const string propertyName = "Property";
-        const string intComparerName = "IntComparer";
         const string comparerName = "Comparer";
 
         private static Action BuildEqualization<TType>() 
@@ -17,7 +16,7 @@ namespace Aspects.Test.Equals.Comparer
         public void ComparerEqualization_WithMemberConfig_UsesComparer()
         {
             var sut = EqualsMethod.FromType<ClassWithMember_ThatHasCustomComparer_EqualsConfig>();
-            var comparerCode = Equalization.Comparer(intComparerName, propertyName, false);
+            var comparerCode = Equalization.Comparer(typeof(ClassWithMember_ThatHasCustomComparer_EqualsConfig), propertyName, false);
 
             Assert.That(sut.Body.Contains(comparerCode));
         }
@@ -26,7 +25,7 @@ namespace Aspects.Test.Equals.Comparer
         public void ComparerEqualization_WithComparerAttribute_UsesComparer()
         {
             var sut = EqualsMethod.FromType<ClassWithMember_ThatHasCustomComparer_ComparerAttribute>();
-            var comparerCode = Equalization.Comparer(intComparerName, propertyName, false);
+            var comparerCode = Equalization.Comparer(typeof(ClassWithMember_ThatHasCustomComparer_ComparerAttribute), propertyName, false);
 
             Assert.That(sut.Body.Contains(comparerCode));
         }
@@ -49,7 +48,7 @@ namespace Aspects.Test.Equals.Comparer
         public void ComparerEqualization_WithNullableComparer_WithNullableNonReferenceProperty_WithNullSafetyOn_IsNullSafe()
         {
             var sut = EqualsMethod.FromType<ClassWithNullableNonReferenceTypeMember_ThatHasNullableComparer_WithNullsafetyOn>();
-            var comparerCode = Equalization.Comparer(intComparerName, propertyName, true);
+            var comparerCode = Equalization.Comparer(typeof(ClassWithNullableNonReferenceTypeMember_ThatHasNullableComparer_WithNullsafetyOn), propertyName, true);
 
             Assert.That(sut.Body.Contains(comparerCode));
         }
@@ -58,8 +57,9 @@ namespace Aspects.Test.Equals.Comparer
         public void ComparerEqualization_WithNonNullableComparer_WithNullableNonReferenceProperty_IsNotNullSafe()
         {
             var sut = EqualsMethod.FromType<ClassWithNullableNonReferenceTypeMember_ThatHasNullableComparer>();
-            var comparerCode = Equalization.Comparer(intComparerName, propertyName, false);
-            var nullSafeCode = Equalization.Comparer(comparerCode, propertyName, true);
+            var type = typeof(ClassWithNullableNonReferenceTypeMember_ThatHasNullableComparer);
+            var comparerCode = Equalization.Comparer(type, propertyName, false);
+            var nullSafeCode = Equalization.Comparer(type, propertyName, true);
 
             Assert.Multiple(() =>
             {
@@ -72,8 +72,9 @@ namespace Aspects.Test.Equals.Comparer
         public void ComparerEqualization_WithNullableComparer_WithNullableProperty_IsNotNullSafe()
         {
             var sut = EqualsMethod.FromType<ClassWithNullableMember_ThatHasNullableComparer>();
-            var comparerCode = Equalization.Comparer(comparerName, propertyName, false);
-            var nullSafeCode = Equalization.Comparer(comparerName, propertyName, true);
+            var type = typeof(ClassWithNullableMember_ThatHasNullableComparer);
+            var comparerCode = Equalization.Comparer(type, propertyName, false);
+            var nullSafeCode = Equalization.Comparer(type, propertyName, true);
 
             Assert.Multiple(() =>
             {

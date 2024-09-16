@@ -1,4 +1,4 @@
-﻿using Aspects.SourceGeneration.Common;
+﻿using Aspects.SourceGeneration.SnippetsHelper;
 using System.Text;
 
 namespace Aspects.Test.HashCode
@@ -6,16 +6,16 @@ namespace Aspects.Test.HashCode
     internal static class HashCode
     {
         public static string Comparer(Type containingType, string memberName, bool nullSafe)
-            => new HashCodeCodeInfo(memberName).ComparerHashCode(Test.EqualityComparer.FromMember(containingType, memberName), nullSafe);
+            => HashCodeSnippets.ComparerHashCode(memberName, EqualityComparer.FromMember(containingType, memberName), nullSafe);
 
         public static string ComparerNullableNonReferenceType(Type containingType, string memberName, bool nullSafe)
-            => new HashCodeCodeInfo(memberName).ComparerNullableNonReferenceTypeHashCode(Test.EqualityComparer.FromMember(containingType, memberName), nullSafe);
+            => HashCodeSnippets.ComparerNullableNonReferenceTypeHashCode(memberName, EqualityComparer.FromMember(containingType, memberName), nullSafe);
 
         public static string DeepCombined(string memberName, bool nullSafe)
-            => new HashCodeCodeInfo(memberName).DeepCombinedHashCode(nullSafe);
+            => HashCodeSnippets.DeepCombinedHashCode(memberName, nullSafe);
 
         public static string Combined(string memberName, bool nullSafe)
-            => new HashCodeCodeInfo(memberName).CombinedHashCode(nullSafe);
+            => HashCodeSnippets.CombinedHashCode(memberName, nullSafe);
 
         public static string CombineMethodBody(Type type, bool includeBase = false, bool storehashCode = false, params string[] memberHashs)
         {

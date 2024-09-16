@@ -1,36 +1,31 @@
-﻿using Aspects.SourceGeneration.Common;
-using System.Reflection;
+﻿using Aspects.SourceGeneration.SnippetsHelper;
 
 namespace Aspects.Test.Equals
 {
     internal static class Equalization
     {
         public static string Operator(string memberName)
-            => CodeInfo(memberName).OperatorEquality();
+            => EqualizationSnippets.OperatorEquality(memberName, $"#i.{memberName}", false);
 
         public static string Equals(string memberName, bool nullSafe)
-            => CodeInfo(memberName).MethodEquality(nullSafe);
+            => EqualizationSnippets.MethodEquality(memberName, $"#i.{memberName}", nullSafe, false);
 
         public static string LinqCollection(string memberName, bool nullSafe)
-            => CodeInfo(memberName).LinqSequenceEquality(nullSafe);
+            => EqualizationSnippets.LinqSequenceEquality(memberName, $"#i.{memberName}", nullSafe, false);
 
         public static string AspectsCollection(string memberName, bool nullSafe)
-            => CodeInfo(memberName).AspectsSequenceEquality(nullSafe);
+            => EqualizationSnippets.AspectsSequenceEquality(memberName, $"#i.{memberName}", nullSafe, false);
 
         public static string AspectsArray(string memberName, bool nullSafe)
-            => CodeInfo(memberName).AspectsArrayEquality(nullSafe);
+            => EqualizationSnippets.AspectsArrayEquality(memberName, $"#i.{memberName}", nullSafe, false);
 
         public static string Comparer(Type containingType, string memberName, bool nullSafe)
-            => CodeInfo(memberName).ComparerEquality(Test.EqualityComparer.FromMember(containingType, memberName), nullSafe);
-
-        public static string Comparer(string comparer, string memberName, bool nullSafe)
-            => CodeInfo(memberName).ComparerEquality(comparer, nullSafe);
+            => EqualizationSnippets.ComparerEquality(
+                EqualityComparer.FromMember(containingType, memberName), memberName, $"#i.{memberName}", nullSafe, false);
 
         public static string ComparerNullableNonReferenceType(Type containingType, string memberName, bool nullSafe)
-            => CodeInfo(memberName).ComparerNullableNonReferenceTypeEquality(Test.EqualityComparer.FromMember(containingType, memberName), nullSafe);
-
-        public static string ComparerNullableNonReferenceType(string comparer, string memberName, bool nullSafe)
-            => CodeInfo(memberName).ComparerNullableNonReferenceTypeEquality(comparer, nullSafe);
+            => EqualizationSnippets.ComparerNullableNonReferenceTypeEquality(
+                EqualityComparer.FromMember(containingType, memberName), memberName, $"#i.{memberName}", nullSafe, false);
 
         public static Action Build<TType>(string propertyName)
         {
@@ -50,8 +45,5 @@ namespace Aspects.Test.Equals
                 lhs.Equals(rhs);
             };
         }
-
-        private static EqualityCodeInfo CodeInfo(string memberName) 
-            => new (memberName, $"#i.{memberName}");
     }
 }

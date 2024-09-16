@@ -1,7 +1,6 @@
 ﻿using Aspects.Interfaces;
 using Aspects.Common;
 using Aspects.SourceGeneration.Base;
-using Aspects.SourceGeneration.Common;
 using Aspects.Util;
 using Aspects.Util.SymbolExtensions;
 using Microsoft.CodeAnalysis;
@@ -13,6 +12,7 @@ using System.Text;
 using TypeInfo = Aspects.SourceGeneration.Common.TypeInfo;
 using Aspects.SourceGeneration.SyntaxReceivers;
 using Aspects.SourceGeneration.DataMembers;
+using Aspects.SourceGeneration;
 
 #pragma warning disable IDE0130
 

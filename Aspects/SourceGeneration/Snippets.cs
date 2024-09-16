@@ -1,9 +1,11 @@
-﻿using Aspects.SourceGeneration.DataMembers;
+﻿using Aspects.SourceGeneration.Common;
+using Aspects.SourceGeneration.DataMembers;
+using Aspects.SourceGeneration.SnippetsHelper;
 using Aspects.Util.SymbolExtensions;
 using Microsoft.CodeAnalysis;
 using System.Text;
 
-namespace Aspects.SourceGeneration.Common
+namespace Aspects.SourceGeneration
 {
     internal static class Snippets
     {
@@ -44,18 +46,14 @@ namespace Aspects.SourceGeneration.Common
         }
 
         public static string InequalityCheck(DataMemberSymbolInfo member, string otherName, bool nullSafe, string comparer)
-        {
-            var info = new EqualityCodeInfo(member.Name, otherName, true);
-            return EqualityFromInfo(member, info, nullSafe, comparer);
-        }
+            => EqualityCheck(member, otherName, nullSafe, comparer, true);
+
 
         public static string EqualityCheck(DataMemberSymbolInfo member, string otherName, bool nullSafe, string comparer)
-        {
-            var info = new EqualityCodeInfo(member.Name, otherName);
-            return EqualityFromInfo(member, info, nullSafe, comparer);
-        }
+            => EqualityCheck(member, otherName, nullSafe, comparer, false);
 
-        private static string EqualityFromInfo(DataMemberSymbolInfo member, EqualityCodeInfo codeInfo, bool nullSafe, string comparer)
+
+        private static string EqualityCheck(DataMemberSymbolInfo member, string otherName, bool nullSafe, string comparer, bool isInequality)
         {
             if (!string.IsNullOrEmpty(comparer))
             {
@@ -63,25 +61,30 @@ namespace Aspects.SourceGeneration.Common
                 comparer = ReduceComparerName(member, comparer);
 
                 if (!member.Type.IsReferenceType && member.Type.HasNullableAnnotation() && !suportsNullable)
-                    return codeInfo.ComparerNullableNonReferenceTypeEquality(comparer, nullSafe);
-                return codeInfo.ComparerEquality(comparer, nullSafe && (member.Type.IsReferenceType || member.Type.HasNullableAnnotation()));
+                    return EqualizationSnippets.ComparerNullableNonReferenceTypeEquality(comparer, member.Name, otherName, nullSafe, isInequality);
+
+                nullSafe = nullSafe && (member.Type.IsReferenceType || member.Type.HasNullableAnnotation());
+
+                return EqualizationSnippets.ComparerEquality(comparer, member.Name, otherName, nullSafe, isInequality);
             }
 
             if (member.Type.CanUseEqualityOperatorsByDefault())
-                return codeInfo.OperatorEquality();
+                return EqualizationSnippets.OperatorEquality(member.Name, otherName, isInequality);
 
             if (!member.Type.OverridesEquals())
             {
                 if (member.Type.CanUseSequenceEquals())
-                    return codeInfo.LinqSequenceEquality(nullSafe);
+                    return EqualizationSnippets.LinqSequenceEquality(member.Name, otherName, nullSafe, isInequality);
 
                 if (member.Type is IArrayTypeSymbol arrayType && arrayType.Rank > 1)
-                    return codeInfo.AspectsArrayEquality(nullSafe);
+                    return EqualizationSnippets.AspectsArrayEquality(member.Name, otherName, nullSafe, isInequality);
 
                 if (member.Type.IsEnumerable())
-                    return codeInfo.AspectsSequenceEquality(nullSafe);
+                    return EqualizationSnippets.AspectsSequenceEquality(member.Name, otherName, nullSafe, isInequality);
             }
-            return codeInfo.MethodEquality(member.Type.IsReferenceType && nullSafe);
+            nullSafe &= member.Type.IsReferenceType;
+
+            return EqualizationSnippets.MethodEquality(member.Name, otherName, nullSafe, isInequality);
         }
 
         public static string GetHashCode(DataMemberSymbolInfo member, bool nullSafe, string comparer)
@@ -92,18 +95,17 @@ namespace Aspects.SourceGeneration.Common
                 comparer = ReduceComparerName(member, comparer);
 
                 if (!member.Type.IsReferenceType && member.Type.HasNullableAnnotation() && !suportsNullable)
-                    return new HashCodeCodeInfo(member.Name).ComparerNullableNonReferenceTypeHashCode(comparer, nullSafe);
-                return new HashCodeCodeInfo(member.Name).ComparerHashCode(comparer, nullSafe && (member.Type.IsReferenceType || member.Type.HasNullableAnnotation()));
+                    return HashCodeSnippets.ComparerNullableNonReferenceTypeHashCode(member.Name, comparer, nullSafe);
+                nullSafe = nullSafe && (member.Type.IsReferenceType || member.Type.HasNullableAnnotation());
+                return HashCodeSnippets.ComparerHashCode(member.Name, comparer, nullSafe);
             }
 
             if (!member.Type.OverridesGetHashCode())
             {
-                var info = new HashCodeCodeInfo(member.Name);
-
                 if (member.Type.CanUseCombinedHashCode())
-                    return info.CombinedHashCode(nullSafe);
+                    return HashCodeSnippets.CombinedHashCode(member.Name, nullSafe);
                 if (member.Type.IsEnumerable())
-                    return info.DeepCombinedHashCode(nullSafe);
+                    return HashCodeSnippets.DeepCombinedHashCode(member.Name,nullSafe);
             }
             return member.Name;
         }
