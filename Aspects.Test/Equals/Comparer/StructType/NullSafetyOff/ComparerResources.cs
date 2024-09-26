@@ -51,4 +51,4 @@ namespace Aspects.Test.Equals.Comparer.StructType.NullSafetyOff
         public int Property { get; set; }
     }
 }
-#pragma warning disable
+#pragma warning restore

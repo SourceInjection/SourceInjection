@@ -1,7 +1,8 @@
 ﻿using NUnit.Framework;
 using CompileUnits.CSharp;
+using Aspects.Test.Equals;
 
-namespace Aspects.Test.Equals.Comparer
+namespace Aspects.Test
 {
     internal static class ComparerAssert
     {
@@ -10,7 +11,7 @@ namespace Aspects.Test.Equals.Comparer
             var sut = EqualsMethod.FromType(type);
             var expectedMethod = comparerMethod(type, "Property", nullSafe);
 
-            if(nullSafe)
+            if (nullSafe)
                 Assert.That(sut.Body.Contains(expectedMethod));
             else
             {

@@ -15,9 +15,42 @@ namespace Aspects.Test
             comparerName = comparerName.TrimEnd(')');
 
             if (comparerName.Contains('+'))
-                return comparerName[(comparerName.LastIndexOf('+') + 1)..];
+                comparerName = comparerName[(comparerName.LastIndexOf('+') + 1)..];
 
+            if (comparerName.Contains('`'))
+                return FormatGenericType(comparerName);
             return comparerName;
+        }
+
+        private static string FormatGenericType(string comparerName)
+        {
+            var name = comparerName[..comparerName.IndexOf('`')];
+            var genericType = comparerName[(name.Length + 4)..];
+            genericType = genericType[..genericType.IndexOf(',')].TrimEnd();
+            return $"{name}<{ShortName(genericType)}>";
+        }
+
+        private static string ShortName(string name)
+        {
+            return name switch
+            {
+                "System.Object" => "object",
+                "System.String" => "string",
+                "System.Boolean" => "bool",
+                "System.Char" => "char",
+                "System.Decimal" => "decimal",
+                "System.Double" => "double",
+                "System.Single" => "float",
+                "System.SByte" => "sbyte",
+                "System.Int16" => "short",
+                "System.Int32" => "int",
+                "System.Int64" => "long",
+                "System.Byte" => "byte",
+                "System.UInt16" => "ushort",
+                "System.UInt32" => "uint",
+                "System.UInt64" => "ulong",
+                _ => name
+            };
         }
     }
 }

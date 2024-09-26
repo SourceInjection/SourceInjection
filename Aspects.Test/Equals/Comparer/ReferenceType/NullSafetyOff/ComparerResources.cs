@@ -47,4 +47,4 @@ namespace Aspects.Test.Equals.Comparer.ReferenceType.NullSafetyOff
         public object Property { get; set; }
     }
 }
-#pragma warning disable
+#pragma warning restore

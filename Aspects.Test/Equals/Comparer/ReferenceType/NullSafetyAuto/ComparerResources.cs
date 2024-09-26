@@ -45,4 +45,4 @@ namespace Aspects.Test.Equals.Comparer.ReferenceType.NullSafetyAuto
         public object Property { get; set; }
     }
 }
-#pragma warning disable
+#pragma warning restore
