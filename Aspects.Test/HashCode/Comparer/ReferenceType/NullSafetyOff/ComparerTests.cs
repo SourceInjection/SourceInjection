@@ -1,6 +1,6 @@
 ﻿using NUnit.Framework;
 
-namespace Aspects.Test.Equals.Comparer.ReferenceType.NullSafetyOff
+namespace Aspects.Test.HashCode.Comparer.ReferenceType.NullSafetyOff
 {
     [TestFixture]
     internal class ComparerTests
@@ -10,7 +10,7 @@ namespace Aspects.Test.Equals.Comparer.ReferenceType.NullSafetyOff
         [TestCaseSource(typeof(ComparerResources), nameof(ComparerResources.Types))]
         public void AssertDefaultComparisonNullSafety(Type type, bool nullSafe)
         {
-            ComparerAssert.EqualsNullSafety(type, nullSafe, Equalization.Comparer);
+            ComparerAssert.HashCodeNullSafety(type, nullSafe, HashCode.Comparer);
         }
     }
 }

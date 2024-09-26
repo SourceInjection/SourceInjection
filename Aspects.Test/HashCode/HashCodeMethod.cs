@@ -4,9 +4,11 @@ namespace Aspects.Test.HashCode
 {
     internal static class HashCodeMethod
     {
-        public static IMethod FromType<T>()
+        public static IMethod FromType<T>() => FromType(typeof(T));
+
+        public static IMethod FromType(Type type)
         {
-            var cu = CodeAnalysis.CompileUnit.FromGeneratedCode<SGHashCode, T>();
+            var cu = CodeAnalysis.CompileUnit.FromGeneratedCode<SGHashCode>(type);
 
             return cu.AllChildren()
                 .OfType<IMethod>()

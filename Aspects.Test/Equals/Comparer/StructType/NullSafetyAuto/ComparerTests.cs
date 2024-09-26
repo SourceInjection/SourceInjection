@@ -9,14 +9,14 @@ namespace Aspects.Test.Equals.Comparer.StructType.NullSafetyAuto
         [TestCaseSource(typeof(ComparerResources), nameof(ComparerResources.MustUseComparerEqualization))]
         public void AssertDefaultComparisonNullSafety(Type type, bool nullSafe)
         {
-            ComparerAssert.NullSafety(type, nullSafe, Equalization.Comparer);
+            ComparerAssert.EqualsNullSafety(type, nullSafe, Equalization.Comparer);
         }
 
         [Test]
         [TestCaseSource(typeof(ComparerResources), nameof(ComparerResources.MustUseComparerStructTypeEqualization))]
         public void AssertStructComparisonNullSafety(Type type, bool nullSafe)
         {
-            ComparerAssert.NullSafety(type, nullSafe, Equalization.ComparerNullableNonReferenceType);
+            ComparerAssert.EqualsNullSafety(type, nullSafe, Equalization.ComparerNullableNonReferenceType);
         }
     }
 }

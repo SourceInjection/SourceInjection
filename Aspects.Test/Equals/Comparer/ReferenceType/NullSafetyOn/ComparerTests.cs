@@ -9,7 +9,7 @@ namespace Aspects.Test.Equals.Comparer.ReferenceType.NullSafetyOn
         [TestCaseSource(typeof(ComparerResources), nameof(ComparerResources.Types))]
         public void AssertDefaultComparisonNullSafety(Type type, bool nullSafe)
         {
-            ComparerAssert.NullSafety(type, nullSafe, Equalization.Comparer);
+            ComparerAssert.EqualsNullSafety(type, nullSafe, Equalization.Comparer);
         }
     }
 }

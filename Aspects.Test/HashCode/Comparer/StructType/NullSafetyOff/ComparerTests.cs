@@ -1,22 +1,23 @@
 ﻿using NUnit.Framework;
 
-namespace Aspects.Test.Equals.Comparer.StructType.NullSafetyOn
+namespace Aspects.Test.HashCode.Comparer.StructType.NullSafetyOff
 {
     [TestFixture]
     internal class ComparerTests
     {
+
         [Test]
         [TestCaseSource(typeof(ComparerResources), nameof(ComparerResources.MustUseComparerEqualization))]
         public void AssertDefaultComparisonNullSafety(Type type, bool nullSafe)
         {
-            ComparerAssert.EqualsNullSafety(type, nullSafe, Equalization.Comparer);
+            ComparerAssert.HashCodeNullSafety(type, nullSafe, HashCode.Comparer);
         }
 
         [Test]
         [TestCaseSource(typeof(ComparerResources), nameof(ComparerResources.MustUseComparerStructTypeEqualization))]
         public void AssertStructComparisonNullSafety(Type type, bool nullSafe)
         {
-            ComparerAssert.EqualsNullSafety(type, nullSafe, Equalization.ComparerNullableNonReferenceType);
+            ComparerAssert.HashCodeNullSafety(type, nullSafe, HashCode.ComparerNullableNonReferenceType);
         }
     }
 }
