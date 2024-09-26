@@ -1,5 +1,4 @@
 ﻿using Aspects.Interfaces;
-using Aspects.Common;
 using Aspects.SourceGeneration.Base;
 using Aspects.SourceGeneration.DataMembers;
 using Aspects.SourceGeneration.Common;
@@ -7,7 +6,7 @@ using Aspects.Util;
 using Microsoft.CodeAnalysis;
 using System.Linq;
 using System.Text;
-using TypeInfo = Aspects.Common.TypeInfo;
+using TypeInfo = Aspects.SourceGeneration.Common.TypeInfo;
 using Aspects.Util.SymbolExtensions;
 using Aspects.SourceGeneration;
 

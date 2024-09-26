@@ -4,11 +4,11 @@ using Aspects.Util;
 using Microsoft.CodeAnalysis;
 using System.Collections.Generic;
 using System.Linq;
-using TypeInfo = Aspects.Common.TypeInfo;
-using PropertyInfo = Aspects.Common.PropertyInfo;
+using TypeInfo = Aspects.SourceGeneration.Common.TypeInfo;
+using PropertyInfo = Aspects.SourceGeneration.Common.PropertyInfo;
 using Aspects.Util.SymbolExtensions;
-using Aspects.Common;
 using Aspects.SourceGeneration.SyntaxReceivers;
+using Aspects.SourceGeneration.Common;
 
 namespace Aspects.SourceGeneration.Base
 {
@@ -50,7 +50,7 @@ namespace Aspects.SourceGeneration.Base
                 else if(member is IFieldSymbol f)
                 {
                     if (MustUseGeneratedProperty(f, dataMemberKind))
-                        result.Add(GeneratedPropertySymbolInfo.Create(f, Accessibility.Public));
+                        result.Add(GeneratedPropertySymbolInfo.Create(f));
                     else if (IsTargeted(f, dataMemberKind))
                         result.Add(FieldSymbolInfo.Create(f));
                 }
@@ -58,9 +58,9 @@ namespace Aspects.SourceGeneration.Base
             return result;
         }
 
-        private bool MustUseGeneratedProperty(IFieldSymbol f, DataMemberKind dataMemberKind)
+        private bool MustUseGeneratedProperty(IFieldSymbol field, DataMemberKind dataMemberKind)
         {
-            return f.HasAttributeOfType<IGeneratesPublicDataMemberPropertyFromFieldAttribute>()
+            return field.HasAttributeOfType<IGeneratesDataMemberPropertyFromFieldAttribute>()
                 && (dataMemberKind == DataMemberKind.DataMember && Priority == DataMemberPriority.Property || dataMemberKind == DataMemberKind.Property);
         }
 

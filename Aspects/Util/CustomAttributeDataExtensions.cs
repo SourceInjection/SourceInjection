@@ -1,4 +1,4 @@
-﻿using Aspects.Common;
+﻿using Aspects.SourceGeneration.Common;
 using System.Reflection;
 
 namespace Aspects.Util

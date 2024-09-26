@@ -1,4 +1,4 @@
-﻿namespace Aspects.Common
+﻿namespace Aspects.SourceGeneration.Common
 {
     internal static class NameOf
     {

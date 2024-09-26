@@ -4,7 +4,6 @@ using System.Reflection;
 using System;
 using System.Linq;
 using Aspects.Util;
-using TypeInfo = Aspects.Common.TypeInfo;
 
 namespace Aspects.SourceGeneration.Common
 {

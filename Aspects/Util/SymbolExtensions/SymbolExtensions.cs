@@ -1,7 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using System.Collections.Generic;
 using System.Linq;
-using Aspects.Common;
+using Aspects.SourceGeneration.Common;
 
 namespace Aspects.Util.SymbolExtensions
 {

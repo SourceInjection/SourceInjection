@@ -1,9 +1,9 @@
 ﻿using Aspects.Interfaces;
-using Aspects.Common;
 using Microsoft.CodeAnalysis;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Aspects.SourceGeneration.Common;
 
 namespace Aspects.Util.SymbolExtensions
 {

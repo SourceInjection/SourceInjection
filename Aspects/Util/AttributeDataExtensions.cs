@@ -1,4 +1,4 @@
-﻿using Aspects.Common;
+﻿using Aspects.SourceGeneration.Common;
 using Microsoft.CodeAnalysis;
 
 namespace Aspects.Util

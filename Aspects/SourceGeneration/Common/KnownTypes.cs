@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Aspects.Common
+namespace Aspects.SourceGeneration.Common
 {
     internal class KnownTypes
     {

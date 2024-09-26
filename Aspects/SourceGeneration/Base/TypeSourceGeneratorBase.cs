@@ -1,7 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 using System.Text;
-using TypeInfo = Aspects.Common.TypeInfo;
+using TypeInfo = Aspects.SourceGeneration.Common.TypeInfo;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis.CSharp.Syntax;

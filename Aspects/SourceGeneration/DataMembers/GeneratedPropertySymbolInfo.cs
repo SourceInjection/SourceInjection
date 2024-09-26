@@ -1,9 +1,9 @@
 ﻿using Aspects.Interfaces;
-using Aspects.Common;
 using Aspects.Util.SymbolExtensions;
 using Microsoft.CodeAnalysis;
 using System.Collections.Immutable;
 using System.Linq;
+using Aspects.SourceGeneration.Common;
 
 namespace Aspects.SourceGeneration.DataMembers
 {
@@ -16,7 +16,9 @@ namespace Aspects.SourceGeneration.DataMembers
             ITypeSymbol containingType,
             ImmutableArray<AttributeData> attributes,
             ITypeSymbol type,
-            IFieldSymbol generationSource
+            IFieldSymbol generationSource,
+            AccessorSymbolInfo getAccessor,
+            AccessorSymbolInfo setAccessor
 
             ) : base(
 
@@ -24,7 +26,9 @@ namespace Aspects.SourceGeneration.DataMembers
             declaredAccessibility: declaredAccessibility,
             containingType: containingType,
             attributes: attributes,
-            type: type)
+            type: type,
+            getAccessor: getAccessor,
+            setAccessor: setAccessor)
         { 
             GenerationSource = generationSource;
         }
@@ -37,24 +41,20 @@ namespace Aspects.SourceGeneration.DataMembers
             return GenerationSource.HasMaybeNullAttribute();
         }
 
-        public static GeneratedPropertySymbolInfo Create(IFieldSymbol field, Accessibility accessibility)
+        public static GeneratedPropertySymbolInfo Create(IFieldSymbol field)
         {
-            var name = GetGeneratedPropertyName(field);
+            var attribute = AttributeFactory.Create<IGeneratesDataMemberPropertyFromFieldAttribute>(
+                field.AttributesOfType<IGeneratesDataMemberPropertyFromFieldAttribute>().First());
 
             return new GeneratedPropertySymbolInfo(
-                name: name,
-                declaredAccessibility: accessibility,
+                name: attribute.PropertyName(field.Name),
+                declaredAccessibility: attribute.Accessibility,
                 containingType: field.ContainingType,
                 attributes: field.GetAttributes(),
                 type: field.Type,
-                generationSource: field);
-        }
-
-        private static string GetGeneratedPropertyName(IFieldSymbol field)
-        {
-            var attribute = AttributeFactory.Create<IGeneratesPublicDataMemberPropertyFromFieldAttribute>(
-                field.AttributesOfType<IGeneratesPublicDataMemberPropertyFromFieldAttribute>().First());
-            return attribute.PropertyName(field.Name);
+                generationSource: field,
+                getAccessor: AccessorSymbolInfo.Create(attribute.GetterAccessibility),
+                setAccessor: null);
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Aspects.Common
+namespace Aspects.SourceGeneration.Common
 {
     internal class Lazy<T>
     {

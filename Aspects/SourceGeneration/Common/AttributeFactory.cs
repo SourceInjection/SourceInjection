@@ -3,7 +3,7 @@ using System;
 using System.Linq;
 using System.Reflection;
 
-namespace Aspects.Common
+namespace Aspects.SourceGeneration.Common
 {
     internal static class AttributeFactory
     {

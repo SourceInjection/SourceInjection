@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Linq;
 
-namespace Aspects.Common
+namespace Aspects.SourceGeneration.Common
 {
     internal class PropertyInfo
     {

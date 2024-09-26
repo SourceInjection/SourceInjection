@@ -1,5 +1,6 @@
 ﻿using Aspects.Interfaces;
 using Aspects.SourceGeneration;
+using Microsoft.CodeAnalysis;
 using System;
 using System.ComponentModel;
 
@@ -8,12 +9,18 @@ namespace Aspects
     /// <summary>
     /// Abstract attribute base for <see cref="INotifyPropertyChanged.PropertyChanged"/> and / or <see cref="INotifyPropertyChanging.PropertyChanging"/> code generation.
     /// </summary>
-    public abstract class PropertyEventGenerationAttribute : Attribute, IGeneratesPublicDataMemberPropertyFromFieldAttribute
+    public abstract class PropertyEventGenerationAttribute : Attribute, IGeneratesDataMemberPropertyFromFieldAttribute
     {
+
+        protected PropertyEventGenerationAttribute(bool equalityCheck = false)
+        {
+            EqualityCheck = equalityCheck;
+        }
+
         /// <summary>
         /// Determines if a equality check is generated.
         /// </summary>
-        public abstract bool EqualityCheck { get; }
+        public bool EqualityCheck { get; }
 
         /// <summary>
         /// Evaluates the generated property name from the field name.
@@ -24,6 +31,10 @@ namespace Aspects
         {
             return Snippets.PropertyNameFromField(fieldName);
         }
+
+        public Accessibility Accessibility => Accessibility.Public;
+
+        public Accessibility GetterAccessibility => Accessibility.NotApplicable;
     }
 
     /// <summary>
@@ -39,11 +50,8 @@ namespace Aspects
         /// </summary>
         /// <param name="equalityCheck">When set to <see langword="true"/>, event will just be fired when the value wich is set does not equal the field value.</param>
         public NotifyPropertyChangedAttribute(bool equalityCheck = false)
-        {
-            EqualityCheck = equalityCheck;
-        }
-
-        public override bool EqualityCheck { get; }
+            : base(equalityCheck)
+        { }
     }
 
     /// <summary>
@@ -59,11 +67,8 @@ namespace Aspects
         /// </summary>
         /// <param name="equalityCheck">When set to <see langword="true"/>, event will just be fired when the value wich is set does not equal the field value.</param>
         public NotifyPropertyChangingAttribute(bool equalityCheck = false)
-        {
-            EqualityCheck = equalityCheck;
-        }
-
-        public override bool EqualityCheck { get; }
+            : base(equalityCheck)
+        { }
     }
 
     /// <summary>
@@ -72,30 +77,14 @@ namespace Aspects
     /// Also adds <see cref="PropertyChangingEventHandler"/> PropertyChanging and <see cref="PropertyChangedEventHandler"/> PropertyChanged to the class if not exist.
     /// Interfaces <see cref="INotifyPropertyChanging"/> and <see cref="INotifyPropertyChanged"/> are added if not defined.
     /// </summary>
-    public class NotifyPropertyEventsAttribute : Attribute, INotifyPropertyChangedAttribute, INotifyPropertyChangingAttribute
+    public class NotifyPropertyEventsAttribute : PropertyEventGenerationAttribute, INotifyPropertyChangedAttribute, INotifyPropertyChangingAttribute
     {
         /// <summary>
         /// Creates an instance of <see cref="NotifyPropertyEventsAttribute"/>.
         /// </summary>
         /// <param name="equalityCheck">When set to <see langword="true"/>, events will just be fired when the value wich is set does not equal the field value.</param>
         public NotifyPropertyEventsAttribute(bool equalityCheck = false)
-        {
-            EqualityCheck = equalityCheck;
-        }
-
-        /// <summary>
-        /// Determines if a equality check occurs before <see cref="INotifyPropertyChanged.PropertyChanged"/> and <see cref="INotifyPropertyChanging.PropertyChanging"/> events are raised.
-        /// </summary>
-        public bool EqualityCheck { get; }
-
-        /// <summary>
-        /// Evaluates the generated property name from the field name.
-        /// </summary>
-        /// <param name="field">The field from which the property is generated.</param>
-        /// <returns>The name of the generated property.</returns>
-        public string PropertyName(string fieldName)
-        {
-            return Snippets.PropertyNameFromField(fieldName);
-        }
+            : base(equalityCheck)
+        { }
     }
 }

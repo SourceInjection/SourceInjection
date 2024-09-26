@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Aspects.Common
+namespace Aspects.SourceGeneration.Common
 {
     internal class TypeInfo
     {
@@ -98,9 +98,9 @@ namespace Aspects.Common
 
         public static void Consider(string name, TypeInfo type)
         {
-            if(!_allTypes.TryGetValue(name, out var list))
+            if (!_allTypes.TryGetValue(name, out var list))
                 _allTypes.Add(name, new List<TypeInfo> { type });
-            else if(!list.Contains(type))
+            else if (!list.Contains(type))
                 list.Add(type);
         }
     }

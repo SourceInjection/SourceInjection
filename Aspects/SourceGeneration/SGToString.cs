@@ -2,8 +2,9 @@
 using Aspects.SourceGeneration.Base;
 using Microsoft.CodeAnalysis;
 using System.Text;
-using TypeInfo = Aspects.Common.TypeInfo;
+using TypeInfo = Aspects.SourceGeneration.Common.TypeInfo;
 using Aspects.SourceGeneration;
+using System.Linq;
 
 #pragma warning disable IDE0130
 
@@ -31,14 +32,15 @@ namespace Aspects
 
             sb.Append(Snippets.Indent($"return $\"({typeInfo.Name})"));
 
-            var symbols = GetSymbols(typeInfo, typeInfo.Members(true), config.DataMemberKind);
+            var symbols = GetSymbols(typeInfo, typeInfo.Members(true), config.DataMemberKind)
+                .Where(m => m.DeclaredAccessibility == Accessibility.Public).ToArray();
 
-            if (symbols.Count > 0)
+            if (symbols.Length > 0)
             {
                 sb.Append("{{");
                 sb.Append($"{symbols[0].Name}: {{{symbols[0].Name}}}");
 
-                for (int i = 1; i < symbols.Count; i++)
+                for (int i = 1; i < symbols.Length; i++)
                     sb.Append($", {symbols[i].Name}: {{{symbols[i].Name}}}");
                 sb.Append("}}");
             }

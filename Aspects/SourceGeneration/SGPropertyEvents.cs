@@ -1,5 +1,4 @@
 ﻿using Aspects.Interfaces;
-using Aspects.Common;
 using Aspects.SourceGeneration.Base;
 using Aspects.Util;
 using Aspects.Util.SymbolExtensions;
@@ -9,10 +8,11 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
-using TypeInfo = Aspects.Common.TypeInfo;
+using TypeInfo = Aspects.SourceGeneration.Common.TypeInfo;
 using Aspects.SourceGeneration.SyntaxReceivers;
 using Aspects.SourceGeneration.DataMembers;
 using Aspects.SourceGeneration;
+using Aspects.SourceGeneration.Common;
 
 #pragma warning disable IDE0130
 
