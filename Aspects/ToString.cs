@@ -26,15 +26,21 @@ namespace Aspects
         /// Linked fields can only be detected when the property fullfilles the following grammar:
         /// <include file="Comments.xml" path="doc/members/member[@name='Properties:PropertySyntax']/*"/>
         /// </param>
-        public AutoToStringAttribute(DataMemberKind dataMemberKind = DataMemberKind.DataMember)
+        public AutoToStringAttribute(DataMemberKind dataMemberKind = DataMemberKind.DataMember, Accessibility accessability = Accessibility.Public)
         {
             DataMemberKind = dataMemberKind;
+            Accessibility = accessability;
         }
 
         /// <summary>
-        /// Defines which data members are used to generate <see cref="object.ToString"/>.<br/>
+        /// Defines which data members are used to generate <see cref="object.ToString"/>.
         /// </summary>
         public DataMemberKind DataMemberKind { get; }
+
+        /// <summary>
+        /// Defines which accessibility is required to be used foreach member to be included to generate <see cref="object.ToString"/>.
+        /// </summary>
+        public Accessibility Accessibility { get; }
     }
 
     /// <summary>

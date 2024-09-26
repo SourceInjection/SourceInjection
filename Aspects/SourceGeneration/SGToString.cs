@@ -33,7 +33,7 @@ namespace Aspects
             sb.Append(Snippets.Indent($"return $\"({typeInfo.Name})"));
 
             var symbols = GetSymbols(typeInfo, typeInfo.Members(true), config.DataMemberKind)
-                .Where(m => m.DeclaredAccessibility == Accessibility.Public).ToArray();
+                .Where(m => m.DeclaredAccessibility == Microsoft.CodeAnalysis.Accessibility.Public).ToArray();
 
             if (symbols.Length > 0)
             {

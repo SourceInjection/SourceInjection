@@ -1,6 +1,5 @@
 ﻿using Aspects.Interfaces;
 using Aspects.SourceGeneration;
-using Microsoft.CodeAnalysis;
 using System;
 using System.ComponentModel;
 
@@ -32,9 +31,9 @@ namespace Aspects
             return Snippets.PropertyNameFromField(fieldName);
         }
 
-        public Accessibility Accessibility => Accessibility.Public;
+        public Microsoft.CodeAnalysis.Accessibility Accessibility => Microsoft.CodeAnalysis.Accessibility.Public;
 
-        public Accessibility GetterAccessibility => Accessibility.NotApplicable;
+        public Microsoft.CodeAnalysis.Accessibility GetterAccessibility => Microsoft.CodeAnalysis.Accessibility.NotApplicable;
     }
 
     /// <summary>

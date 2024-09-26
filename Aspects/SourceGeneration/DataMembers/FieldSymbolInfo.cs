@@ -7,7 +7,7 @@ namespace Aspects.SourceGeneration.DataMembers
     {
         protected FieldSymbolInfo(
             string name,
-            Accessibility
+            Microsoft.CodeAnalysis.Accessibility
             declaredAccessibility,
             ITypeSymbol containingType,
             ImmutableArray<AttributeData> attributes,

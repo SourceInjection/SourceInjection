@@ -11,7 +11,7 @@ namespace Aspects.SourceGeneration.DataMembers
     {
         protected DataMemberSymbolInfo(
             string name,
-            Accessibility
+            Microsoft.CodeAnalysis.Accessibility
             declaredAccessibility,
             ITypeSymbol containingType,
             ImmutableArray<AttributeData> attributes,
@@ -26,7 +26,7 @@ namespace Aspects.SourceGeneration.DataMembers
 
         public string Name { get; }
 
-        public Accessibility DeclaredAccessibility { get; }
+        public Microsoft.CodeAnalysis.Accessibility DeclaredAccessibility { get; }
 
         public ITypeSymbol ContainingType { get; }
 

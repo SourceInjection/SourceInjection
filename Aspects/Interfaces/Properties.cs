@@ -1,7 +1,7 @@
-﻿using Microsoft.CodeAnalysis;
-
+﻿
 namespace Aspects.Interfaces
 {
+    using Accessibility = Microsoft.CodeAnalysis.Accessibility;
     public interface IGeneratesDataMemberPropertyFromFieldAttribute 
     {
         string PropertyName(string fieldName);

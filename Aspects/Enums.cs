@@ -1,5 +1,49 @@
-﻿namespace Aspects
+﻿using System;
+
+namespace Aspects
 {
+    /// <summary>
+    /// Defines the accessability of types and members.<br/>
+    /// See <see href="https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/access-modifiers">Access Modifiers</see>.
+    /// </summary>
+    [Flags]
+    public enum Accessibility
+    {
+        /// <summary>
+        /// No modifier is present.
+        /// </summary>
+        None = 0,
+        /// <summary>
+        /// <see langword="public"/> modifier is present.
+        /// </summary>
+        Public = 1,
+        /// <summary>
+        /// <see langword="internal"/> modifier is present.
+        /// </summary>
+        Internal = 2,
+        /// <summary>
+        /// <see langword="protected"/> modifier is present.
+        /// </summary>
+        Protected = 4,
+        /// <summary>
+        /// <see langword="private"/> modifier is present.
+        /// </summary>
+        Private = 8,
+        /// <summary>
+        /// <see langword="protected"/> and <see langword="internal"/> modifiers are present.
+        /// </summary>
+        ProtectedInternal = 16,
+        /// <summary>
+        /// <see langword="protected"/> and <see langword="private"/> modifiers are present.
+        /// </summary>
+        ProtectedPrivate = 32,
+        /// <summary>
+        /// <see langword="file"/> modifier is present.
+        /// </summary>
+        File = 64,
+    }
+
+
     /// <summary>
     /// Defines which kind of data member are taken into account during code generation.
     /// </summary>

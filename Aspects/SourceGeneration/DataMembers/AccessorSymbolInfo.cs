@@ -5,12 +5,12 @@ namespace Aspects.SourceGeneration.DataMembers
 {
     internal class AccessorSymbolInfo
     {
-        private AccessorSymbolInfo(Accessibility declaredAccessibility)
+        private AccessorSymbolInfo(Microsoft.CodeAnalysis.Accessibility declaredAccessibility)
         {
             DeclaredAccessibility = declaredAccessibility;
         }
 
-        public Accessibility DeclaredAccessibility { get; }
+        public Microsoft.CodeAnalysis.Accessibility DeclaredAccessibility { get; }
 
         public static AccessorSymbolInfo Create(IMethodSymbol accessor)
         {
@@ -19,7 +19,7 @@ namespace Aspects.SourceGeneration.DataMembers
                 : new AccessorSymbolInfo(accessor.DeclaredAccessibility);
         }
 
-        public static AccessorSymbolInfo Create(Accessibility accessibility)
+        public static AccessorSymbolInfo Create(Microsoft.CodeAnalysis.Accessibility accessibility)
         {
             return new AccessorSymbolInfo(accessibility);
         }
