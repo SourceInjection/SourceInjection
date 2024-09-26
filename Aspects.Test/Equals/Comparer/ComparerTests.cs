@@ -14,11 +14,5 @@ namespace Aspects.Test.Equals.Comparer
 
             Assert.That(sut.Body.Contains(comparerCode));
         }
-
-        [Test]
-        public void ComparerEqualization_WithExternComparers_DetectsNullable()
-        {
-
-        }
     }
 }
