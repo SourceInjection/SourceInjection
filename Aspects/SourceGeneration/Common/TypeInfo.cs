@@ -80,6 +80,7 @@ namespace Aspects.SourceGeneration.Common
         public override bool Equals(object obj)
         {
             return obj is TypeInfo other
+                && Symbol.Name == other.Symbol.Name // speeds up detection process
                 && Symbol.ToDisplayString() == other.Symbol.ToDisplayString() // speeds up detection process
                 && Symbol.Equals(other.Symbol, SymbolEqualityComparer.Default);
         }
