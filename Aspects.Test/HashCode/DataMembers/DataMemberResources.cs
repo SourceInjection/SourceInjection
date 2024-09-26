@@ -2,87 +2,108 @@
 
 namespace Aspects.Test.HashCode.DataMembers
 {
-    using NullSafety = NullSafety;
+    public static class DataMemberResources
+    {
+        public static readonly Type[] MustUseField = 
+        {
+            typeof(ClassWithPropertyLinkedField_DataMemberKind_DataMember),
+            typeof(ClassWithPropertyLinkedField_DataMemberKind_Field),
+            typeof(ClassWithGeneratedProperty_DataMemberKind_Field),
+            typeof(ClassWithGeneratedProperty_DataMemberKind_DataMember),
+        };
+
+        public static readonly Type[] MustUseProperty =
+        {
+            typeof(ClassWithPropertyLinkedField_DataMemberKind_Property),
+            typeof(ClassWithPropertyLinkedField_ArrowFunction_DataMemberKind_Property),
+            typeof(ClassWithPropertyLinkedField_ArrowFunction_Coalesce_DataMemberKind_Property),
+            typeof(ClassWithGeneratedProperty_DataMemberKind_Property),
+            typeof(ClassWithQueryProperty_WithHashCodeInclude),
+        };
+
+        public static readonly Type[] MustBeIgnored =
+        {
+            typeof(ClassWithQueryProperty_WithDefaultSettings),
+            typeof(ClassWithQueryProperty_WithDataMemberKindProperty),
+            typeof(ClassWithConstantField),
+            typeof(ClassWithConstantField_WithHashCodeInclude),
+            typeof(ClassWithStaticField),
+            typeof(ClassWithStaticField_WithHashCodeInclude),
+            typeof(ClassWithEvent),
+        };
+    }
 
     [AutoHashCode]
     public partial class ClassWithPropertyLinkedField_DataMemberKind_DataMember
     {
-        private int _int;
+        private int _field;
 
-        public int Int
+        public int Property
         {
-            get => _int;
-            set => _int = value;
+            get => _field;
+            set => _field = value;
         }
     }
 
     [AutoHashCode(dataMemberKind: DataMemberKind.Field)]
     public partial class ClassWithPropertyLinkedField_DataMemberKind_Field
     {
-        private int _int;
+        private int _field;
 
-        public int Int
+        public int Property
         {
-            get => _int;
-            set => _int = value;
+            get => _field;
+            set => _field = value;
         }
     }
 
     [AutoHashCode(dataMemberKind: DataMemberKind.Property)]
     public partial class ClassWithPropertyLinkedField_DataMemberKind_Property
     {
-        private int _int;
+        private int _field;
 
-        public int Int
+        public int Property
         {
-            get => _int;
-            set => _int = value;
+            get => _field;
+            set => _field = value;
         }
     }
 
     [AutoHashCode(dataMemberKind: DataMemberKind.Property)]
     public partial class ClassWithPropertyLinkedField_ArrowFunction_DataMemberKind_Property
     {
-        private int _int;
+        private int _field;
 
-        public int Int => _int;
+        public int Property => _field;
     }
 
     [AutoHashCode(dataMemberKind: DataMemberKind.Property)]
     public partial class ClassWithPropertyLinkedField_ArrowFunction_Coalesce_DataMemberKind_Property
     {
-        private int? _int;
+        private int? _field;
 
-        public int Int => _int ?? 0;
+        public int Property => _field ?? 0;
     }
 
     [AutoHashCode(dataMemberKind: DataMemberKind.Property)]
     public partial class ClassWithGeneratedProperty_DataMemberKind_Property
     {
         [NotifyPropertyChanged]
-        private int _int;
+        private int _property;
     }
 
     [AutoHashCode(dataMemberKind: DataMemberKind.Field)]
     public partial class ClassWithGeneratedProperty_DataMemberKind_Field
     {
         [NotifyPropertyChanged]
-        private int _int;
+        private int _field;
     }
 
     [AutoHashCode]
     public partial class ClassWithGeneratedProperty_DataMemberKind_DataMember
     {
         [NotifyPropertyChanged]
-        private int _int;
-    }
-
-    [AutoHashCode(DataMemberKind.Property)]
-    public partial class ClassWithGeneratedProperty_WithFieldConfiguration
-    {
-        [HashCode]
-        [NotifyPropertyChanged]
-        private object _object = null!;
+        private int _field;
     }
 
     [AutoHashCode]
@@ -98,7 +119,7 @@ namespace Aspects.Test.HashCode.DataMembers
     }
 
 
-    public partial class ClassWithQueryProperty_WithEqualsInclude
+    public partial class ClassWithQueryProperty_WithHashCodeInclude
     {
         [HashCode]
         public int Property => 3;
@@ -107,31 +128,31 @@ namespace Aspects.Test.HashCode.DataMembers
     [AutoHashCode]
     public partial class ClassWithConstantField
     {
-        public const int _int = 3;
+        public const int _field = 3;
     }
 
-    public partial class ClassWithConstantField_WithEqualsInclude
+    public partial class ClassWithConstantField_WithHashCodeInclude
     {
         [HashCode]
-        public const int _int = 3;
+        public const int _field = 3;
     }
 
     [AutoHashCode]
     public partial class ClassWithStaticField
     {
-        static int s_int = 3;
+        static int _field = 3;
     }
 
-    public partial class ClassWithStaticField_WithEqualsInclude
+    public partial class ClassWithStaticField_WithHashCodeInclude
     {
         [HashCode]
-        static int s_int = 3;
+        static int _field = 3;
     }
 
     [AutoHashCode]
     public partial class ClassWithEvent
     {
-        public event EventHandler Event;
+        public event EventHandler _field;
     }
 }
 

@@ -6,6 +6,24 @@ namespace Aspects.Test.HashCode.BaseCall
 {
     using BaseCall = Aspects.BaseCall;
 
+    public static class BaseCallResources
+    {
+        public static readonly Type[] MustCallBase =
+        {
+            typeof(ClassEmpty_WithBaseCallOn),
+            typeof(SubClassOfClassEmpty),
+            typeof(SubClassOfClassEmpty_WithBaseCallOn)
+        };
+
+        public static readonly Type[] MustNotCallBase =
+        {
+            typeof(ClassEmpty),
+            typeof(StructEmpty),
+            typeof(StructEmpty_WithBaseCallOn),
+            typeof(SubClassOfClassEmpty_WithBaseCallOff)
+        };
+    }
+
     [AutoHashCode]
     public partial class ClassEmpty { }
 
