@@ -3,6 +3,7 @@ using NUnit.Framework;
 
 namespace Aspects.Test.Equals.Comparer
 {
+    [TestFixture]
     internal class ComparerTests
     {
         [Test]

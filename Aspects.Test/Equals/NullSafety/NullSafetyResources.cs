@@ -6,6 +6,24 @@ namespace Aspects.Test.Equals.NullSafety
 {
     using NullSafety = Aspects.NullSafety;
 
+    public static class NullSafetyResources
+    {
+        public static readonly Type[] MustBeNullSafe =
+        {
+            typeof(ClassWithNullableProperty),
+            typeof(ClassWithProperty_NullableDisabled),
+            typeof(ClassWithProperty_NullSafetyOn),
+            typeof(ClassWithProperty_ThatHasMaybeNullAttribute),
+        };
+
+        public static readonly Type[] MustNotBeNullSafe =
+        {
+            typeof(ClassWithProperty),
+            typeof(ClassWithProperty_NullableDisabled_NullSafetyOff),
+            typeof(ClassWithProperty_ThatHasNotNullAttribute_NullableDisabled),
+        };
+    }
+
     public class ClassEmpty { }
 
     [AutoEquals]

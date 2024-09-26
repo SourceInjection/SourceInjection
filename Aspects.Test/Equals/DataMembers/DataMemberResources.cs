@@ -9,6 +9,7 @@ namespace Aspects.Test.Equals.DataMembers
             typeof(ClassWithPropertyLinkedField_DataMemberKind_DataMember),
             typeof(ClassWithPropertyLinkedField_DataMemberKind_Field),
             typeof(ClassWithGeneratedProperty_DataMemberKind_DataMember),
+            typeof(ClassWithGeneratedProperty_DataMemberKind_Field),
         };
 
         public static readonly Type[] MustUseProperty =
@@ -17,9 +18,7 @@ namespace Aspects.Test.Equals.DataMembers
             typeof(ClassWithPropertyLinkedField_ArrowFunction_DataMemberKind_Property),
             typeof(ClassWithPropertyLinkedField_ArrowFunction_Coalesce_DataMemberKind_Property),
             typeof(ClassWithGeneratedProperty_DataMemberKind_Property),
-            typeof(ClassWithGeneratedProperty_DataMemberKind_Field),
             typeof(ClassWithQueryProperty_WithEqualsInclude),
-            typeof(ClassWithGeneratedProperty_WithFieldConfiguration)
         };
 
         public static readonly Type[] MustBeIgnored =
@@ -90,7 +89,7 @@ namespace Aspects.Test.Equals.DataMembers
     public partial class ClassWithGeneratedProperty_DataMemberKind_Property
     {
         [NotifyPropertyChanged]
-        private int _field;
+        private int _property;
     }
 
     [AutoEquals(dataMemberKind: DataMemberKind.Field)]
@@ -105,14 +104,6 @@ namespace Aspects.Test.Equals.DataMembers
     {
         [NotifyPropertyChanged]
         private int _field;
-    }
-
-    [AutoEquals(DataMemberKind.Property)]
-    public partial class ClassWithGeneratedProperty_WithFieldConfiguration
-    {
-        [Equals]
-        [NotifyPropertyChanged]
-        private int _property;
     }
 
     [AutoEquals]

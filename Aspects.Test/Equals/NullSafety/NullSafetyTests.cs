@@ -2,63 +2,29 @@
 
 namespace Aspects.Test.Equals.NullSafety
 {
+    [TestFixture]
     internal class NullSafetyTests
     {
         private const string propertyName = "Property";
 
-        private static Action BuildEqualization<TType>() 
-        {
-            return Equalization.Build<TType>(propertyName);
-        }
+        private static Action BuildEqualization(Type type) 
+            => Equalization.Build(type, propertyName);
 
 
         [Test]
-        public void NullablePropertyEqualization_IsNullSafe()
+        [TestCaseSource(typeof(NullSafetyResources), nameof(NullSafetyResources.MustBeNullSafe))]
+        public void Equalization_MustBeNullSafe(Type type)
         {
-            var equalization = BuildEqualization<ClassWithNullableProperty>();
+            var equalization = BuildEqualization(type);
             Assert.DoesNotThrow(() => equalization());
         }
 
         [Test]
-        public void PropertyEqualization_IsNotNullSafe()
+        [TestCaseSource(typeof(NullSafetyResources), nameof(NullSafetyResources.MustNotBeNullSafe))]
+        public void Equalization_MustNotBeNullSafe(Type type)
         {
-            var equalization = BuildEqualization<ClassWithProperty>();
+            var equalization = BuildEqualization(type);
             Assert.Throws<NullReferenceException>(() => equalization());
-        }
-
-        [Test]
-        public void PropertyEqualization_WhenNullableFeatureDisabled_IsNullSafe()
-        {
-            var equalization = BuildEqualization<ClassWithProperty_NullableDisabled>();
-            Assert.DoesNotThrow(() => equalization());
-        }
-
-        [Test]
-        public void PropertyEqualization_WhenNullableFeatureDisabled_ButNullCheckIsOff_IsNotNullSafe()
-        {
-            var equalization = BuildEqualization<ClassWithProperty_NullableDisabled_NullSafetyOff>();
-            Assert.Throws<NullReferenceException>(() => equalization());
-        }
-
-        [Test]
-        public void NullablePropertyEqualization_WhenNullCheckIsOn_IsNullSafe()
-        {
-            var equalization = BuildEqualization<ClassWithProperty_NullSafetyOn>();
-            Assert.DoesNotThrow(() => equalization());
-        }
-
-        [Test]
-        public void PropertyEqualization_NotNullAttribute_NullableDisabled_IsNotNullSafe()
-        {
-            var equalization = BuildEqualization<ClassWithProperty_ThatHasNotNullAttribute_NullableDisabled>();
-            Assert.Throws<NullReferenceException>(() => equalization());
-        }
-
-        [Test]
-        public void PropertyEqualization_WithMaybeNullAttribute_IsNullSafe()
-        {
-            var equalization = BuildEqualization<ClassWithProperty_ThatHasMaybeNullAttribute>();
-            Assert.DoesNotThrow(() => equalization());
         }
     }
 }

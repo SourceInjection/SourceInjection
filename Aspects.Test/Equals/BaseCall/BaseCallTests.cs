@@ -3,6 +3,7 @@ using NUnit.Framework;
 
 namespace Aspects.Test.Equals.BaseCall
 {
+    [TestFixture]
     internal class BaseCallTests
     {
         private static bool DoesNotCallBase(IMethod m)

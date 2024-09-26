@@ -3,6 +3,7 @@ using NUnit.Framework;
 
 namespace Aspects.Test.Equals.TypeHandling
 {
+    [TestFixture]
     internal class TypeHandlingTests
     {
         [Test]

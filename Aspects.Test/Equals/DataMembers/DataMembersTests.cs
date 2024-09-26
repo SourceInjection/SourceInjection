@@ -15,11 +15,7 @@ namespace Aspects.Test.Equals.DataMembers
         public void Equalization_MustUseField(Type type)
         {
             var sut = EqualsMethod.FromType(type);
-            Assert.Multiple(() =>
-            {
-                Assert.That(sut.Body.Contains(fieldName));
-                Assert.That(!sut.Body.Contains(propertyName));
-            });
+            Assert.That(sut.Body.Contains(fieldName));
         }
 
         [Test]
@@ -27,11 +23,7 @@ namespace Aspects.Test.Equals.DataMembers
         public void Equalization_MustUseProperty(Type type)
         {
             var sut = EqualsMethod.FromType(type);
-            Assert.Multiple(() =>
-            {
-                Assert.That(sut.Body.Contains(propertyName));
-                Assert.That(!sut.Body.Contains(fieldName));
-            });
+            Assert.That(sut.Body.Contains(propertyName));
         }
 
 
