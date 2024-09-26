@@ -1,4 +1,5 @@
 ﻿using Aspects.SourceGeneration.SnippetsHelper;
+using System.Text;
 
 namespace Aspects.Test.Equals
 {
@@ -53,6 +54,26 @@ namespace Aspects.Test.Equals
 
                 lhs.Equals(rhs);
             };
+        }
+
+        public static string Body(Type type, bool includeBase = false, params string[] memberEquals)
+        {
+            var sb = new StringBuilder("{ return ");
+            if (type.IsClass)
+                sb.Append("#i == this || ");
+            sb.Append("#i != null ");
+
+            if (includeBase && type.IsClass)
+                sb.Append("&& base.Equals(#i) ");
+
+            foreach (var member in memberEquals)
+            {
+                if (member.Contains("||"))
+                    sb.Append($"&& ({member}) ");
+                else sb.Append($"&& {member} ");
+            }
+            sb.Append("; }");
+            return sb.ToString();
         }
     }
 }

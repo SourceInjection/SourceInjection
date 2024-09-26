@@ -8,7 +8,6 @@ namespace Aspects.Test.Equals.Comparisons
     {
         private const string propertyName = "Property";
 
-
         private static bool UsesOperatorEqualization(IMethod m, string name) 
             => m.Body.Contains(Equalization.Operator(name));
 

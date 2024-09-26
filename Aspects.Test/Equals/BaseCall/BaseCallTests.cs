@@ -12,52 +12,19 @@ namespace Aspects.Test.Equals.BaseCall
             => m.Body.Contains($"&& base.Equals({m.Parameters[0].Name})");
 
         [Test]
-        public void ClassEqualization_WithBaseThatHasAutoEquals_CallsBase()
+        [TestCaseSource(typeof(BaseCallResources), nameof(BaseCallResources.MustCallBase))]
+        public void Equals_CallsBase(Type type)
         {
-            var sut = EqualsMethod.FromType<ClassWithBase_ThatHasAutoEquals>();
+            var sut = EqualsMethod.FromType(type);
             Assert.That(CallsBase(sut));
         }
 
         [Test]
-        public void ClassEqualization_WithBaseThatHasAutoEquals_WithBaseCallOff_DoesNotCallBase()
+        [TestCaseSource(typeof(BaseCallResources), nameof(BaseCallResources.MustNotCallBase))]
+        public void Equals_DoesNotCallBase(Type type)
         {
-            var sut = EqualsMethod.FromType<ClassEmptyWithBase_ThatHasAutoEquals_WithBaseCallOff>();
+            var sut = EqualsMethod.FromType(type);
             Assert.That(DoesNotCallBase(sut));
-        }
-
-        [Test]
-        public void ClassEqualization_WithNoEqualsOverrideInSuper_WithBaseCallOn_CallsBase()
-        {
-            var sut = EqualsMethod.FromType<ClassEmpty_WithBaseCallOn>();
-            Assert.That(CallsBase(sut));
-        }
-
-        [Test]
-        public void StructEqualization_WithBaseCallOn_DoesNotCallBase()
-        {
-            var sut = EqualsMethod.FromType<NonReferenceTypeEmpty_WithBaseCallOn>();
-            Assert.That(DoesNotCallBase(sut));
-        }
-
-        [Test]
-        public void ClassEqualization_WithBaseThatHasEqualsAttributeOnMember_CallsBase()
-        {
-            var sut = EqualsMethod.FromType<ClassWithBase_ThatHasEqualsOnMember>();
-            Assert.That(CallsBase(sut));
-        }
-
-        [Test]
-        public void ClassEqualization_WithBaseThatHasNoEqualsOverride_DoesNotCallBase()
-        {
-            var sut = EqualsMethod.FromType<ClassWithBase_ThatHasNoEqualsOverride>();
-            Assert.That(DoesNotCallBase(sut));
-        }
-
-        [Test]
-        public void ClassEqualization_WithBaseThatHasEqualsOverride_CallsBase()
-        {
-            var sut = EqualsMethod.FromType<ClassWithBase_ThatHasEqualsOverride>();
-            Assert.That(CallsBase(sut));
         }
     }
 }

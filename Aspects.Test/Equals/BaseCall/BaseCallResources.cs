@@ -7,6 +7,24 @@ namespace Aspects.Test.Equals.BaseCall
 {
     using BaseCall = Aspects.BaseCall;
 
+    public static class BaseCallResources
+    {
+        public static readonly Type[] MustCallBase =
+        {
+            typeof(ClassWithBase_ThatHasAutoEquals),
+            typeof(ClassEmpty_WithBaseCallOn),
+            typeof(ClassWithBase_ThatHasEqualsOnMember),
+            typeof(ClassWithBase_ThatHasEqualsOverride),
+        };
+
+        public static readonly Type[] MustNotCallBase =
+        {
+            typeof(ClassEmptyWithBase_ThatHasAutoEquals_WithBaseCallOff),
+            typeof(NonReferenceTypeEmpty_WithBaseCallOn),
+            typeof(ClassWithBase_ThatHasNoEqualsOverride),
+        };
+    }
+
     [AutoEquals]
     public partial class ClassEmpty { }
 

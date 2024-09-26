@@ -2,87 +2,117 @@
 
 namespace Aspects.Test.Equals.DataMembers
 {
-    using NullSafety = Aspects.NullSafety;
+    public static class DataMemberResources
+    {
+        public static readonly Type[] MustUseField =
+        {
+            typeof(ClassWithPropertyLinkedField_DataMemberKind_DataMember),
+            typeof(ClassWithPropertyLinkedField_DataMemberKind_Field),
+            typeof(ClassWithGeneratedProperty_DataMemberKind_DataMember),
+        };
+
+        public static readonly Type[] MustUseProperty =
+        {
+            typeof(ClassWithPropertyLinkedField_DataMemberKind_Property),
+            typeof(ClassWithPropertyLinkedField_ArrowFunction_DataMemberKind_Property),
+            typeof(ClassWithPropertyLinkedField_ArrowFunction_Coalesce_DataMemberKind_Property),
+            typeof(ClassWithGeneratedProperty_DataMemberKind_Property),
+            typeof(ClassWithGeneratedProperty_DataMemberKind_Field),
+            typeof(ClassWithQueryProperty_WithEqualsInclude),
+            typeof(ClassWithGeneratedProperty_WithFieldConfiguration)
+        };
+
+        public static readonly Type[] MustBeIgnored =
+        {
+            typeof(ClassWithEvent),
+            typeof(ClassWithConstantField),
+            typeof(ClassWithConstantField_WithEqualsInclude),
+            typeof(ClassWithStaticField),
+            typeof(ClassWithStaticField_WithEqualsInclude),
+            typeof(ClassWithQueryProperty_WithDataMemberKindProperty),
+            typeof(ClassWithQueryProperty_WithDefaultSettings)
+        };
+    }
 
     [AutoEquals]
     public partial class ClassWithPropertyLinkedField_DataMemberKind_DataMember
     {
-        private int _int;
+        private int _field;
 
-        public int Int
+        public int Property
         {
-            get => _int;
-            set => _int = value;
+            get => _field;
+            set => _field = value;
         }
     }
 
     [AutoEquals(dataMemberKind: DataMemberKind.Field)]
     public partial class ClassWithPropertyLinkedField_DataMemberKind_Field
     {
-        private int _int;
+        private int _field;
 
-        public int Int
+        public int Property
         {
-            get => _int;
-            set => _int = value;
+            get => _field;
+            set => _field = value;
         }
     }
 
     [AutoEquals(dataMemberKind: DataMemberKind.Property)]
     public partial class ClassWithPropertyLinkedField_DataMemberKind_Property
     {
-        private int _int;
+        private int _field;
 
-        public int Int
+        public int Property
         {
-            get => _int;
-            set => _int = value;
+            get => _field;
+            set => _field = value;
         }
     }
 
     [AutoEquals(dataMemberKind: DataMemberKind.Property)]
     public partial class ClassWithPropertyLinkedField_ArrowFunction_DataMemberKind_Property
     {
-        private int _int;
+        private int _field;
 
-        public int Int => _int;
+        public int Property => _field;
     }
 
     [AutoEquals(dataMemberKind: DataMemberKind.Property)]
     public partial class ClassWithPropertyLinkedField_ArrowFunction_Coalesce_DataMemberKind_Property
     {
-        private int? _int;
+        private int? _field;
 
-        public int Int => _int ?? 0;
+        public int Property => _field ?? 0;
     }
 
     [AutoEquals(dataMemberKind: DataMemberKind.Property)]
     public partial class ClassWithGeneratedProperty_DataMemberKind_Property
     {
         [NotifyPropertyChanged]
-        private int _int;
+        private int _field;
     }
 
     [AutoEquals(dataMemberKind: DataMemberKind.Field)]
     public partial class ClassWithGeneratedProperty_DataMemberKind_Field
     {
         [NotifyPropertyChanged]
-        private int _int;
+        private int _field;
     }
 
     [AutoEquals]
     public partial class ClassWithGeneratedProperty_DataMemberKind_DataMember
     {
         [NotifyPropertyChanged]
-        private int _int;
+        private int _field;
     }
 
     [AutoEquals(DataMemberKind.Property)]
     public partial class ClassWithGeneratedProperty_WithFieldConfiguration
     {
-        [Equals(nullSafety: NullSafety.On)]
+        [Equals]
         [NotifyPropertyChanged]
-        private object _object = null!;
+        private int _property;
     }
 
     [AutoEquals]
@@ -97,7 +127,6 @@ namespace Aspects.Test.Equals.DataMembers
         public int Property => 3;
     }
 
-
     public partial class ClassWithQueryProperty_WithEqualsInclude
     {
         [Equals]
@@ -107,31 +136,31 @@ namespace Aspects.Test.Equals.DataMembers
     [AutoEquals]
     public partial class ClassWithConstantField
     {
-        public const int _int = 3;
+        public const int _field = 3;
     }
 
     public partial class ClassWithConstantField_WithEqualsInclude
     {
         [Equals]
-        public const int _int = 3;
+        public const int _field = 3;
     }
 
     [AutoEquals]
     public partial class ClassWithStaticField
     {
-        static int s_int = 3;
+        static int _field = 3;
     }
 
     public partial class ClassWithStaticField_WithEqualsInclude
     {
         [Equals]
-        static int s_int = 3;
+        static int _field = 3;
     }
 
     [AutoEquals]
     public partial class ClassWithEvent
     {
-        public event EventHandler Event;
+        public event EventHandler _field;
     }
 }
 
