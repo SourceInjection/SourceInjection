@@ -2,7 +2,7 @@
 
 namespace Aspects.Test.ToString
 {
-    internal class ToStringMethod
+    internal static class ToStringMethod
     {
         public static IMethod FromType<T>() => FromType(typeof(T));
 

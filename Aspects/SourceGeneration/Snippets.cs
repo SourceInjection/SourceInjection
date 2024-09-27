@@ -20,12 +20,7 @@ namespace Aspects.SourceGeneration
             => HashCodeSnippets.GetHashCode(member, nullSafe, comparer);
 
         public static string MemberToString(DataMemberSymbolInfo member, string label, string format)
-        {
-            var coalesce = !string.IsNullOrEmpty(format) 
-                && (member.Type.HasNullableAnnotation() || member.Type.IsReferenceType);
-
-            return ToStringSnippets.MemberToString(member.Name, label, format, coalesce);
-        }  
+            => ToStringSnippets.MemberToString(member.Name, label, format);
 
         public static string UnconflictingVariable(INamedTypeSymbol type, string name = "temp")
         {

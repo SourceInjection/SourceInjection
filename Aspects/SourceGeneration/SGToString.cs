@@ -31,7 +31,7 @@ namespace Aspects
             var config = GetConfigAttribute(typeInfo);
 
             var sb = new StringBuilder();
-            sb.AppendLine($"public override string {Name}()");
+            sb.AppendLine($"public override string {nameof(ToString)}()");
             sb.AppendLine("{");
 
             sb.Append(Text.Indent($"return $\"({typeInfo.Name})"));

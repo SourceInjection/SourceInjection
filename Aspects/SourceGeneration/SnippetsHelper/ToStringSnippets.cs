@@ -1,10 +1,10 @@
 ﻿namespace Aspects.SourceGeneration.SnippetsHelper
 {
-    internal class ToStringSnippets
+    internal static class ToStringSnippets
     {
-        public static string MemberToString(string member, string label, string format, bool coalesce)
+        public static string MemberToString(string member, string label, string format)
         {
-            return $"{MemberLabel(member, label)}: {MemberValue(member, format, coalesce)}";
+            return $"{MemberLabel(member, label)}: {MemberValue(member, format)}";
         }
 
         private static string MemberLabel(string member, string label)
@@ -14,12 +14,11 @@
             return label;
         }
 
-        private static string MemberValue(string member, string format, bool coalesce)
+        private static string MemberValue(string member, string format)
         {
             if (string.IsNullOrEmpty(format))
                 return $"{{{member}}}";
-            var coalesceOp = coalesce ? "?" : string.Empty;
-            return $"{{{member}{coalesceOp}.ToString(\"{format}\")}}";
+            return $"{{{member}:{format}}}";
         }
     }
 }

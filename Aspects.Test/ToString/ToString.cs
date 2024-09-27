@@ -5,11 +5,9 @@ namespace Aspects.Test.ToString
 {
     internal static class ToString
     {
-        public static string Member(string memberName, string? label = null, string? format = null, bool coalesce = false)
-        {
-            return ToStringSnippets.MemberToString(memberName, label, format, coalesce);
-        }
-
+        public static string Member(string memberName, string? label = null, string? format = null)
+            => ToStringSnippets.MemberToString(memberName, label, format);
+        
         public static string Body(Type type, params string[] memberToString)
         {
             var sb = new StringBuilder($"{{ return $\"({type.Name})");
