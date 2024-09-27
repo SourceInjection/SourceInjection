@@ -37,10 +37,16 @@ namespace Aspects
         /// <see langword="protected"/> and <see langword="private"/> modifiers are present.
         /// </summary>
         ProtectedPrivate = 32,
-        /// <summary>
-        /// <see langword="file"/> modifier is present.
-        /// </summary>
-        File = 64,
+
+        All = Public | ProtectedInternal | Internal | Protected | ProtectedPrivate | Private,
+
+        GreaterPrivate = Public | ProtectedInternal | Internal | Protected | ProtectedPrivate,
+
+        GreaterProtectedPrivate = Public | ProtectedInternal | Internal | Protected,
+
+        GreaterProtected = Public | ProtectedInternal | Internal,
+
+        GreaterInternal = Public | ProtectedInternal,
     }
 
 

@@ -12,7 +12,9 @@ using Aspects.SourceGeneration.Common;
 
 namespace Aspects.SourceGeneration.Base
 {
-    internal abstract class ObjectMethodSourceGeneratorBase<TConfigAttribute, TAttribute, TExcludeAttribute> : TypeSourceGeneratorBase 
+    internal abstract class ObjectMethodSourceGeneratorBase<TConfigAttribute, TAttribute, TExcludeAttribute> 
+        : TypeSourceGeneratorBase 
+
         where TConfigAttribute : class 
         where TAttribute : class
         where TExcludeAttribute : class

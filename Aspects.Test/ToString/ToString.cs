@@ -4,16 +4,29 @@ namespace Aspects.Test.ToString
 {
     internal static class ToString
     {
-        public static string Body(Type type, params string[] memberNames)
+        public static string Member(string memberName, string? label = null, string? format = null, bool coalesce = false)
+        {
+            var memberLabel = string.IsNullOrEmpty(label) 
+                ? memberName : label;
+
+            var coalesceOp = coalesce ? "?" : string.Empty;
+            var memberValue = string.IsNullOrEmpty(format)
+                ? $"{{{memberName}}}"
+                : $"{{{memberName}{coalesceOp}.ToString(\"{format}\")}}";
+
+            return $"{memberLabel}: {memberValue}";
+        }
+
+        public static string Body(Type type, params string[] memberToString)
         {
             var sb = new StringBuilder($"{{ return $\"({type.Name})");
-            if(memberNames.Length > 0)
+            if(memberToString.Length > 0)
             {
                 sb.Append("{{");
-                sb.Append($"{memberNames[0]}: {{{memberNames[0]}}}");
+                sb.Append(memberToString[0]);
 
-                for (int i = 1; i < memberNames.Length; i++)
-                    sb.Append($", {memberNames[i]}: {{{memberNames[i]}}}");
+                for (int i = 1; i < memberToString.Length; i++)
+                    sb.Append($", {memberToString[i]}");
                 sb.Append("}}");
             }
             sb.Append("\"; }");

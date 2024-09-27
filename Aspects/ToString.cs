@@ -26,10 +26,10 @@ namespace Aspects
         /// Linked fields can only be detected when the property fullfilles the following grammar:
         /// <include file="Comments.xml" path="doc/members/member[@name='Properties:PropertySyntax']/*"/>
         /// </param>
-        public AutoToStringAttribute(DataMemberKind dataMemberKind = DataMemberKind.DataMember, Accessibility accessability = Accessibility.Public)
+        public AutoToStringAttribute(DataMemberKind dataMemberKind = DataMemberKind.DataMember, Accessibility accessibility = Accessibility.Public)
         {
             DataMemberKind = dataMemberKind;
-            Accessibility = accessability;
+            Accessibility = accessibility;
         }
 
         /// <summary>
@@ -49,7 +49,24 @@ namespace Aspects
     /// If used in combination with <see cref="AutoToStringAttribute"/> this attribute includes members that are normally excluded.
     /// </summary>
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, Inherited = true, AllowMultiple = false)]
-    public class ToStringAttribute : Attribute, IToStringAttribute { }
+    public class ToStringAttribute : Attribute, IToStringAttribute 
+    {
+        public ToStringAttribute(string label = null, string format = null)
+        {
+            Label = label;
+            Format = format;
+        }
+
+        /// <summary>
+        /// Defines the name which is used to represent the member.
+        /// </summary>
+        public string Label { get; }
+
+        /// <summary>
+        /// Defines the format which will be handover to the string representation of the targeted object.
+        /// </summary>
+        public string Format { get; }
+    }
 
     /// <summary>
     /// Must be used in combination with <see cref="AutoToStringAttribute"/>.

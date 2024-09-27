@@ -52,7 +52,6 @@ namespace Aspects.SourceGeneration
         public static string EqualityCheck(DataMemberSymbolInfo member, string otherName, bool nullSafe, string comparer)
             => EqualityCheck(member, otherName, nullSafe, comparer, false);
 
-
         private static string EqualityCheck(DataMemberSymbolInfo member, string otherName, bool nullSafe, string comparer, bool isInequality)
         {
             if (!string.IsNullOrEmpty(comparer))

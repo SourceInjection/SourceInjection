@@ -1,5 +1,6 @@
 ﻿using Aspects.Interfaces;
 using Aspects.SourceGeneration;
+using Microsoft.CodeAnalysis;
 using System;
 using System.ComponentModel;
 
@@ -26,9 +27,9 @@ namespace Aspects
         /// </summary>
         /// <param name="field">The field from which the property is generated.</param>
         /// <returns>The name of the generated property.</returns>
-        public string PropertyName(string fieldName)
+        public string PropertyName(IFieldSymbol field)
         {
-            return Snippets.PropertyNameFromField(fieldName);
+            return Snippets.PropertyNameFromField(field);
         }
 
         public Microsoft.CodeAnalysis.Accessibility Accessibility => Microsoft.CodeAnalysis.Accessibility.Public;

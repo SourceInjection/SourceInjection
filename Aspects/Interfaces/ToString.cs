@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Aspects.Interfaces
+﻿namespace Aspects.Interfaces
 {
     public interface IAutoToStringAttribute 
     {
@@ -9,7 +7,12 @@ namespace Aspects.Interfaces
         Accessibility Accessibility { get; }
     }
 
-    public interface IToStringAttribute { }
+    public interface IToStringAttribute 
+    {
+        string Label { get; }
+
+        string Format { get; }
+    }
 
     public interface IToStringExcludeAttribute { }
 }

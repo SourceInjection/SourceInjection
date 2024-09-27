@@ -1,10 +1,12 @@
 ﻿
 namespace Aspects.Interfaces
 {
+    using Microsoft.CodeAnalysis;
     using Accessibility = Microsoft.CodeAnalysis.Accessibility;
+
     public interface IGeneratesDataMemberPropertyFromFieldAttribute 
     {
-        string PropertyName(string fieldName);
+        string PropertyName(IFieldSymbol field);
 
         Accessibility Accessibility { get; }
 

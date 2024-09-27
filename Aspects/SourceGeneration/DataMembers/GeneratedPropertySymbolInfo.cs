@@ -47,7 +47,7 @@ namespace Aspects.SourceGeneration.DataMembers
                 field.AttributesOfType<IGeneratesDataMemberPropertyFromFieldAttribute>().First());
 
             return new GeneratedPropertySymbolInfo(
-                name: attribute.PropertyName(field.Name),
+                name: attribute.PropertyName(field),
                 declaredAccessibility: attribute.Accessibility,
                 containingType: field.ContainingType,
                 attributes: field.GetAttributes(),

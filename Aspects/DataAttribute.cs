@@ -9,12 +9,14 @@ namespace Aspects
             DataMemberKind dataMemberKind = DataMemberKind.DataMember,
             NullSafety nullSafety = NullSafety.Auto,
             BaseCall baseCall = BaseCall.Auto, 
-            bool storeHashCode = false)
+            bool storeHashCode = false,
+            Accessibility toStringAccessibility = Accessibility.Public)
         {
             DataMemberKind = dataMemberKind;
             NullSafety = nullSafety;
             BaseCall = baseCall;
             StoreHashCode = storeHashCode;
+            Accessibility = toStringAccessibility;
         }
 
         public DataMemberKind DataMemberKind { get; }
@@ -24,5 +26,7 @@ namespace Aspects
         public BaseCall BaseCall { get; }
 
         public bool StoreHashCode { get; }
+
+        public Accessibility Accessibility { get; }
     }
 }

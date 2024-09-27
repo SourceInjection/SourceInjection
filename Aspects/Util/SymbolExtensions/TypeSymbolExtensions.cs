@@ -70,6 +70,17 @@ namespace Aspects.Util.SymbolExtensions
                 || symbol.AllInterfaces.Any(i => i.ToDisplayString().StartsWith(NameOf.GenericIEnumerable));
         }
 
+        public static bool OverridesToString(this ITypeSymbol symbol)
+        {
+            return symbol.HasAttributeOfType<IAutoToStringAttribute>()
+                || symbol.GetMembers().Any(m => m.HasAttributeOfType<IToStringAttribute>())
+                || symbol.GetMembers().OfType<IMethodSymbol>().Any(m =>
+                    m.Name == nameof(ToString)
+                    && m.IsOverride
+                    && m.ReturnType.IsString()
+                    && m.Parameters.Length == 0);
+        }
+
         public static bool OverridesEquals(this ITypeSymbol symbol)
         {
             return symbol.HasAttributeOfType<IAutoEqualsAttribute>()
