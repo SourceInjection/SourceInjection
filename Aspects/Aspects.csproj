@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.1" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.1" PrivateAssets="analyzers;build" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.11.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4" />
   </ItemGroup>
@@ -30,6 +30,15 @@
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
       <_Parameter1>Aspects.Test</_Parameter1>
     </AssemblyAttribute>
+  </ItemGroup>
+
+  <ItemGroup>
+	  <ProjectReference Include="..\Aspects.Collections\Aspects.Collections.csproj">
+		  <PrivateAssets>analyzers;build</PrivateAssets>
+	  </ProjectReference>
+	  <ProjectReference Include="..\Aspects.FormatProviders\Aspects.FormatProviders.csproj">
+		  <PrivateAssets>analyzers;build</PrivateAssets>
+	  </ProjectReference>
   </ItemGroup>
 
 </Project>
