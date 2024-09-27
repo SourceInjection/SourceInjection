@@ -8,6 +8,7 @@ using TypeInfo = Aspects.SourceGeneration.Common.TypeInfo;
 using PropertyInfo = Aspects.SourceGeneration.Common.PropertyInfo;
 using Aspects.SourceGeneration.SyntaxReceivers;
 using Aspects.SourceGeneration.Common;
+using Aspects.Util;
 
 namespace Aspects.SourceGeneration.Base
 {

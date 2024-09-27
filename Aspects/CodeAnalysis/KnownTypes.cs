@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Aspects.Util
+namespace Aspects.CodeAnalysis
 {
     internal static class KnownTypes
     {

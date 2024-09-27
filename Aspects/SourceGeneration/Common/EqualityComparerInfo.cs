@@ -3,6 +3,7 @@ using System.Reflection;
 using System;
 using System.Linq;
 using Aspects.CodeAnalysis;
+using Aspects.Util;
 
 namespace Aspects.SourceGeneration.Common
 {

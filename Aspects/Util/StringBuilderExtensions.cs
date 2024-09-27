@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace Aspects.CodeAnalysis
+namespace Aspects.Util
 {
     internal static class StringBuilderExtensions
     {

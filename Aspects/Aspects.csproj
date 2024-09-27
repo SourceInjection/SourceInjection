@@ -33,7 +33,6 @@
   </ItemGroup>
 
   <ItemGroup>
-	  <ProjectReference Include="..\Aspects.CodeAnalysis\Aspects.CodeAnalysis.csproj" />
 	  <ProjectReference Include="..\Aspects.Collections\Aspects.Collections.csproj">
 		  <PrivateAssets>analyzers;build</PrivateAssets>
 	  </ProjectReference>
