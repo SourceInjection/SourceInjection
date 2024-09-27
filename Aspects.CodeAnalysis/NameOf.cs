@@ -1,6 +1,6 @@
-﻿namespace Aspects.SourceGeneration.Common
+﻿namespace Aspects.CodeAnalysis
 {
-    internal static class NameOf
+    public static class NameOf
     {
         public static string GenericIEnumerable { get; } = "System.Collections.Generic.IEnumerable";
 

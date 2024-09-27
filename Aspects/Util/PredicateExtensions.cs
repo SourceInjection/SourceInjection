@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Aspects.Util
+namespace Aspects.CodeAnalysis
 {
     internal static class PredicateExtensions
     {

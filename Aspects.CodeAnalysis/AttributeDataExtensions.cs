@@ -1,9 +1,8 @@
-﻿using Aspects.SourceGeneration.Common;
-using Microsoft.CodeAnalysis;
+﻿using Microsoft.CodeAnalysis;
 
-namespace Aspects.Util
+namespace Aspects.CodeAnalysis
 {
-    internal static class AttributeDataExtensions
+    public static class AttributeDataExtensions
     {
         public static bool IsNotNullAttribute(this AttributeData attData)
         {

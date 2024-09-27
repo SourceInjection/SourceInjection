@@ -1,9 +1,9 @@
 ﻿using Aspects.Interfaces;
-using Aspects.Util.SymbolExtensions;
 using Microsoft.CodeAnalysis;
 using System.Collections.Immutable;
 using System.Linq;
 using Aspects.SourceGeneration.Common;
+using Aspects.CodeAnalysis;
 
 namespace Aspects.SourceGeneration.DataMembers
 {

@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Aspects.Util.SymbolExtensions
+namespace Aspects.CodeAnalysis
 {
-    internal static class NamedTypeSymbolExtensions
+    public static class NamedTypeSymbolExtensions
     {
         public static IEnumerable<INamedTypeSymbol> InheritanceFromBottomToTop(this INamedTypeSymbol symbol)
         {

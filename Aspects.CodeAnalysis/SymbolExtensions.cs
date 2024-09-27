@@ -1,11 +1,10 @@
 ﻿using Microsoft.CodeAnalysis;
 using System.Collections.Generic;
 using System.Linq;
-using Aspects.SourceGeneration.Common;
 
-namespace Aspects.Util.SymbolExtensions
+namespace Aspects.CodeAnalysis
 {
-    internal static class SymbolExtensions
+    public static class SymbolExtensions
     {
         public static bool HasAttributeOfType<T>(this ISymbol symbol)
         {

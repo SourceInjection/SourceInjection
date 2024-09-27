@@ -7,8 +7,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using TypeInfo = Aspects.SourceGeneration.Common.TypeInfo;
-using Aspects.Util.SymbolExtensions;
 using Aspects.SourceGeneration;
+using Aspects.CodeAnalysis;
+using Aspects.Util;
 
 #pragma warning disable IDE0130
 

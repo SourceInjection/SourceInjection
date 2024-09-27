@@ -1,9 +1,8 @@
-﻿using Aspects.Util.SymbolExtensions;
-using Microsoft.CodeAnalysis;
+﻿using Microsoft.CodeAnalysis;
 using System.Reflection;
 using System;
 using System.Linq;
-using Aspects.Util;
+using Aspects.CodeAnalysis;
 
 namespace Aspects.SourceGeneration.Common
 {

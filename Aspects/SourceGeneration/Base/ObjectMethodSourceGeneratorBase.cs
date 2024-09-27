@@ -1,12 +1,11 @@
 ﻿using Aspects.Interfaces;
 using Aspects.SourceGeneration.DataMembers;
-using Aspects.Util;
+using Aspects.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 using System.Collections.Generic;
 using System.Linq;
 using TypeInfo = Aspects.SourceGeneration.Common.TypeInfo;
 using PropertyInfo = Aspects.SourceGeneration.Common.PropertyInfo;
-using Aspects.Util.SymbolExtensions;
 using Aspects.SourceGeneration.SyntaxReceivers;
 using Aspects.SourceGeneration.Common;
 

@@ -1,5 +1,4 @@
-﻿using Aspects.Util.SymbolExtensions;
-using Aspects.Util.DeclarationSyntaxExtensions;
+﻿using Aspects.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Generic;

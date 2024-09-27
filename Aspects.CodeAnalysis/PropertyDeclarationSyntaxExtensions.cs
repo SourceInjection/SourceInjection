@@ -3,9 +3,9 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Linq;
 
-namespace Aspects.Util.DeclarationSyntaxExtensions
+namespace Aspects.CodeAnalysis
 {
-    internal static class PropertyDeclarationSyntaxExtensions
+    public static class PropertyDeclarationSyntaxExtensions
     {
 
         public static bool IsDataMember(this PropertyDeclarationSyntax propertySyntax)

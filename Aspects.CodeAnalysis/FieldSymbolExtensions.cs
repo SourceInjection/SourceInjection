@@ -1,8 +1,8 @@
 ﻿using Microsoft.CodeAnalysis;
 
-namespace Aspects.Util.SymbolExtensions
+namespace Aspects.CodeAnalysis
 {
-    internal static class FieldSymbolExtensions
+    public static class FieldSymbolExtensions
     {
         public static bool IsInstanceMember(this IFieldSymbol field)
         {

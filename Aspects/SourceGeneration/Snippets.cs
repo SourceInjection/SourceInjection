@@ -1,6 +1,5 @@
 ﻿using Aspects.SourceGeneration.DataMembers;
 using Aspects.SourceGeneration.SnippetsHelper;
-using Aspects.Util.SymbolExtensions;
 using Microsoft.CodeAnalysis;
 
 namespace Aspects.SourceGeneration

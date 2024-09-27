@@ -4,9 +4,9 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Linq;
 
-namespace Aspects.Util.DeclarationSyntaxExtensions
+namespace Aspects.CodeAnalysis
 {
-    internal static class TypeDeclarationSyntaxExtensions
+    public static class TypeDeclarationSyntaxExtensions
     {
         public static string NameWithGenericParameters(this TypeDeclarationSyntax node)
         {

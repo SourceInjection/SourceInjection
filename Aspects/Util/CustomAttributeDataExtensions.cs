@@ -1,7 +1,7 @@
 ﻿using Aspects.SourceGeneration.Common;
 using System.Reflection;
 
-namespace Aspects.Util
+namespace Aspects.CodeAnalysis
 {
     internal static class CustomAttributeDataExtensions
     {

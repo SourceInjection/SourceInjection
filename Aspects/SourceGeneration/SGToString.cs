@@ -5,10 +5,11 @@ using System.Text;
 using TypeInfo = Aspects.SourceGeneration.Common.TypeInfo;
 using Aspects.SourceGeneration;
 using System.Linq;
-using Aspects.Util.SymbolExtensions;
 using System.Collections.Generic;
 using Aspects.SourceGeneration.Common;
 using Aspects.SourceGeneration.DataMembers;
+using Aspects.Util;
+using Aspects.CodeAnalysis;
 
 #pragma warning disable IDE0130
 

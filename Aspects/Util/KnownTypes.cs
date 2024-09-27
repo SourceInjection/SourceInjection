@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 
-namespace Aspects.SourceGeneration.Common
+namespace Aspects.Util
 {
-    internal class KnownTypes
+    internal static class KnownTypes
     {
         public static readonly HashSet<string> GenericCollections = new HashSet<string>()
         {

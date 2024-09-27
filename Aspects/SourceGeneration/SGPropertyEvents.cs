@@ -1,7 +1,6 @@
 ﻿using Aspects.Interfaces;
 using Aspects.SourceGeneration.Base;
-using Aspects.Util;
-using Aspects.Util.SymbolExtensions;
+using Aspects.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 using System;
 using System.Collections.Generic;

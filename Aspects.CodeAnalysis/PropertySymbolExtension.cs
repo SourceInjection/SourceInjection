@@ -1,9 +1,9 @@
 ﻿using Microsoft.CodeAnalysis;
 using System.Linq;
 
-namespace Aspects.Util.SymbolExtensions
+namespace Aspects.CodeAnalysis
 {
-    internal static class PropertySymbolExtension
+    public static class PropertySymbolExtension
     {
         public static bool HidesBasePropertyByName(this IPropertySymbol symbol)
         {

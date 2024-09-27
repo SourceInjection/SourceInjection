@@ -1,4 +1,4 @@
-﻿using Aspects.Util.SymbolExtensions;
+﻿using Aspects.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 using System;
 using System.Linq;

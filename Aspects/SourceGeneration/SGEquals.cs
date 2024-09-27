@@ -2,13 +2,13 @@
 using Aspects.SourceGeneration.Base;
 using Aspects.SourceGeneration.DataMembers;
 using Aspects.SourceGeneration.Common;
-using Aspects.Util;
+using Aspects.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using TypeInfo = Aspects.SourceGeneration.Common.TypeInfo;
-using Aspects.Util.SymbolExtensions;
 using Aspects.SourceGeneration;
+using Aspects.Util;
 
 #pragma warning disable IDE0130
 

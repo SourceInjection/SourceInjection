@@ -1,5 +1,4 @@
-﻿using Aspects.Util;
-using Aspects.Util.SymbolExtensions;
+﻿using Aspects.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 using System.Collections.Generic;
 using System.Collections.Immutable;
