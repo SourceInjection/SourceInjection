@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using Aspects.SourceGeneration.SnippetsHelper;
+using System.Text;
 
 namespace Aspects.Test.ToString
 {
@@ -6,15 +7,7 @@ namespace Aspects.Test.ToString
     {
         public static string Member(string memberName, string? label = null, string? format = null, bool coalesce = false)
         {
-            var memberLabel = string.IsNullOrEmpty(label) 
-                ? memberName : label;
-
-            var coalesceOp = coalesce ? "?" : string.Empty;
-            var memberValue = string.IsNullOrEmpty(format)
-                ? $"{{{memberName}}}"
-                : $"{{{memberName}{coalesceOp}.ToString(\"{format}\")}}";
-
-            return $"{memberLabel}: {memberValue}";
+            return ToStringSnippets.MemberToString(memberName, label, format, coalesce);
         }
 
         public static string Body(Type type, params string[] memberToString)

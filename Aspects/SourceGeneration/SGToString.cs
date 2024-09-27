@@ -5,10 +5,10 @@ using System.Text;
 using TypeInfo = Aspects.SourceGeneration.Common.TypeInfo;
 using Aspects.SourceGeneration;
 using System.Linq;
-using Aspects.SourceGeneration.DataMembers;
 using Aspects.Util.SymbolExtensions;
 using System.Collections.Generic;
 using Aspects.SourceGeneration.Common;
+using Aspects.SourceGeneration.DataMembers;
 
 #pragma warning disable IDE0130
 
@@ -62,14 +62,20 @@ namespace Aspects
             return sb.ToString();
         }
 
+        private string MemberToString(DataMemberSymbolInfo member)
+        {
+            var config = GetMemberConfigAttribute(member);
+            return Snippets.MemberToString(member, config.Label, config.Format);
+        }
+
         private static IEnumerable<Microsoft.CodeAnalysis.Accessibility> GetAllowedAccessibilities(Accessibility accessibility)
         {
-            if (accessibility.HasFlag(Accessibility.Public)) yield return Microsoft.CodeAnalysis.Accessibility.Public;
-            if (accessibility.HasFlag(Accessibility.Internal)) yield return Microsoft.CodeAnalysis.Accessibility.Internal;
-            if(accessibility.HasFlag(Accessibility.Protected)) yield return Microsoft.CodeAnalysis.Accessibility.Protected;
-            if(accessibility.HasFlag(Accessibility.Private)) yield return Microsoft.CodeAnalysis.Accessibility.Private;
+            if (accessibility.HasFlag(Accessibility.Public))            yield return Microsoft.CodeAnalysis.Accessibility.Public;
+            if (accessibility.HasFlag(Accessibility.Internal))          yield return Microsoft.CodeAnalysis.Accessibility.Internal;
+            if (accessibility.HasFlag(Accessibility.Protected))         yield return Microsoft.CodeAnalysis.Accessibility.Protected;
+            if (accessibility.HasFlag(Accessibility.Private))           yield return Microsoft.CodeAnalysis.Accessibility.Private;
             if (accessibility.HasFlag(Accessibility.ProtectedInternal)) yield return Microsoft.CodeAnalysis.Accessibility.ProtectedOrInternal;
-            if (accessibility.HasFlag(Accessibility.ProtectedPrivate)) yield return Microsoft.CodeAnalysis.Accessibility.ProtectedAndInternal;
+            if (accessibility.HasFlag(Accessibility.ProtectedPrivate))  yield return Microsoft.CodeAnalysis.Accessibility.ProtectedAndInternal;
         }
 
         private static bool SymbolIsAllowed(ISymbol symbol, Microsoft.CodeAnalysis.Accessibility[] accessibilities)
@@ -119,30 +125,6 @@ namespace Aspects
             if (getterAccessibility == Microsoft.CodeAnalysis.Accessibility.NotApplicable)
                 return declaredAccessibility;
             return getterAccessibility;
-        }
-
-        private string MemberToString(DataMemberSymbolInfo member)
-        {
-            var config = GetMemberConfigAttribute(member);
-            return $"{MemberLabel(member, config)}: {MemberValue(member, config)}";
-        }
-
-        private string MemberLabel(DataMemberSymbolInfo member, IToStringAttribute config)
-        {
-            if(string.IsNullOrEmpty(config.Label))
-                return member.Name;
-            return config.Label;
-        }
-
-        private string MemberValue(DataMemberSymbolInfo member, IToStringAttribute config)
-        {
-            if (string.IsNullOrEmpty(config.Format))
-                return $"{{{member.Name}}}";
-
-            var coalesce = member.Type.HasNullableAnnotation() || member.Type.IsReferenceType
-                ? "?" : string.Empty;
-
-            return $"{{{member.Name}{coalesce}.ToString(\"{config.Format}\")}}";
         }
     }
 }
