@@ -61,7 +61,7 @@ namespace Aspects.SourceGeneration.Base
 
             sb.AppendLine($"namespace {typeInfo.Symbol.ContainingNamespace.ToDisplayString()}");
             sb.AppendLine("{");
-            sb.Append(Snippets.Indent());
+            sb.Append(Text.Indent());
 
             sb.Append(typeInfo.Declaration);
             var ifaces = InterfacesToAdd(typeInfo);
@@ -69,13 +69,13 @@ namespace Aspects.SourceGeneration.Base
                 sb.AppendLine();
             else
                 sb.AppendLine($" : {string.Join(", ", ifaces)}");
-            sb.AppendLine(Snippets.Indent("{"));
+            sb.AppendLine(Text.Indent("{"));
 
             sb.AppendLine(TypeBody(typeInfo)
-                .Replace("\n", $"\n{Snippets.Indent(tabCount: 2)}")
-                .Insert(0, Snippets.Indent(tabCount: 2)));
+                .Replace("\n", $"\n{Text.Indent(tabCount: 2)}")
+                .Insert(0, Text.Indent(tabCount: 2)));
 
-            sb.AppendLine(Snippets.Indent("}"));
+            sb.AppendLine(Text.Indent("}"));
             sb.Append("}");
 
             return sb.ToString();

@@ -1,4 +1,7 @@
 ﻿using Aspects.SourceGeneration.Common;
+using Aspects.SourceGeneration.DataMembers;
+using Aspects.Util.SymbolExtensions;
+using Microsoft.CodeAnalysis;
 
 namespace Aspects.SourceGeneration.SnippetsHelper
 {
@@ -54,6 +57,40 @@ namespace Aspects.SourceGeneration.SnippetsHelper
             return nullSafe
                 ? Equality(comparerCode, nameA, nameB, isInequality)
                 : MayInversed(comparerCode, isInequality);
+        }
+
+        public static string EqualityCheck(DataMemberSymbolInfo member, string otherName, bool nullSafe, string comparer, bool isInequality)
+        {
+            if (!string.IsNullOrEmpty(comparer))
+            {
+                var suportsNullable = EqualityComparerInfo.EqualsSupportsNullable(comparer, member.Type);
+                comparer = Reduce.ComparerName(member, comparer);
+
+                if (!member.Type.IsReferenceType && member.Type.HasNullableAnnotation() && !suportsNullable)
+                    return ComparerNullableNonReferenceTypeEquality(comparer, member.Name, otherName, nullSafe, isInequality);
+
+                nullSafe = nullSafe && (member.Type.IsReferenceType || member.Type.HasNullableAnnotation());
+
+                return ComparerEquality(comparer, member.Name, otherName, nullSafe, isInequality);
+            }
+
+            if (member.Type.CanUseEqualityOperatorsByDefault())
+                return OperatorEquality(member.Name, otherName, isInequality);
+
+            if (!member.Type.OverridesEquals())
+            {
+                if (member.Type.CanUseSequenceEquals())
+                    return LinqSequenceEquality(member.Name, otherName, nullSafe, isInequality);
+
+                if (member.Type is IArrayTypeSymbol arrayType && arrayType.Rank > 1)
+                    return AspectsArrayEquality(member.Name, otherName, nullSafe, isInequality);
+
+                if (member.Type.IsEnumerable())
+                    return AspectsSequenceEquality(member.Name, otherName, nullSafe, isInequality);
+            }
+            nullSafe &= member.Type.IsReferenceType;
+
+            return MethodEquality(member.Name, otherName, nullSafe, isInequality);
         }
 
         private static string MayInversed(string s, bool isInequality) => isInequality ? '!' + s : s;

@@ -62,24 +62,24 @@ namespace Aspects
 
             if (config.StoreHashCode)
             {
-                sb.AppendLine(Snippets.Indent($"if({StoredHashCode}.HasValue)"));
-                sb.AppendLine(Snippets.Indent($"return {StoredHashCode}.Value;", 2));
+                sb.AppendLine(Text.Indent($"if({StoredHashCode}.HasValue)"));
+                sb.AppendLine(Text.Indent($"return {StoredHashCode}.Value;", 2));
             }
-            sb.AppendLine(Snippets.Indent("var hash = new System.HashCode();"));
-            sb.AppendLine(Snippets.Indent($"hash.Add(\"{name}\");"));
+            sb.AppendLine(Text.Indent("var hash = new System.HashCode();"));
+            sb.AppendLine(Text.Indent($"hash.Add(\"{name}\");"));
 
             if (includeBase)
-                sb.AppendLine(Snippets.Indent($"hash.Add(base.{nameof(GetHashCode)}());"));
+                sb.AppendLine(Text.Indent($"hash.Add(base.{nameof(GetHashCode)}());"));
 
             for (int i = 0; i < symbols.Count; i++)
-                sb.AppendLine(Snippets.Indent($"hash.Add({MemberHash(symbols[i], typeInfo)});"));
+                sb.AppendLine(Text.Indent($"hash.Add({MemberHash(symbols[i], typeInfo)});"));
 
             if (!config.StoreHashCode)
-                sb.Append(Snippets.Indent("return hash.ToHashCode();"));
+                sb.Append(Text.Indent("return hash.ToHashCode();"));
             else
             {
-                sb.AppendLine(Snippets.Indent($"{StoredHashCode} = hash.ToHashCode();"));
-                sb.Append(Snippets.Indent($"return {StoredHashCode}.Value;"));
+                sb.AppendLine(Text.Indent($"{StoredHashCode} = hash.ToHashCode();"));
+                sb.Append(Text.Indent($"return {StoredHashCode}.Value;"));
             }
             return sb.ToString();
         }
@@ -92,31 +92,31 @@ namespace Aspects
             var name = typeInfo.Symbol.ToDisplayString();
 
             if (!config.StoreHashCode)
-                sb.Append(Snippets.Indent("return"));
-            else sb.Append(Snippets.Indent($"{StoredHashCode} ??="));
+                sb.Append(Text.Indent("return"));
+            else sb.Append(Text.Indent($"{StoredHashCode} ??="));
 
             sb.Append(" System.HashCode.Combine(");
 
             sb.AppendLine();
-            sb.Append(Snippets.Indent($"\"{name}\"", tabs));
+            sb.Append(Text.Indent($"\"{name}\"", tabs));
             if (includeBase || symbols.Count > 0)
                 sb.AppendLine(",");
 
             if (includeBase)
             {
-                sb.Append(Snippets.Indent($"base.{nameof(GetHashCode)}()", tabs));
+                sb.Append(Text.Indent($"base.{nameof(GetHashCode)}()", tabs));
                 if (symbols.Count > 0)
                     sb.Append(',');
             }
 
             if (symbols.Count > 0)
             {
-                sb.Append(Snippets.Indent($"{MemberHash(symbols[0], typeInfo)}", tabs));
+                sb.Append(Text.Indent($"{MemberHash(symbols[0], typeInfo)}", tabs));
 
                 for (var i = 1; i < symbols.Count; i++)
                 {
                     sb.AppendLine(",");
-                    sb.Append(Snippets.Indent($"{MemberHash(symbols[i], typeInfo)}", tabs));
+                    sb.Append(Text.Indent($"{MemberHash(symbols[i], typeInfo)}", tabs));
                 }
             }
             sb.Append(");");

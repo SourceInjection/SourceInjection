@@ -56,8 +56,8 @@ namespace Aspects
         private void AppendEquals(TypeInfo typeInfo, StringBuilder sb)
         {
             AppendEqualsHead(typeInfo, sb, "object", argName, true);
-            sb.AppendLine(Snippets.Indent($"return {argName} is {typeInfo.Name} {otherName}"));
-            sb.AppendLine(Snippets.Indent($"&& {nameof(Equals)}({otherName});", 2));
+            sb.AppendLine(Text.Indent($"return {argName} is {typeInfo.Name} {otherName}"));
+            sb.AppendLine(Text.Indent($"&& {nameof(Equals)}({otherName});", 2));
             AppendMethodEnd(typeInfo, sb);
         }
 
@@ -68,7 +68,7 @@ namespace Aspects
 
             AppendEqualsHead(typeInfo, sb, typeInfo.Name, otherName, false);
 
-            sb.Append(Snippets.Indent("return "));
+            sb.Append(Text.Indent("return "));
             if (typeInfo.Symbol.IsReferenceType)
                 sb.Append($"{otherName} == this || ");
 
@@ -84,7 +84,7 @@ namespace Aspects
             if (ShouldIncludeBase(typeInfo, config))
             {
                 sb.AppendLine();
-                sb.Append(Snippets.Indent($"&& base.{nameof(Equals)}({otherName})", 2));
+                sb.Append(Text.Indent($"&& base.{nameof(Equals)}({otherName})", 2));
             }
 
             foreach (var symbol in symbols)
@@ -94,7 +94,7 @@ namespace Aspects
                     typeInfo,
                     config);
 
-                sb.AppendLine().Append(Snippets.Indent($"&& {memberEquals}", 2));
+                sb.AppendLine().Append(Text.Indent($"&& {memberEquals}", 2));
             }
 
             sb.AppendLine(";");

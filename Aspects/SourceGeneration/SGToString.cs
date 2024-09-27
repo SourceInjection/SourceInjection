@@ -34,7 +34,7 @@ namespace Aspects
             sb.AppendLine($"public override string {Name}()");
             sb.AppendLine("{");
 
-            sb.Append(Snippets.Indent($"return $\"({typeInfo.Name})"));
+            sb.Append(Text.Indent($"return $\"({typeInfo.Name})"));
 
             var allowedAccessibilities = GetAllowedAccessibilities(config.Accessibility).ToArray();
 
