@@ -49,10 +49,10 @@ namespace Aspects.CodeAnalysis
 
             if (member.DeclaredAccessibility == Microsoft.CodeAnalysis.Accessibility.ProtectedAndInternal)
             {
-                var memberAssebly = member.ContainingType?.ContainingAssembly;
-                if (memberAssebly is null)
+                var memberAssembly = member.ContainingType?.ContainingAssembly;
+                if (memberAssembly is null)
                     return false;
-                return symbol.ContainingAssembly.Equals(memberAssebly, SymbolEqualityComparer.Default);
+                return symbol.ContainingAssembly.Equals(memberAssembly, SymbolEqualityComparer.Default);
             }
 
             return false;
