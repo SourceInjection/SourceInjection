@@ -30,15 +30,22 @@ namespace SourceInjection
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, Inherited = true, AllowMultiple = false)]
     public class ToStringAttribute : Attribute, IToStringAttribute
     {
-        public ToStringAttribute(string label = null, string format = null)
+        public ToStringAttribute(string label = null, string format = null, Type formatProvider = null)
+            : this(label, format, formatProvider?.FullName) 
+        { }
+
+        private ToStringAttribute(string label = null, string format = null, string formatProvider = null)
         {
             Label = label;
             Format = format;
+            FormatProvider = formatProvider;
         }
 
         public string Label { get; }
 
         public string Format { get; }
+
+        public string FormatProvider { get; }
     }
 
     /// <summary>

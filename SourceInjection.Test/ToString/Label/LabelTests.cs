@@ -1,5 +1,6 @@
 ﻿using CompileUnits.CSharp;
 using NUnit.Framework;
+using System.Globalization;
 
 namespace SourceInjection.Test.ToString.Label
 {
