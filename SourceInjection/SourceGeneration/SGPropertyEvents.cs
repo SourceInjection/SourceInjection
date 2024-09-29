@@ -8,7 +8,6 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using TypeInfo = SourceInjection.SourceGeneration.Common.TypeInfo;
-using SourceInjection.SourceGeneration.SyntaxReceivers;
 using SourceInjection.SourceGeneration.DataMembers;
 using SourceInjection.SourceGeneration;
 using SourceInjection.SourceGeneration.Common;
@@ -18,7 +17,7 @@ using SourceInjection.Util;
 
 namespace SourceInjection
 {
-    [Generator]
+    [Generator(LanguageNames.CSharp)]
     internal class SGPropertyEvents : TypeSourceGeneratorBase
     {
         private const string PropertyChanged = nameof(INotifyPropertyChanged.PropertyChanged);
@@ -43,14 +42,15 @@ $@"protected virtual void {PropertyChangingNotifyMethod}(string propertyName)
 
         protected internal override string Name { get; } = "PropertyEvent";
 
-        protected override TypeSyntaxReceiver SyntaxReceiver { get; } = new TypeSyntaxReceiver(
-                    Types.WithMembersWithAttributeOfType<INotifyPropertyChangedAttribute>()
-                .Or(Types.WithMembersWithAttributeOfType<INotifyPropertyChangingAttribute>()));
-
-
         protected override IEnumerable<string> Dependencies(TypeInfo typeInfo)
         {
             yield return "using System.ComponentModel;";
+        }
+
+        protected override bool IsTargeted(INamedTypeSymbol symbol)
+        {
+            return symbol.GetMembers()
+                .Any(m => m.HasAttributeOfType<INotifyPropertyChangingAttribute>() || m.HasAttributeOfType<INotifyPropertyChangedAttribute>());
         }
 
         protected override IEnumerable<string> InterfacesToAdd(TypeInfo typeInfo)

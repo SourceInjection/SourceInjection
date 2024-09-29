@@ -5,49 +5,63 @@ using TypeInfo = SourceInjection.SourceGeneration.Common.TypeInfo;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using SourceInjection.SourceGeneration.SyntaxReceivers;
 using SourceInjection.SourceGeneration.Diagnostics;
+using System;
 
 namespace SourceInjection.SourceGeneration.Base
 {
-    internal abstract class TypeSourceGeneratorBase : ISourceGenerator
+    internal abstract class TypeSourceGeneratorBase : IIncrementalGenerator
     {
         protected internal abstract string Name { get; }
 
-        protected abstract TypeSyntaxReceiver SyntaxReceiver { get; }
+        protected abstract bool IsTargeted(INamedTypeSymbol symbol);
 
-        public void Initialize(GeneratorInitializationContext context)
+        protected abstract string TypeBody(TypeInfo typeInfo);
+
+        protected virtual IEnumerable<string> Dependencies(TypeInfo typeInfo)
         {
-            context.RegisterForSyntaxNotifications(() => SyntaxReceiver);
+            return Enumerable.Empty<string>();
         }
-
-        public void Execute(GeneratorExecutionContext context)
-        {
-            if (context.SyntaxContextReceiver == SyntaxReceiver || context.SyntaxContextReceiver.Equals(SyntaxReceiver))
-            {
-                foreach (var typeInfo in SyntaxReceiver.IdentifiedTypes)
-                {
-                    if (typeInfo.SyntaxNode.Parent is TypeDeclarationSyntax)
-                        context.ReportDiagnostic(Errors.NestedClassesAreNotSupported(typeInfo.Symbol, Name));
-                    else if (!typeInfo.HasPartialModifier)
-                        context.ReportDiagnostic(Errors.MissingPartialModifier(typeInfo.Symbol, Name));
-                    else
-                    {
-                        var src = GeneratePartialType(typeInfo);
-                        context.AddSource($"{typeInfo.FullName.Replace('<', '[').Replace('>', ']').Replace('.', '/')}-{Name}.g.cs", SourceText.From(src, Encoding.UTF8));
-                    }
-                }
-            }
-        }
-
-        protected abstract IEnumerable<string> Dependencies(TypeInfo typeInfo);
 
         protected virtual IEnumerable<string> InterfacesToAdd(TypeInfo typeInfo)
         {
             return Enumerable.Empty<string>();
         }
 
-        protected abstract string TypeBody(TypeInfo typeInfo);
+        public void Initialize(IncrementalGeneratorInitializationContext context)
+        {
+            var collected = context.SyntaxProvider.CreateSyntaxProvider(
+                (n, _) => n is TypeDeclarationSyntax, 
+                (n, _) => new { Context = n, Symbol = (INamedTypeSymbol)n.SemanticModel.GetDeclaredSymbol(n.Node) })
+                .Collect();
+
+            context.RegisterSourceOutput(collected, (sourceProductionContext, types) =>
+            {
+                foreach(var type in types)
+                {
+                    var typeInfo = new TypeInfo(type.Context, (TypeDeclarationSyntax)type.Context.Node, type.Symbol);
+                    TypeInfo.Consider(type.Symbol.ToDisplayString(), typeInfo);
+
+                    if (!IsTargeted(typeInfo.Symbol))
+                        continue;
+
+                    if (type.Context.Node.Parent is TypeDeclarationSyntax)
+                        sourceProductionContext.ReportDiagnostic(Errors.NestedClassesAreNotSupported(type.Symbol, Name));
+                    else
+                    {
+                        if (!typeInfo.HasPartialModifier)
+                            sourceProductionContext.ReportDiagnostic(Errors.MissingPartialModifier(typeInfo.Symbol, Name));
+                        else
+                        {
+                            var src = GeneratePartialType(typeInfo);
+                            sourceProductionContext.AddSource(
+                                $"{typeInfo.FullName.Replace('<', '[').Replace('>', ']').Replace('.', '/')}-{Name}.g.cs",
+                                SourceText.From(src, Encoding.UTF8));
+                        }
+                    }
+                }
+            });
+        }
 
         private string GeneratePartialType(TypeInfo typeInfo)
         {

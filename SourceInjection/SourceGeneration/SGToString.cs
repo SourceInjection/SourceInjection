@@ -15,7 +15,7 @@ using SourceInjection.CodeAnalysis;
 
 namespace SourceInjection
 {
-    [Generator]
+    [Generator(LanguageNames.CSharp)]
     internal class SGToString
         : ObjectMethodSourceGeneratorBase<IAutoToStringAttribute, IToStringAttribute, IToStringExcludeAttribute>
     {

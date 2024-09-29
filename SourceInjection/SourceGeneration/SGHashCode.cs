@@ -15,7 +15,7 @@ using SourceInjection.Util;
 
 namespace SourceInjection
 {
-    [Generator]
+    [Generator(LanguageNames.CSharp)]
     internal class SGHashCode : ObjectMethodSourceGeneratorBase<IAutoHashCodeAttribute, IHashCodeAttribute, IHashCodeExcludeAttribute>
     {
         private const string StoredHashCode = "_storedHashCode";

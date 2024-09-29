@@ -14,7 +14,7 @@ using SourceInjection.Util;
 
 namespace SourceInjection
 {
-    [Generator]
+    [Generator(LanguageNames.CSharp)]
     internal class SGEquals
         : ObjectMethodSourceGeneratorBase<IAutoEqualsAttribute, IEqualsAttribute, IEqualsExcludeAttribute>
     {

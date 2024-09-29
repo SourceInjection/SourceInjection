@@ -6,9 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TypeInfo = SourceInjection.SourceGeneration.Common.TypeInfo;
 using PropertyInfo = SourceInjection.SourceGeneration.Common.PropertyInfo;
-using SourceInjection.SourceGeneration.SyntaxReceivers;
 using SourceInjection.SourceGeneration.Common;
-using SourceInjection.Util;
 
 namespace SourceInjection.SourceGeneration.Base
 {
@@ -25,13 +23,13 @@ namespace SourceInjection.SourceGeneration.Base
 
         protected abstract TAttribute DefaultMemberConfigAttribute { get; }
 
-        protected override TypeSyntaxReceiver SyntaxReceiver { get; } = new TypeSyntaxReceiver(
-                Types.WithAttributeOfType<TConfigAttribute>()
-            .Or(Types.WithMembersWithAttributeOfType<TAttribute>()));
-
         protected abstract DataMemberPriority Priority { get; }
 
-        protected override IEnumerable<string> Dependencies(TypeInfo typeInfo) => Enumerable.Empty<string>();
+        protected override bool IsTargeted(INamedTypeSymbol symbol)
+        {
+            return symbol.HasAttributeOfType<TConfigAttribute>()
+                || symbol.GetMembers().Any(m => m.HasAttributeOfType<TAttribute>());
+        }
 
         protected IList<DataMemberSymbolInfo> GetSymbols(TypeInfo typeInfo, IEnumerable<ISymbol> members, DataMemberKind dataMemberKind)
         {
