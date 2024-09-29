@@ -50,7 +50,7 @@ $@"protected virtual void {PropertyChangingNotifyMethod}(string propertyName)
         protected override bool IsTargeted(INamedTypeSymbol symbol)
         {
             return symbol.GetMembers()
-                .Any(m => m.HasAttributeOfType<INotifyPropertyChangingAttribute>() || m.HasAttributeOfType<INotifyPropertyChangedAttribute>());
+                .Any(m => m.HasAttributeOfType<IPropertyEventGenerationAttribute>());
         }
 
         protected override IEnumerable<string> InterfacesToAdd(TypeInfo typeInfo)
@@ -280,14 +280,14 @@ $@"protected virtual void {PropertyChangingNotifyMethod}(string propertyName)
                 $"if ({Snippets.InequalityCheck(member, other, nullSafe, null)})", 2);
         }
 
-        private static T GetAttribute<T>(IFieldSymbol field)
+        private static T GetAttribute<T>(IFieldSymbol field) where T : class
         {
-            var attData = field.GetAttributes()
-                .SingleOrDefault(a => a.AttributeClass.Implements<T>());
+            var attData = field.AttributesOfType<T>()
+                .FirstOrDefault();
 
             if (AttributeFactory.TryCreate<T>(attData, out var att))
                 return att;
-            return default;
+            return null;
         }
 
         private static string SetField(string fieldName, int tabCount)

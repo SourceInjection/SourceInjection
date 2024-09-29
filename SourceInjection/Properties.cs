@@ -3,29 +3,47 @@ using SourceInjection.SourceGeneration;
 using Microsoft.CodeAnalysis;
 using System;
 using System.ComponentModel;
+using System.Collections.Generic;
 
 namespace SourceInjection
 {
     /// <summary>
     /// Abstract attribute base for <see cref="INotifyPropertyChanged.PropertyChanged"/> and / or <see cref="INotifyPropertyChanging.PropertyChanging"/> code generation.
     /// </summary>
-    public abstract class PropertyEventGenerationAttribute : Attribute, IGeneratesDataMemberPropertyFromFieldAttribute
+    public abstract class PropertyEventGenerationAttribute : Attribute, IPropertyEventGenerationAttribute
     {
-        protected PropertyEventGenerationAttribute(bool equalityCheck = true)
+        protected PropertyEventGenerationAttribute(
+            bool equalityCheck = true, 
+            NullSafety inEqualityNullSafety = NullSafety.Auto, 
+            string equalityComparer = null, 
+            bool throwIfValueIsNull = false, 
+            params string[] relatedProperties)
         {
             EqualityCheck = equalityCheck;
+            NullSafety = inEqualityNullSafety;
+            EqualityComparer = equalityComparer;
+            ThrowIfValueIsNull = throwIfValueIsNull;
+            RelatedProperties = relatedProperties;
         }
 
         public bool EqualityCheck { get; }
+
+        public string EqualityComparer { get; }
+
+        public NullSafety NullSafety { get; }
+
+        public bool ThrowIfValueIsNull { get; }
+
+        public IEnumerable<string> RelatedProperties { get; }
+
+        public Microsoft.CodeAnalysis.Accessibility Accessibility => Microsoft.CodeAnalysis.Accessibility.Public;
+
+        public Microsoft.CodeAnalysis.Accessibility GetterAccessibility => Microsoft.CodeAnalysis.Accessibility.NotApplicable;
 
         public string PropertyName(IFieldSymbol field)
         {
             return Snippets.PropertyNameFromField(field);
         }
-
-        public Microsoft.CodeAnalysis.Accessibility Accessibility => Microsoft.CodeAnalysis.Accessibility.Public;
-
-        public Microsoft.CodeAnalysis.Accessibility GetterAccessibility => Microsoft.CodeAnalysis.Accessibility.NotApplicable;
     }
 
     /// <summary>
@@ -36,8 +54,18 @@ namespace SourceInjection
     [AttributeUsage(AttributeTargets.Field, Inherited = false, AllowMultiple = false)]
     public class NotifyPropertyChangedAttribute : PropertyEventGenerationAttribute, INotifyPropertyChangedAttribute
     {
-        public NotifyPropertyChangedAttribute(bool equalityCheck = true)
-            : base(equalityCheck)
+        public NotifyPropertyChangedAttribute(
+                bool equalityCheck = true,
+                NullSafety inEqualityNullSafety = NullSafety.Auto,
+                string equalityComparer = null,
+                bool throwIfValueIsNull = false,
+                params string[] relatedProperties)
+            : base(
+                  equalityCheck,
+                  inEqualityNullSafety,
+                  equalityComparer,
+                  throwIfValueIsNull,
+                  relatedProperties)
         { }
     }
 
@@ -49,8 +77,18 @@ namespace SourceInjection
     [AttributeUsage(AttributeTargets.Field, Inherited = false, AllowMultiple = false)]
     public class NotifyPropertyChangingAttribute : PropertyEventGenerationAttribute, INotifyPropertyChangingAttribute
     {
-        public NotifyPropertyChangingAttribute(bool equalityCheck = true)
-            : base(equalityCheck)
+        public NotifyPropertyChangingAttribute(
+                bool equalityCheck = true,
+                NullSafety inEqualityNullSafety = NullSafety.Auto,
+                string equalityComparer = null,
+                bool throwIfValueIsNull = false,
+                params string[] relatedProperties)
+            : base(
+                  equalityCheck,
+                  inEqualityNullSafety,
+                  equalityComparer,
+                  throwIfValueIsNull,
+                  relatedProperties)
         { }
     }
 
@@ -62,8 +100,18 @@ namespace SourceInjection
     /// </summary>
     public class NotifyPropertyEventsAttribute : PropertyEventGenerationAttribute, INotifyPropertyChangedAttribute, INotifyPropertyChangingAttribute
     {
-        public NotifyPropertyEventsAttribute(bool equalityCheck = true)
-            : base(equalityCheck)
+        public NotifyPropertyEventsAttribute(
+                bool equalityCheck = true,
+                NullSafety inEqualityNullSafety = NullSafety.Auto,
+                string equalityComparer = null,
+                bool throwIfValueIsNull = false,
+                params string[] relatedProperties)
+            : base(
+                  equalityCheck,
+                  inEqualityNullSafety,
+                  equalityComparer,
+                  throwIfValueIsNull,
+                  relatedProperties)
         { }
     }
 }
