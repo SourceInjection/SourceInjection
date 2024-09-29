@@ -11,7 +11,7 @@ namespace SourceInjection
     /// </summary>
     public abstract class PropertyEventGenerationAttribute : Attribute, IGeneratesDataMemberPropertyFromFieldAttribute
     {
-        protected PropertyEventGenerationAttribute(bool equalityCheck = false)
+        protected PropertyEventGenerationAttribute(bool equalityCheck = true)
         {
             EqualityCheck = equalityCheck;
         }
@@ -36,7 +36,7 @@ namespace SourceInjection
     [AttributeUsage(AttributeTargets.Field, Inherited = false, AllowMultiple = false)]
     public class NotifyPropertyChangedAttribute : PropertyEventGenerationAttribute, INotifyPropertyChangedAttribute
     {
-        public NotifyPropertyChangedAttribute(bool equalityCheck = false)
+        public NotifyPropertyChangedAttribute(bool equalityCheck = true)
             : base(equalityCheck)
         { }
     }
@@ -49,7 +49,7 @@ namespace SourceInjection
     [AttributeUsage(AttributeTargets.Field, Inherited = false, AllowMultiple = false)]
     public class NotifyPropertyChangingAttribute : PropertyEventGenerationAttribute, INotifyPropertyChangingAttribute
     {
-        public NotifyPropertyChangingAttribute(bool equalityCheck = false)
+        public NotifyPropertyChangingAttribute(bool equalityCheck = true)
             : base(equalityCheck)
         { }
     }
@@ -62,7 +62,7 @@ namespace SourceInjection
     /// </summary>
     public class NotifyPropertyEventsAttribute : PropertyEventGenerationAttribute, INotifyPropertyChangedAttribute, INotifyPropertyChangingAttribute
     {
-        public NotifyPropertyEventsAttribute(bool equalityCheck = false)
+        public NotifyPropertyEventsAttribute(bool equalityCheck = true)
             : base(equalityCheck)
         { }
     }

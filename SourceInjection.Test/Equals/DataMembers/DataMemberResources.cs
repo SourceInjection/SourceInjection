@@ -88,21 +88,21 @@ namespace SourceInjection.Test.Equals.DataMembers
     [AutoEquals(dataMemberKind: DataMemberKind.Property)]
     public partial class ClassWithGeneratedProperty_DataMemberKind_Property
     {
-        [NotifyPropertyChanged]
+        [NotifyPropertyChanged(equalityCheck: false)]
         private int _property;
     }
 
     [AutoEquals(dataMemberKind: DataMemberKind.Field)]
     public partial class ClassWithGeneratedProperty_DataMemberKind_Field
     {
-        [NotifyPropertyChanged]
+        [NotifyPropertyChanged(equalityCheck: false)]
         private int _field;
     }
 
     [AutoEquals]
     public partial class ClassWithGeneratedProperty_DataMemberKind_DataMember
     {
-        [NotifyPropertyChanged]
+        [NotifyPropertyChanged(equalityCheck: false)]
         private int _field;
     }
 

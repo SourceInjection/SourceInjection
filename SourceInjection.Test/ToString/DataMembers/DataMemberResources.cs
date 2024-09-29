@@ -88,21 +88,21 @@ namespace SourceInjection.Test.ToString.DataMembers
     [AutoToString(dataMemberKind: DataMemberKind.Property)]
     public partial class ClassWithGeneratedProperty_DataMemberKind_Property
     {
-        [NotifyPropertyChanged]
+        [NotifyPropertyChanged(equalityCheck: false)]
         public int _property;
     }
 
     [AutoToString(dataMemberKind: DataMemberKind.Field)]
     public partial class ClassWithGeneratedProperty_DataMemberKind_Field
     {
-        [NotifyPropertyChanged]
+        [NotifyPropertyChanged(equalityCheck: false)]
         public int _field;
     }
 
     [AutoToString]
     public partial class ClassWithGeneratedProperty_DataMemberKind_DataMember
     {
-        [NotifyPropertyChanged]
+        [NotifyPropertyChanged(equalityCheck: false)]
         public int _property;
     }
 
