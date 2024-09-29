@@ -57,15 +57,31 @@ namespace SourceInjection
         public NotifyPropertyChangedAttribute(
                 bool equalityCheck = true,
                 NullSafety inEqualityNullSafety = NullSafety.Auto,
+                Type equalityComparer = null,
+                bool throwIfValueIsNull = false/*,
+                params string[] relatedProperties*/)
+
+            : this(
+                  equalityCheck,
+                  inEqualityNullSafety,
+                  equalityComparer?.FullName,
+                  throwIfValueIsNull/*,
+                  relatedProperties*/)
+        { }
+
+        protected NotifyPropertyChangedAttribute(
+                bool equalityCheck = true,
+                NullSafety inEqualityNullSafety = NullSafety.Auto,
                 string equalityComparer = null,
-                bool throwIfValueIsNull = false,
-                params string[] relatedProperties)
+                bool throwIfValueIsNull = false /*,
+                params string[] relatedProperties*/)
+
             : base(
                   equalityCheck,
                   inEqualityNullSafety,
                   equalityComparer,
                   throwIfValueIsNull,
-                  relatedProperties)
+                  /*relatedProperties*/Array.Empty<string>())
         { }
     }
 
@@ -78,6 +94,21 @@ namespace SourceInjection
     public class NotifyPropertyChangingAttribute : PropertyEventGenerationAttribute, INotifyPropertyChangingAttribute
     {
         public NotifyPropertyChangingAttribute(
+                bool equalityCheck = true,
+                NullSafety inEqualityNullSafety = NullSafety.Auto,
+                Type equalityComparer = null,
+                bool throwIfValueIsNull = false,
+                params string[] relatedProperties)
+
+            : this(
+                  equalityCheck,
+                  inEqualityNullSafety,
+                  equalityComparer?.FullName,
+                  throwIfValueIsNull,
+                  relatedProperties)
+        { }
+
+        protected NotifyPropertyChangingAttribute(
                 bool equalityCheck = true,
                 NullSafety inEqualityNullSafety = NullSafety.Auto,
                 string equalityComparer = null,
@@ -101,6 +132,21 @@ namespace SourceInjection
     public class NotifyPropertyEventsAttribute : PropertyEventGenerationAttribute, INotifyPropertyChangedAttribute, INotifyPropertyChangingAttribute
     {
         public NotifyPropertyEventsAttribute(
+                bool equalityCheck = true,
+                NullSafety inEqualityNullSafety = NullSafety.Auto,
+                Type equalityComparer = null,
+                bool throwIfValueIsNull = false,
+                params string[] relatedProperties)
+
+            : this(
+                  equalityCheck,
+                  inEqualityNullSafety,
+                  equalityComparer?.FullName,
+                  throwIfValueIsNull,
+                  relatedProperties)
+        { }
+
+        protected NotifyPropertyEventsAttribute(
                 bool equalityCheck = true,
                 NullSafety inEqualityNullSafety = NullSafety.Auto,
                 string equalityComparer = null,

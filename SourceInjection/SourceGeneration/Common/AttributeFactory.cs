@@ -48,10 +48,10 @@ namespace SourceInjection.SourceGeneration.Common
         {
             if (constant.Kind == TypedConstantKind.Enum)
                 return EnumFromConstant(constant);
-            if (constant.Kind == TypedConstantKind.Array)
-                return constant.Values;
             if (constant.Kind == TypedConstantKind.Type)
                 return (constant.Value as INamedTypeSymbol)?.ToDisplayString();
+            if (constant.Kind == TypedConstantKind.Array)
+                return constant.Values.Select(v => SelectValue(v)).ToArray();
             return constant.Value;
         }
 
