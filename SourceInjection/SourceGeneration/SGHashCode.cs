@@ -10,6 +10,7 @@ using TypeInfo = SourceInjection.SourceGeneration.Common.TypeInfo;
 using SourceInjection.SourceGeneration;
 using SourceInjection.CodeAnalysis;
 using SourceInjection.Util;
+using System;
 
 #pragma warning disable IDE0130
 
@@ -132,15 +133,16 @@ namespace SourceInjection
         private string MemberHash(DataMemberSymbolInfo member, TypeInfo containingType)
         {
             var memberConfig = GetEqualityConfigAttribute(member);
-            var nullSafety = GetNullSafety(member, memberConfig);
+            var comparerInfo = GetComparerInfo(member, memberConfig);
+            var nullSafety = GetNullSafety(member, memberConfig, comparerInfo);
 
             var isNullSafe = nullSafety == NullSafety.On ||
                 nullSafety == NullSafety.Auto && (!containingType.HasNullableEnabled || member.Type.HasNullableAnnotation());
 
-            return Snippets.GetHashCode(member, isNullSafe, memberConfig.EqualityComparer);
+            return Snippets.GetHashCode(member, isNullSafe, comparerInfo);
         }
 
-        private static NullSafety GetNullSafety(DataMemberSymbolInfo member, IEqualityComparisonConfigAttribute memberConfig)
+        private NullSafety GetNullSafety(DataMemberSymbolInfo member, IEqualityComparisonConfigAttribute memberConfig, ComparerInfo comparerInfo)
         {
             if (memberConfig.NullSafety != NullSafety.Auto)
                 return memberConfig.NullSafety;
@@ -148,7 +150,7 @@ namespace SourceInjection
                 return NullSafety.Off;
             if (member.HasMaybeNullAttribute())
                 return NullSafety.On;
-            if (ComparerSupportsNullSafe(memberConfig.EqualityComparer, member.Type))
+            if (comparerInfo != null && comparerInfo.IsNullSafe)
                 return NullSafety.Off;
 
             return NullSafety.Auto;
@@ -171,10 +173,35 @@ namespace SourceInjection
                 || config.BaseCall == BaseCall.Auto && typeInfo.Symbol.BaseType is ITypeSymbol syBase && syBase.OverridesGetHashCode());
         }
 
-        private static bool ComparerSupportsNullSafe(string comparer, ITypeSymbol memberType)
+        private ComparerInfo GetComparerInfo(DataMemberSymbolInfo member, IEqualityComparisonConfigAttribute config)
         {
-            return !string.IsNullOrEmpty(comparer)
-                && EqualityComparerInfo.HashCodeSupportsNullable(comparer, memberType);
+            if(string.IsNullOrEmpty(config.EqualityComparer))
+                return null;
+            return new ComparerInfo(config.EqualityComparer, ComparerSupportsNullable(config.EqualityComparer, member.Type));
+        }
+
+        private bool ComparerSupportsNullable(string comparerName, ITypeSymbol argType)
+        {
+            var types = GetTypes(comparerName);
+            if (types.Count > 0)
+            {
+                var equalsMethod = types.SelectMany(t => t.Symbol.GetAllMembers())
+                    .OfType<IMethodSymbol>()
+                    .FirstOrDefault(m => m.IsComparerGetHashCodeMethod(argType));
+
+                return equalsMethod != null
+                    && equalsMethod.Parameters[0].SupportsNullable();
+            }
+
+            var type = Type.GetType(comparerName);
+            if (type != null)
+            {
+                var equalsMethod = Array.Find(type.GetMethods(), m => m.IsComparerGetHashCodeMethod(argType));
+
+                return equalsMethod != null
+                    && equalsMethod.GetParameters()[0].SupportsNullable();
+            }
+            return false;
         }
     }
 }

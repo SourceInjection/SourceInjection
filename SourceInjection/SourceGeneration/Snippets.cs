@@ -1,6 +1,7 @@
 ﻿using SourceInjection.SourceGeneration.DataMembers;
 using SourceInjection.SourceGeneration.SnippetsHelper;
 using Microsoft.CodeAnalysis;
+using SourceInjection.SourceGeneration.Common;
 
 namespace SourceInjection.SourceGeneration
 {
@@ -9,13 +10,13 @@ namespace SourceInjection.SourceGeneration
         public static string PropertyNameFromField(IFieldSymbol field)
             => PropertySnippets.PropertyNameFromField(field.Name);
 
-        public static string InequalityCheck(DataMemberSymbolInfo member, string otherName, bool nullSafe, string comparer)
+        public static string InequalityCheck(DataMemberSymbolInfo member, string otherName, bool nullSafe, ComparerInfo comparer)
             => EqualizationSnippets.EqualityCheck(member, otherName, nullSafe, comparer, true);
 
-        public static string EqualityCheck(DataMemberSymbolInfo member, string otherName, bool nullSafe, string comparer)
+        public static string EqualityCheck(DataMemberSymbolInfo member, string otherName, bool nullSafe, ComparerInfo comparer)
             => EqualizationSnippets.EqualityCheck(member, otherName, nullSafe, comparer, false);
 
-        public static string GetHashCode(DataMemberSymbolInfo member, bool nullSafe, string comparer)
+        public static string GetHashCode(DataMemberSymbolInfo member, bool nullSafe, ComparerInfo comparer)
             => HashCodeSnippets.GetHashCode(member, nullSafe, comparer);
 
         public static string MemberToString(DataMemberSymbolInfo member, string label, string format)

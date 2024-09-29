@@ -8,8 +8,6 @@ namespace SourceInjection.SourceGeneration.Common
 {
     internal class TypeInfo
     {
-        private readonly static Dictionary<string, List<TypeInfo>> _allTypes = new Dictionary<string, List<TypeInfo>>(1024);
-
         private readonly Lazy<bool> _hasPartialModifier;
         private readonly Lazy<string> _declaration;
         private readonly Lazy<string> _name;
@@ -87,21 +85,6 @@ namespace SourceInjection.SourceGeneration.Common
         public override int GetHashCode()
         {
             return SymbolEqualityComparer.Default.GetHashCode(Symbol);
-        }
-
-        public static IReadOnlyList<TypeInfo> GetTypes(string name)
-        {
-            if (_allTypes.TryGetValue(name, out var value))
-                return value;
-            return System.Array.Empty<TypeInfo>();
-        }
-
-        public static void Consider(string name, TypeInfo type)
-        {
-            if (!_allTypes.TryGetValue(name, out var list))
-                _allTypes.Add(name, new List<TypeInfo> { type });
-            else if (!list.Contains(type))
-                list.Add(type);
         }
     }
 }

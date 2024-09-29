@@ -16,13 +16,14 @@ namespace SourceInjection.CodeAnalysis
             }
         }
 
-        public static bool Is(this ITypeSymbol symbol, ITypeSymbol requiredType)
-        {
-            var name = requiredType.ToDisplayString().TrimEnd('?');
+        public static bool Is<T>(this ITypeSymbol symbol)
+            => Is(symbol, typeof(T));
 
-            return symbol.Inheritance().Any(sy => sy.IsType(name, true))
-                || symbol.AllInterfaces.Any(sy => sy.IsType(name, true));
-        }
+        public static bool Is(this ITypeSymbol symbol, Type requiredType)
+            => Is(symbol, requiredType.FullName);
+        
+        public static bool Is(this ITypeSymbol symbol, ITypeSymbol requiredType)
+            => Is(symbol, requiredType.ToDisplayString());
 
         public static bool HasNullableAnnotation(this ITypeSymbol symbol)
         {
@@ -47,8 +48,6 @@ namespace SourceInjection.CodeAnalysis
             return symbol.ToDisplayString().StartsWith(NameOf.GenericIEnumerable)
                 || symbol.AllInterfaces.Any(i => i.ToDisplayString().StartsWith(NameOf.GenericIEnumerable));
         }
-
-
 
         public static bool IsPrimitive(this ITypeSymbol symbol, bool allowNullable)
         {
@@ -165,6 +164,13 @@ namespace SourceInjection.CodeAnalysis
         {
             return symbol.IsType("decimal", allowNullable)
                 || symbol.IsType($"{nameof(System)}.{nameof(Decimal)}", allowNullable);
+        }
+
+        private static bool Is(ITypeSymbol symbol, string requiredType)
+        {
+            requiredType = requiredType.TrimEnd('?');
+            return symbol.Inheritance().Any(sy => sy.IsType(requiredType, true))
+                || symbol.AllInterfaces.Any(sy => sy.IsType(requiredType, true));
         }
 
         private static bool IsType(this ITypeSymbol type, string typeName, bool alsoCheckNullable = false)

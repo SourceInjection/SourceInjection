@@ -6,12 +6,13 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using SourceInjection.SourceGeneration.Diagnostics;
-using System;
 
 namespace SourceInjection.SourceGeneration.Base
 {
     internal abstract class TypeSourceGeneratorBase : IIncrementalGenerator
     {
+        private readonly Dictionary<string, List<TypeInfo>> _allTypes = new Dictionary<string, List<TypeInfo>>(1024);
+
         protected internal abstract string Name { get; }
 
         protected abstract bool IsTargeted(INamedTypeSymbol symbol);
@@ -28,6 +29,21 @@ namespace SourceInjection.SourceGeneration.Base
             return Enumerable.Empty<string>();
         }
 
+        protected IReadOnlyList<TypeInfo> GetTypes(string name)
+        {
+            if (_allTypes.TryGetValue(name, out var value))
+                return value;
+            return System.Array.Empty<TypeInfo>();
+        }
+
+        private void Consider(string name, TypeInfo type)
+        {
+            if (!_allTypes.TryGetValue(name, out var list))
+                _allTypes.Add(name, new List<TypeInfo> { type });
+            else if (!list.Contains(type))
+                list.Add(type);
+        }
+
         public void Initialize(IncrementalGeneratorInitializationContext context)
         {
             var collected = context.SyntaxProvider.CreateSyntaxProvider(
@@ -35,20 +51,25 @@ namespace SourceInjection.SourceGeneration.Base
                 (n, _) => new { Context = n, Symbol = (INamedTypeSymbol)n.SemanticModel.GetDeclaredSymbol(n.Node) })
                 .Collect();
 
-            context.RegisterSourceOutput(collected, (sourceProductionContext, types) =>
+            context.RegisterSourceOutput(collected, (_, types) =>
             {
                 foreach(var type in types)
                 {
                     var typeInfo = new TypeInfo(type.Context, (TypeDeclarationSyntax)type.Context.Node, type.Symbol);
-                    TypeInfo.Consider(type.Symbol.ToDisplayString(), typeInfo);
+                    Consider(type.Symbol.ToDisplayString(), typeInfo);
+                }
+            });
 
-                    if (!IsTargeted(typeInfo.Symbol))
-                        continue;
-
+            context.RegisterSourceOutput(collected, (sourceProductionContext, types) =>
+            {
+                foreach(var type in types.Where(t => IsTargeted(t.Symbol)))
+                {
                     if (type.Context.Node.Parent is TypeDeclarationSyntax)
                         sourceProductionContext.ReportDiagnostic(Errors.NestedClassesAreNotSupported(type.Symbol, Name));
                     else
                     {
+                        var typeInfo = new TypeInfo(type.Context, (TypeDeclarationSyntax)type.Context.Node, type.Symbol);
+
                         if (!typeInfo.HasPartialModifier)
                             sourceProductionContext.ReportDiagnostic(Errors.MissingPartialModifier(typeInfo.Symbol, Name));
                         else

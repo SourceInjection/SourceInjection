@@ -26,19 +26,18 @@ namespace SourceInjection.SourceGeneration.SnippetsHelper
                 : hashCodeCode;
         }
 
-        public static string GetHashCode(DataMemberSymbolInfo member, bool nullSafe, string comparer)
+        public static string GetHashCode(DataMemberSymbolInfo member, bool nullSafe, ComparerInfo comparer)
         {
-            if (!string.IsNullOrEmpty(comparer))
+            if (comparer != null)
             {
-                var suportsNullable = EqualityComparerInfo.HashCodeSupportsNullable(comparer, member.Type);
-                comparer = Reduce.ComparerName(member, comparer);
+                var comparerName = Reduce.ComparerName(member, comparer.Name);
 
-                if (!member.Type.IsReferenceType && member.Type.HasNullableAnnotation() && !suportsNullable)
-                    return ComparerNullableNonReferenceTypeHashCode(member.Name, comparer, nullSafe);
+                if (!member.Type.IsReferenceType && member.Type.HasNullableAnnotation() && !comparer.IsNullSafe)
+                    return ComparerNullableNonReferenceTypeHashCode(member.Name, comparerName, nullSafe);
 
                 nullSafe = nullSafe && (member.Type.IsReferenceType || member.Type.HasNullableAnnotation());
 
-                return ComparerHashCode(member.Name, comparer, nullSafe);
+                return ComparerHashCode(member.Name, comparerName, nullSafe);
             }
 
             if (!member.Type.OverridesGetHashCode())

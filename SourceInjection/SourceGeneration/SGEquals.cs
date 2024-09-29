@@ -9,6 +9,8 @@ using System.Text;
 using TypeInfo = SourceInjection.SourceGeneration.Common.TypeInfo;
 using SourceInjection.SourceGeneration;
 using SourceInjection.Util;
+using System;
+using System.Collections;
 
 #pragma warning disable IDE0130
 
@@ -118,12 +120,13 @@ namespace SourceInjection
         private string MemberEquals(DataMemberSymbolInfo member, TypeInfo containingType, IAutoEqualsAttribute config)
         {
             var memberConfig = GetEqualityConfigAttribute(member);
-            var nullSafety = GetNullSafety(member, config, memberConfig);
+            var comparerInfo = GetComparerInfo(member, memberConfig);
+            var nullSafety = GetNullSafety(member, config, memberConfig, comparerInfo);
 
             var isNullSafe = nullSafety == NullSafety.On ||
                 nullSafety == NullSafety.Auto && (!containingType.HasNullableEnabled || member.Type.HasNullableAnnotation());
 
-            var snippet = Snippets.EqualityCheck(member, $"{otherName}.{member.Name}", isNullSafe, memberConfig.EqualityComparer);
+            var snippet = Snippets.EqualityCheck(member, $"{otherName}.{member.Name}", isNullSafe, comparerInfo);
 
             return snippet.Contains("||")
                 ? $"({snippet})"
@@ -141,7 +144,7 @@ namespace SourceInjection
             return GetMemberConfigAttribute(symbolInfo);
         }
 
-        private static NullSafety GetNullSafety(DataMemberSymbolInfo member, IAutoEqualsAttribute config, IEqualityComparisonConfigAttribute memberConfig)
+        private NullSafety GetNullSafety(DataMemberSymbolInfo member, IAutoEqualsAttribute config, IEqualityComparisonConfigAttribute memberConfig, ComparerInfo comparerInfo)
         {
             if (memberConfig.NullSafety != NullSafety.Auto)
                 return memberConfig.NullSafety;
@@ -149,16 +152,41 @@ namespace SourceInjection
                 return NullSafety.Off;
             if (member.HasMaybeNullAttribute())
                 return NullSafety.On;
-            if (config.NullSafety == NullSafety.Auto && ComparerSupportsNullSafe(memberConfig.EqualityComparer, member.Type))
+            if (config.NullSafety == NullSafety.Auto && comparerInfo != null && comparerInfo.IsNullSafe)
                 return NullSafety.Off;
             
             return config.NullSafety;
         }
 
-        private static bool ComparerSupportsNullSafe(string comparer, ITypeSymbol memberType)
+        private ComparerInfo GetComparerInfo(DataMemberSymbolInfo member, IEqualityComparisonConfigAttribute config)
         {
-            return !string.IsNullOrEmpty(comparer) 
-                && EqualityComparerInfo.EqualsSupportsNullable(comparer, memberType);
+            if(string.IsNullOrEmpty(config.EqualityComparer))
+                return null;
+            return new ComparerInfo(config.EqualityComparer, ComparerSupportsNullable(config.EqualityComparer, member.Type));
+        }
+
+        private bool ComparerSupportsNullable(string comparerName, ITypeSymbol argType)
+        {
+            var types = GetTypes(comparerName);
+            if (types.Count > 0)
+            {
+                var equalsMethod = types.SelectMany(t => t.Symbol.GetAllMembers())
+                    .OfType<IMethodSymbol>()
+                    .FirstOrDefault(m => m.IsComparerEqualsMethod(argType));
+
+                return equalsMethod != null
+                    && equalsMethod.Parameters.All(p => p.SupportsNullable());
+            }
+
+            var type = Type.GetType(comparerName);
+            if (type != null)
+            {
+                var equalsMethod = Array.Find(type.GetMethods(), m => m.IsComparerEqualsMethod(argType));
+
+                return equalsMethod != null
+                    && Array.TrueForAll(equalsMethod.GetParameters(), p => p.SupportsNullable());
+            }
+            return false;
         }
     }
 }
