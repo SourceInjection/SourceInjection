@@ -13,11 +13,6 @@ namespace SourceInjection.Interfaces
         /// Defines which accessibility is required to be used foreach member to be included to generate <see cref="object.ToString"/>.
         /// </summary>
         Accessibility Accessibility { get; }
-
-        /// <summary>
-        /// Defines if <see cref="IFormattable.ToString(string, IFormatProvider)"/> is implemented.
-        /// </summary>
-        bool Formatable { get; }
     }
 
     public interface IToStringAttribute 
@@ -31,16 +26,6 @@ namespace SourceInjection.Interfaces
         /// Defines the format which will be handover to the string representation of the targeted object.
         /// </summary>
         string Format { get; }
-
-        /// <summary>
-        /// Defines the <see cref="IFormatProvider"/> which is passed to the <see cref="IFormattable.ToString(string, IFormatProvider)"/> method.
-        /// </summary>
-        string FormatProvider { get; }
-
-        /// <summary>
-        /// Defines if the <see cref="IFormattable"/> from <see cref="IFormattable.ToString(string, IFormatProvider)"/> is passed to the members ToString method.
-        /// </summary>
-        bool UseArgumentFormatProvider { get; }
     }
 
     public interface IToStringExcludeAttribute { }
