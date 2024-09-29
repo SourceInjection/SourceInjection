@@ -66,7 +66,7 @@ namespace SourceInjection
         private string MemberToString(DataMemberSymbolInfo member)
         {
             var config = GetMemberConfigAttribute(member);
-            return Snippets.MemberToString(member, config.Label, config.Format);
+            return Snippets.MemberToString(member, config);
         }
 
         private static IEnumerable<Microsoft.CodeAnalysis.Accessibility> GetAllowedAccessibilities(Accessibility accessibility)

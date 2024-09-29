@@ -2,6 +2,8 @@
 using SourceInjection.SourceGeneration.SnippetsHelper;
 using Microsoft.CodeAnalysis;
 using SourceInjection.SourceGeneration.Common;
+using SourceInjection.CodeAnalysis;
+using SourceInjection.Interfaces;
 
 namespace SourceInjection.SourceGeneration
 {
@@ -19,8 +21,8 @@ namespace SourceInjection.SourceGeneration
         public static string GetHashCode(DataMemberSymbolInfo member, bool nullSafe, ComparerInfo comparer)
             => HashCodeSnippets.GetHashCode(member, nullSafe, comparer);
 
-        public static string MemberToString(DataMemberSymbolInfo member, string label, string format)
-            => ToStringSnippets.MemberToString(member.Name, label, format);
+        public static string MemberToString(DataMemberSymbolInfo member, IToStringAttribute config)
+            => ToStringSnippets.MemberToString(member, config);
 
         public static string UnconflictingVariable(INamedTypeSymbol type, string name = "temp")
         {
