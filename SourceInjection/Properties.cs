@@ -11,22 +11,13 @@ namespace SourceInjection
     /// </summary>
     public abstract class PropertyEventGenerationAttribute : Attribute, IGeneratesDataMemberPropertyFromFieldAttribute
     {
-
         protected PropertyEventGenerationAttribute(bool equalityCheck = false)
         {
             EqualityCheck = equalityCheck;
         }
 
-        /// <summary>
-        /// Determines if a equality check is generated.
-        /// </summary>
         public bool EqualityCheck { get; }
 
-        /// <summary>
-        /// Evaluates the generated property name from the field name.
-        /// </summary>
-        /// <param name="field">The field from which the property is generated.</param>
-        /// <returns>The name of the generated property.</returns>
         public string PropertyName(IFieldSymbol field)
         {
             return Snippets.PropertyNameFromField(field);
@@ -45,10 +36,6 @@ namespace SourceInjection
     [AttributeUsage(AttributeTargets.Field, Inherited = false, AllowMultiple = false)]
     public class NotifyPropertyChangedAttribute : PropertyEventGenerationAttribute, INotifyPropertyChangedAttribute
     {
-        /// <summary>
-        /// Creates an instance of <see cref="NotifyPropertyChangedAttribute"/>.
-        /// </summary>
-        /// <param name="equalityCheck">When set to <see langword="true"/>, event will just be fired when the value wich is set does not equal the field value.</param>
         public NotifyPropertyChangedAttribute(bool equalityCheck = false)
             : base(equalityCheck)
         { }
@@ -62,10 +49,6 @@ namespace SourceInjection
     [AttributeUsage(AttributeTargets.Field, Inherited = false, AllowMultiple = false)]
     public class NotifyPropertyChangingAttribute : PropertyEventGenerationAttribute, INotifyPropertyChangingAttribute
     {
-        /// <summary>
-        /// Creates an instance of <see cref="NotifyPropertyChangingAttribute"/>.
-        /// </summary>
-        /// <param name="equalityCheck">When set to <see langword="true"/>, event will just be fired when the value wich is set does not equal the field value.</param>
         public NotifyPropertyChangingAttribute(bool equalityCheck = false)
             : base(equalityCheck)
         { }
@@ -79,10 +62,6 @@ namespace SourceInjection
     /// </summary>
     public class NotifyPropertyEventsAttribute : PropertyEventGenerationAttribute, INotifyPropertyChangedAttribute, INotifyPropertyChangingAttribute
     {
-        /// <summary>
-        /// Creates an instance of <see cref="NotifyPropertyEventsAttribute"/>.
-        /// </summary>
-        /// <param name="equalityCheck">When set to <see langword="true"/>, events will just be fired when the value wich is set does not equal the field value.</param>
         public NotifyPropertyEventsAttribute(bool equalityCheck = false)
             : base(equalityCheck)
         { }
