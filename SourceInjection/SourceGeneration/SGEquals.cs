@@ -10,7 +10,6 @@ using TypeInfo = SourceInjection.SourceGeneration.Common.TypeInfo;
 using SourceInjection.SourceGeneration;
 using SourceInjection.Util;
 using System;
-using System.Collections;
 
 #pragma warning disable IDE0130
 
