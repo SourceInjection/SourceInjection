@@ -136,7 +136,8 @@ $@"protected virtual void {PropertyChangingNotifyMethod}(string propertyName)
 
         private static string PropertyCode(IFieldSymbol field, bool nullableEnabled)
         {
-            var name = Snippets.PropertyNameFromField(field);
+
+
             var sb = new StringBuilder();
 
             var type = field.Type.ToDisplayString();
@@ -191,7 +192,7 @@ $@"protected virtual void {PropertyChangingNotifyMethod}(string propertyName)
             IFieldSymbol field, INotifyPropertyChangedAttribute changedAttribute, bool nullSafe)
         {
             var sb = new StringBuilder();
-            var propertyName = Snippets.PropertyNameFromField(field);
+            var propertyName = GetPropertyName(field);
 
             if (changedAttribute?.EqualityCheck is true)
             {
@@ -219,7 +220,7 @@ $@"protected virtual void {PropertyChangingNotifyMethod}(string propertyName)
 
             string tempVar = null;
             var sb = new StringBuilder();
-            var propertyName = Snippets.PropertyNameFromField(field);
+            var propertyName = GetPropertyName(field);
 
             AppendRaiseChangingEvent(sb, changingAttribute, propertyName, tab);
             sb.AppendLine();
@@ -253,7 +254,7 @@ $@"protected virtual void {PropertyChangingNotifyMethod}(string propertyName)
             IFieldSymbol field, INotifyPropertyChangingAttribute changingAttribute, INotifyPropertyChangedAttribute changedAttribute, bool nullSafe)
         {
             var sb = new StringBuilder();
-            var propertyName = Snippets.PropertyNameFromField(field);
+            var propertyName = GetPropertyName(field);
 
             const int tab = 3;
             sb.AppendLine(InequalityConditionCode(field, nullSafe));
@@ -286,6 +287,9 @@ $@"protected virtual void {PropertyChangingNotifyMethod}(string propertyName)
         {
             var attData = field.AttributesOfType<T>()
                 .FirstOrDefault();
+
+            if (attData == null)
+                return null;
 
             if (AttributeFactory.TryCreate<T>(attData, out var att))
                 return att;
@@ -322,6 +326,12 @@ $@"protected virtual void {PropertyChangingNotifyMethod}(string propertyName)
                     sb.Append(ChangedEventCall(prop, tabCount));
                 }
             }
+        }
+
+        private static string GetPropertyName(IFieldSymbol field)
+        {
+            return GetAttribute<INotifyPropertyChangedAttribute>(field)?.PropertyName(field)
+                ?? GetAttribute<INotifyPropertyChangingAttribute>(field).PropertyName(field);
         }
 
         private static string ChangingEventCall(string propName, int tabCount)

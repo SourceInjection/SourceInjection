@@ -2,16 +2,12 @@
 using SourceInjection.SourceGeneration.SnippetsHelper;
 using Microsoft.CodeAnalysis;
 using SourceInjection.SourceGeneration.Common;
-using SourceInjection.CodeAnalysis;
 using SourceInjection.Interfaces;
 
 namespace SourceInjection.SourceGeneration
 {
     internal static class Snippets
     {
-        public static string PropertyNameFromField(IFieldSymbol field)
-            => PropertySnippets.PropertyNameFromField(field.Name);
-
         public static string InequalityCheck(DataMemberSymbolInfo member, string otherName, bool nullSafe, ComparerInfo comparer)
             => EqualizationSnippets.EqualityCheck(member, otherName, nullSafe, comparer, true);
 

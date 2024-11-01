@@ -1,5 +1,4 @@
 ﻿using SourceInjection.Interfaces;
-using SourceInjection.SourceGeneration;
 using Microsoft.CodeAnalysis;
 using System;
 using System.ComponentModel;
@@ -46,7 +45,15 @@ namespace SourceInjection
 
         public string PropertyName(IFieldSymbol field)
         {
-            return Snippets.PropertyNameFromField(field);
+            var fieldName = field.Name;
+
+            while (fieldName.Length > 0 && fieldName[0] == '_')
+                fieldName = fieldName.Substring(1);
+
+            if (fieldName.Length > 0 && char.IsLetter(fieldName[0]) && char.IsLower(fieldName[0]))
+                fieldName = char.ToUpper(fieldName[0]) + fieldName.Substring(1);
+
+            return fieldName;
         }
     }
 
