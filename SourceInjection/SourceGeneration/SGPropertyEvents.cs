@@ -2,7 +2,6 @@
 using SourceInjection.SourceGeneration.Base;
 using SourceInjection.CodeAnalysis;
 using Microsoft.CodeAnalysis;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -50,7 +49,7 @@ $@"protected virtual void {PropertyChangingNotifyMethod}(string propertyName)
         protected override bool IsTargeted(INamedTypeSymbol symbol)
         {
             return symbol.GetMembers()
-                .Any(m => m.HasAttributeOfType<IPropertyEventGenerationAttribute>());
+                .Any(m => m.HasAttributeOfType<INotifyPropertyChangingAttribute>() || m.HasAttributeOfType<INotifyPropertyChangedAttribute>());
         }
 
         protected override IEnumerable<string> InterfacesToAdd(TypeInfo typeInfo)
@@ -86,8 +85,8 @@ $@"protected virtual void {PropertyChangingNotifyMethod}(string propertyName)
         {
             return method.Name == name
                 && (method.Parameters.Length == 1
-                    || method.Parameters.Length > 1 && method.Parameters.Skip(1).All(p => p.HasExplicitDefaultValue))
-                && method.Parameters[0].Type.Name == nameof(String);
+                    || method.Parameters.Length > 1 && method.Parameters.Skip(1).All(p => p.HasExplicitDefaultValue || p.IsParams))
+                &&  method.Parameters[0].Type.IsString();
         }
 
         protected override string TypeBody(TypeInfo typeInfo)
@@ -180,9 +179,9 @@ $@"protected virtual void {PropertyChangingNotifyMethod}(string propertyName)
             if (changingAttribute is null)
                 sb.AppendLine(SetterCodeWithoutChangingEvent(field, changedAttribute, nullSafe));
             else if (!changingAttribute.EqualityCheck)
-                sb.AppendLine(SetterCodeWithoutChangingEqualityCheck(field, changedAttribute, nullSafe));
+                sb.AppendLine(SetterCodeWithoutChangingEqualityCheck(field, changingAttribute, changedAttribute, nullSafe));
             else
-                sb.AppendLine(SetterCodeWithChangingEqualityCheck(field, changedAttribute, nullSafe));
+                sb.AppendLine(SetterCodeWithChangingEqualityCheck(field, changingAttribute, changedAttribute, nullSafe));
 
             sb.Append(Text.Indent("}"));
             return sb.ToString();
@@ -200,20 +199,21 @@ $@"protected virtual void {PropertyChangingNotifyMethod}(string propertyName)
                 sb.AppendLine(InequalityConditionCode(field, nullSafe));
                 sb.AppendLine(Text.Indent("{", tab - 1));
                 sb.AppendLine(SetField(field.Name, tab));
-                sb.AppendLine(RaiseChangedEvent(propertyName, tab));
+                AppendRaiseChangedEvent(sb, changedAttribute, propertyName, tab);
+                sb.AppendLine();
                 sb.Append(Text.Indent("}", tab - 1));
             }
             else
             {
                 const int tab = 2;
                 sb.AppendLine(SetField(field.Name, tab));
-                sb.Append(RaiseChangedEvent(propertyName, tab));
+                AppendRaiseChangedEvent(sb, changedAttribute, propertyName, tab);
             }
             return sb.ToString();
         }
 
         private static string SetterCodeWithoutChangingEqualityCheck(
-            IFieldSymbol field, INotifyPropertyChangedAttribute changedAttribute, bool nullSafe)
+            IFieldSymbol field, INotifyPropertyChangingAttribute changingAttribute, INotifyPropertyChangedAttribute changedAttribute, bool nullSafe)
         {
             const int tab = 2;
 
@@ -221,7 +221,8 @@ $@"protected virtual void {PropertyChangingNotifyMethod}(string propertyName)
             var sb = new StringBuilder();
             var propertyName = Snippets.PropertyNameFromField(field);
 
-            sb.AppendLine(RaiseChangingEvent(propertyName, tab));
+            AppendRaiseChangingEvent(sb, changingAttribute, propertyName, tab);
+            sb.AppendLine();
 
             if (changedAttribute?.EqualityCheck is true)
             {
@@ -235,12 +236,13 @@ $@"protected virtual void {PropertyChangingNotifyMethod}(string propertyName)
             {
                 sb.AppendLine();
                 if (!changedAttribute.EqualityCheck)
-                    sb.Append(RaiseChangedEvent(propertyName, tab));
+                    AppendRaiseChangedEvent(sb, changedAttribute, propertyName, tab);
                 else
                 {
                     sb.AppendLine(InequalityConditionCode(field, nullSafe, $"{tempVar}"));
                     sb.AppendLine(Text.Indent("{", tab));
-                    sb.AppendLine(RaiseChangedEvent(propertyName, tab + 1));
+                    AppendRaiseChangedEvent(sb, changedAttribute, propertyName, tab + 1);
+                    sb.AppendLine();
                     sb.Append(Text.Indent("}", tab));
                 }
             }
@@ -248,7 +250,7 @@ $@"protected virtual void {PropertyChangingNotifyMethod}(string propertyName)
         }
 
         private static string SetterCodeWithChangingEqualityCheck(
-            IFieldSymbol field, INotifyPropertyChangedAttribute changedAttribute, bool nullSafe)
+            IFieldSymbol field, INotifyPropertyChangingAttribute changingAttribute, INotifyPropertyChangedAttribute changedAttribute, bool nullSafe)
         {
             var sb = new StringBuilder();
             var propertyName = Snippets.PropertyNameFromField(field);
@@ -256,19 +258,19 @@ $@"protected virtual void {PropertyChangingNotifyMethod}(string propertyName)
             const int tab = 3;
             sb.AppendLine(InequalityConditionCode(field, nullSafe));
             sb.AppendLine(Text.Indent("{", tab - 1));
-            sb.AppendLine(RaiseChangingEvent(propertyName, tab));
+            AppendRaiseChangingEvent(sb, changingAttribute, propertyName, tab);
 
             if (!(changedAttribute?.EqualityCheck is false))
                 sb.AppendLine(SetField(field.Name, tab));
 
             if (changedAttribute?.EqualityCheck is true)
-                sb.AppendLine(RaiseChangedEvent(propertyName, tab));
+                AppendRaiseChangedEvent(sb, changedAttribute, propertyName, tab);
 
             sb.AppendLine(Text.Indent("}", tab - 1));
             if (changedAttribute?.EqualityCheck is false)
             {
                 sb.AppendLine(SetField(field.Name, tab - 1));
-                sb.AppendLine(RaiseChangedEvent(propertyName, tab - 1));
+                AppendRaiseChangedEvent(sb, changedAttribute, propertyName, tab - 1);
             }
             return sb.ToString().TrimEnd();
         }
@@ -295,12 +297,39 @@ $@"protected virtual void {PropertyChangingNotifyMethod}(string propertyName)
             return Text.Indent($"{fieldName} = value;", tabCount);
         }
 
-        private static string RaiseChangingEvent(string propName, int tabCount)
+        private static void AppendRaiseChangingEvent(StringBuilder sb, INotifyPropertyChangingAttribute attribute, string propName, int tabCount)
+        {
+            sb.Append(ChangingEventCall(propName, tabCount));
+            if (attribute.RelatedProperties.Any())
+            {
+                foreach (var prop in attribute.RelatedProperties)
+                {
+                    sb.AppendLine();
+                    sb.Append(ChangingEventCall(prop, tabCount));
+                }
+            }
+        }
+
+
+        private static void AppendRaiseChangedEvent(StringBuilder sb, INotifyPropertyChangedAttribute attribute, string propName, int tabCount)
+        {
+            sb.Append(ChangedEventCall(propName, tabCount));
+            if (attribute.RelatedProperties.Any())
+            {
+                foreach (var prop in attribute.RelatedProperties)
+                {
+                    sb.AppendLine();
+                    sb.Append(ChangedEventCall(prop, tabCount));
+                }
+            }
+        }
+
+        private static string ChangingEventCall(string propName, int tabCount)
         {
             return Text.Indent($"{PropertyChangingNotifyMethod}(\"{propName}\");", tabCount);
         }
 
-        private static string RaiseChangedEvent(string propName, int tabCount)
+        private static string ChangedEventCall(string propName, int tabCount)
         {
             return Text.Indent($"{PropertyChangedNotifyMethod}(\"{propName}\");", tabCount);
         }
