@@ -62,14 +62,16 @@ namespace SourceInjection
                 bool equalityCheck = true,
                 NullSafety inEqualityNullSafety = NullSafety.Auto,
                 Type equalityComparer = null,
-                bool throwIfValueIsNull = false/*,
+                bool throwIfValueIsNull = false,
+                Accessibility setterAccessibility = Accessibility.NotApplicable/*,
                 params string[] relatedProperties*/)
 
             : this(
                   equalityCheck,
                   inEqualityNullSafety,
                   equalityComparer?.FullName,
-                  throwIfValueIsNull/*,
+                  throwIfValueIsNull,
+                  setterAccessibility/*,
                   relatedProperties*/)
         { }
 
@@ -77,7 +79,8 @@ namespace SourceInjection
                 bool equalityCheck = true,
                 NullSafety inEqualityNullSafety = NullSafety.Auto,
                 string equalityComparer = null,
-                bool throwIfValueIsNull = false/*,
+                bool throwIfValueIsNull = false,
+                Accessibility setterAccessibility = Accessibility.NotApplicable/*,
                 params string[] relatedProperties*/)
 
             : base(
@@ -85,7 +88,7 @@ namespace SourceInjection
                   inEqualityNullSafety,
                   equalityComparer,
                   throwIfValueIsNull,
-                  Accessibility.NotApplicable/*,
+                  setterAccessibility/*,
                   relatedProperties*/)
         { }
     }

@@ -26,8 +26,10 @@ namespace SourceInjection.SourceGeneration.Common
             if (data is null)
                 throw new ArgumentNullException(nameof(data));
 
-            string name = data.AttributeClass.ToDisplayString();
+            var name = data.AttributeClass.ToDisplayString();
             var type = Type.GetType(name);
+
+
             var args = data.ConstructorArguments
                     .Select(arg => SelectValue(arg))
                     .ToArray();
@@ -46,6 +48,9 @@ namespace SourceInjection.SourceGeneration.Common
 
         private static object SelectValue(TypedConstant constant)
         {
+            if (constant.IsNull)
+                return null;
+
             if (constant.Kind == TypedConstantKind.Enum)
                 return EnumFromConstant(constant);
             if (constant.Kind == TypedConstantKind.Type)
@@ -60,8 +65,23 @@ namespace SourceInjection.SourceGeneration.Common
             if (constant.Value is null)
                 return null;
 
-            var type = Type.GetType(constant.Type.ToDisplayString());
+            var type = GetType(constant.Type.ToDisplayString());
+
             return Enum.Parse(type, constant.Value.ToString());
+        }
+
+        private static Type GetType(string name)
+        {
+            var type = Type.GetType(name);
+            if (type != null)
+                return type;
+
+            if (name == typeof(Accessibility).FullName)
+                return typeof(Accessibility);
+
+            // TODO: find a way to load all types of Microsoft.CodeAnalysis
+
+            throw new TypeLoadException($"Could not find type '{name}'");
         }
     }
 }
