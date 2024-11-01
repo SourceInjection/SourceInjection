@@ -1,7 +1,7 @@
 ﻿using NUnit.Framework;
 using System.Collections;
 
-namespace SourceInjection.Test.UnitTests.Collections
+namespace SourceInjection.Test.Collections
 {
     [TestFixture]
     internal class OperationTests

@@ -40,14 +40,14 @@ namespace SourceInjection.CodeAnalysis
 
         private static bool IsVisibleFromDerived(INamedTypeSymbol symbol, IFieldSymbol member)
         {
-            if (member.DeclaredAccessibility == Microsoft.CodeAnalysis.Accessibility.Public
-                || member.DeclaredAccessibility == Microsoft.CodeAnalysis.Accessibility.Protected
-                || member.DeclaredAccessibility == Microsoft.CodeAnalysis.Accessibility.ProtectedOrInternal)
+            if (member.DeclaredAccessibility == Accessibility.Public
+                || member.DeclaredAccessibility == Accessibility.Protected
+                || member.DeclaredAccessibility == Accessibility.ProtectedOrInternal)
             {
                 return true;
             }
 
-            if (member.DeclaredAccessibility == Microsoft.CodeAnalysis.Accessibility.ProtectedAndInternal)
+            if (member.DeclaredAccessibility == Accessibility.ProtectedAndInternal)
             {
                 var memberAssembly = member.ContainingType?.ContainingAssembly;
                 if (memberAssembly is null)

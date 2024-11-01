@@ -1,6 +1,6 @@
-﻿namespace SourceInjection.Test.UnitTests.Collections
+﻿namespace SourceInjection.Test.Collections
 {
-    internal class OperationResources
+    internal static class OperationResources
     {
         public static readonly object[] EqualCollections =
         [

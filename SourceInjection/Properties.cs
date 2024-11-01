@@ -13,16 +13,18 @@ namespace SourceInjection
     public abstract class PropertyEventGenerationAttribute : Attribute, IPropertyEventGenerationAttribute
     {
         protected PropertyEventGenerationAttribute(
-            bool equalityCheck = true, 
-            NullSafety inEqualityNullSafety = NullSafety.Auto, 
-            string equalityComparer = null, 
-            bool throwIfValueIsNull = false, 
+            bool equalityCheck,
+            NullSafety inEqualityNullSafety,
+            string equalityComparer, 
+            bool throwIfValueIsNull,
+            Accessibility setterAccessibility,
             params string[] relatedProperties)
         {
             EqualityCheck = equalityCheck;
             NullSafety = inEqualityNullSafety;
             EqualityComparer = equalityComparer;
             ThrowIfValueIsNull = throwIfValueIsNull;
+            SetterAccessibility = setterAccessibility;
             RelatedProperties = relatedProperties;
         }
 
@@ -36,9 +38,11 @@ namespace SourceInjection
 
         public IEnumerable<string> RelatedProperties { get; }
 
-        public Microsoft.CodeAnalysis.Accessibility Accessibility => Microsoft.CodeAnalysis.Accessibility.Public;
+        public Accessibility Accessibility => Accessibility.Public;
 
-        public Microsoft.CodeAnalysis.Accessibility GetterAccessibility => Microsoft.CodeAnalysis.Accessibility.NotApplicable;
+        public Accessibility GetterAccessibility => Accessibility.NotApplicable;
+
+        public Accessibility SetterAccessibility {  get; }
 
         public string PropertyName(IFieldSymbol field)
         {
@@ -73,7 +77,7 @@ namespace SourceInjection
                 bool equalityCheck = true,
                 NullSafety inEqualityNullSafety = NullSafety.Auto,
                 string equalityComparer = null,
-                bool throwIfValueIsNull = false /*,
+                bool throwIfValueIsNull = false/*,
                 params string[] relatedProperties*/)
 
             : base(
@@ -81,7 +85,8 @@ namespace SourceInjection
                   inEqualityNullSafety,
                   equalityComparer,
                   throwIfValueIsNull,
-                  /*relatedProperties*/Array.Empty<string>())
+                  Accessibility.NotApplicable/*,
+                  relatedProperties*/)
         { }
     }
 
@@ -98,6 +103,7 @@ namespace SourceInjection
                 NullSafety inEqualityNullSafety = NullSafety.Auto,
                 Type equalityComparer = null,
                 bool throwIfValueIsNull = false,
+                Accessibility setterAccessibility = Accessibility.NotApplicable,
                 params string[] relatedProperties)
 
             : this(
@@ -105,6 +111,7 @@ namespace SourceInjection
                   inEqualityNullSafety,
                   equalityComparer?.FullName,
                   throwIfValueIsNull,
+                  setterAccessibility,
                   relatedProperties)
         { }
 
@@ -113,12 +120,14 @@ namespace SourceInjection
                 NullSafety inEqualityNullSafety = NullSafety.Auto,
                 string equalityComparer = null,
                 bool throwIfValueIsNull = false,
+                Accessibility setterAccessibility = Accessibility.NotApplicable,
                 params string[] relatedProperties)
             : base(
                   equalityCheck,
                   inEqualityNullSafety,
                   equalityComparer,
                   throwIfValueIsNull,
+                  setterAccessibility,
                   relatedProperties)
         { }
     }
@@ -136,6 +145,7 @@ namespace SourceInjection
                 NullSafety inEqualityNullSafety = NullSafety.Auto,
                 Type equalityComparer = null,
                 bool throwIfValueIsNull = false,
+                Accessibility setterAccessibility = Accessibility.NotApplicable,
                 params string[] relatedProperties)
 
             : this(
@@ -143,6 +153,7 @@ namespace SourceInjection
                   inEqualityNullSafety,
                   equalityComparer?.FullName,
                   throwIfValueIsNull,
+                  setterAccessibility,
                   relatedProperties)
         { }
 
@@ -151,12 +162,14 @@ namespace SourceInjection
                 NullSafety inEqualityNullSafety = NullSafety.Auto,
                 string equalityComparer = null,
                 bool throwIfValueIsNull = false,
+                Accessibility setterAccessibility = Accessibility.NotApplicable,
                 params string[] relatedProperties)
             : base(
                   equalityCheck,
                   inEqualityNullSafety,
                   equalityComparer,
                   throwIfValueIsNull,
+                  setterAccessibility,
                   relatedProperties)
         { }
     }

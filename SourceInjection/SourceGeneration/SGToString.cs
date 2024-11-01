@@ -69,17 +69,17 @@ namespace SourceInjection
             return Snippets.MemberToString(member, config);
         }
 
-        private static IEnumerable<Microsoft.CodeAnalysis.Accessibility> GetAllowedAccessibilities(Accessibility accessibility)
+        private static IEnumerable<Accessibility> GetAllowedAccessibilities(AccessibilityRestriction accessibility)
         {
-            if (accessibility.HasFlag(Accessibility.Public))            yield return Microsoft.CodeAnalysis.Accessibility.Public;
-            if (accessibility.HasFlag(Accessibility.Internal))          yield return Microsoft.CodeAnalysis.Accessibility.Internal;
-            if (accessibility.HasFlag(Accessibility.Protected))         yield return Microsoft.CodeAnalysis.Accessibility.Protected;
-            if (accessibility.HasFlag(Accessibility.Private))           yield return Microsoft.CodeAnalysis.Accessibility.Private;
-            if (accessibility.HasFlag(Accessibility.ProtectedInternal)) yield return Microsoft.CodeAnalysis.Accessibility.ProtectedOrInternal;
-            if (accessibility.HasFlag(Accessibility.ProtectedPrivate))  yield return Microsoft.CodeAnalysis.Accessibility.ProtectedAndInternal;
+            if (accessibility.HasFlag(AccessibilityRestriction.Public))            yield return Accessibility.Public;
+            if (accessibility.HasFlag(AccessibilityRestriction.Internal))          yield return Accessibility.Internal;
+            if (accessibility.HasFlag(AccessibilityRestriction.Protected))         yield return Accessibility.Protected;
+            if (accessibility.HasFlag(AccessibilityRestriction.Private))           yield return Accessibility.Private;
+            if (accessibility.HasFlag(AccessibilityRestriction.ProtectedInternal)) yield return Accessibility.ProtectedOrInternal;
+            if (accessibility.HasFlag(AccessibilityRestriction.ProtectedPrivate))  yield return Accessibility.ProtectedAndInternal;
         }
 
-        private static bool SymbolIsAllowed(ISymbol symbol, Microsoft.CodeAnalysis.Accessibility[] accessibilities)
+        private static bool SymbolIsAllowed(ISymbol symbol, Accessibility[] accessibilities)
         {
             ITypeSymbol type;
             if (symbol is IFieldSymbol field)
@@ -93,9 +93,9 @@ namespace SourceInjection
                     HasRequiredAccessibility(symbol, accessibilities) && (!type.IsEnumerable() || type.OverridesToString())));
         }
 
-        private static bool HasRequiredAccessibility(ISymbol symbol, Microsoft.CodeAnalysis.Accessibility[] accessibilities)
+        private static bool HasRequiredAccessibility(ISymbol symbol, Accessibility[] accessibilities)
         {
-            Microsoft.CodeAnalysis.Accessibility accessibility;
+            Accessibility accessibility;
             if(symbol is IPropertySymbol property)
             {
                 if (property.GetMethod == null)
@@ -113,17 +113,15 @@ namespace SourceInjection
                 accessibility = MergePropertyAccessibility(attribute.Accessibility, attribute.GetterAccessibility);
             }
 
-            if (accessibility == Microsoft.CodeAnalysis.Accessibility.NotApplicable)
-                accessibility = Microsoft.CodeAnalysis.Accessibility.Private;
+            if (accessibility == Accessibility.NotApplicable)
+                accessibility = Accessibility.Private;
 
             return accessibilities.Contains(accessibility);
         }
 
-        private static Microsoft.CodeAnalysis.Accessibility MergePropertyAccessibility(
-            Microsoft.CodeAnalysis.Accessibility declaredAccessibility, 
-            Microsoft.CodeAnalysis.Accessibility getterAccessibility)
+        private static Accessibility MergePropertyAccessibility(Accessibility declaredAccessibility, Accessibility getterAccessibility)
         {
-            if (getterAccessibility == Microsoft.CodeAnalysis.Accessibility.NotApplicable)
+            if (getterAccessibility == Accessibility.NotApplicable)
                 return declaredAccessibility;
             return getterAccessibility;
         }

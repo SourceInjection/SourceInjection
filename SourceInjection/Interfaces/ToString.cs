@@ -12,7 +12,7 @@ namespace SourceInjection.Interfaces
         /// <summary>
         /// Defines which accessibility is required to be used foreach member to be included to generate <see cref="object.ToString"/>.
         /// </summary>
-        Accessibility Accessibility { get; }
+        AccessibilityRestriction Accessibility { get; }
     }
 
     public interface IToStringAttribute 

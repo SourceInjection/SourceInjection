@@ -7,8 +7,7 @@ namespace SourceInjection.SourceGeneration.DataMembers
     {
         protected FieldSymbolInfo(
             string name,
-            Microsoft.CodeAnalysis.Accessibility
-            declaredAccessibility,
+            Accessibility declaredAccessibility,
             ITypeSymbol containingType,
             ImmutableArray<AttributeData> attributes,
             ITypeSymbol type

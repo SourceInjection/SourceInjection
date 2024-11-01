@@ -4,8 +4,6 @@ using System;
 
 namespace SourceInjection.Interfaces
 {
-    using Accessibility = Microsoft.CodeAnalysis.Accessibility;
-
     public interface IGeneratesDataMemberPropertyFromFieldAttribute 
     {
         /// <summary>
@@ -31,6 +29,8 @@ namespace SourceInjection.Interfaces
         /// Determines if a <see cref="ArgumentNullException"/> is thrown when <see langword="value"/> is <see langword="null"/>.
         /// </summary>
         bool ThrowIfValueIsNull { get; }
+
+        Accessibility SetterAccessibility { get; }
 
         /// <summary>
         /// Also raises a event for the defined properties.

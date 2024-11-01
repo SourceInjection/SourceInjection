@@ -7,7 +7,7 @@ namespace SourceInjection
     /// See <see href="https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/access-modifiers">Access Modifiers</see>.
     /// </summary>
     [Flags]
-    public enum Accessibility
+    public enum AccessibilityRestriction
     {
         /// <summary>
         /// No modifier is present.
