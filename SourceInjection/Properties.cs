@@ -63,16 +63,16 @@ namespace SourceInjection
                 NullSafety inEqualityNullSafety = NullSafety.Auto,
                 Type equalityComparer = null,
                 bool throwIfValueIsNull = false,
-                Accessibility setterAccessibility = Accessibility.NotApplicable/*,
-                params string[] relatedProperties*/)
+                Accessibility setterAccessibility = Accessibility.NotApplicable,
+                params string[] relatedProperties)
 
             : this(
                   equalityCheck,
                   inEqualityNullSafety,
                   equalityComparer?.FullName,
                   throwIfValueIsNull,
-                  setterAccessibility/*,
-                  relatedProperties*/)
+                  setterAccessibility,
+                  relatedProperties)
         { }
 
         protected NotifyPropertyChangedAttribute(
@@ -80,16 +80,16 @@ namespace SourceInjection
                 NullSafety inEqualityNullSafety = NullSafety.Auto,
                 string equalityComparer = null,
                 bool throwIfValueIsNull = false,
-                Accessibility setterAccessibility = Accessibility.NotApplicable/*,
-                params string[] relatedProperties*/)
+                Accessibility setterAccessibility = Accessibility.NotApplicable,
+                params string[] relatedProperties)
 
             : base(
                   equalityCheck,
                   inEqualityNullSafety,
                   equalityComparer,
                   throwIfValueIsNull,
-                  setterAccessibility/*,
-                  relatedProperties*/)
+                  setterAccessibility,
+                  relatedProperties)
         { }
     }
 

@@ -56,7 +56,10 @@ namespace SourceInjection.SourceGeneration.Common
             if (constant.Kind == TypedConstantKind.Type)
                 return (constant.Value as INamedTypeSymbol)?.ToDisplayString();
             if (constant.Kind == TypedConstantKind.Array)
-                return constant.Values.Select(v => SelectValue(v)).ToArray();
+            {
+                // TODO: implement type casting for param arrays other than string
+                return constant.Values.Select(v => (string)SelectValue(v)).ToArray();
+            }
             return constant.Value;
         }
 
