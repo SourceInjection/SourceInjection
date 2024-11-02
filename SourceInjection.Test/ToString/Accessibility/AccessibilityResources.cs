@@ -4,28 +4,28 @@ namespace SourceInjection.Test.ToString.Accessibility
 {
     internal class AccessibilityResources
     {
-        internal static IEnumerable<string> GetTargetedFields(AccessibilityRestriction accessibility)
+        internal static IEnumerable<string> GetTargetedFields(Accessibilities accessibility)
         {
             // do not change order !!!
-            if (accessibility.HasFlag(AccessibilityRestriction.Public)) yield return "_publicField";
-            if (accessibility.HasFlag(AccessibilityRestriction.ProtectedInternal)) yield return "_protectedInternalField";
-            if (accessibility.HasFlag(AccessibilityRestriction.Internal)) yield return "_internalField";
-            if (accessibility.HasFlag(AccessibilityRestriction.Protected)) yield return "_protectedField";
-            if (accessibility.HasFlag(AccessibilityRestriction.ProtectedPrivate)) yield return "_protectedPrivateField";
-            if (accessibility.HasFlag(AccessibilityRestriction.Private)) yield return "_privateField";
+            if (accessibility.HasFlag(Accessibilities.Public)) yield return "_publicField";
+            if (accessibility.HasFlag(Accessibilities.ProtectedInternal)) yield return "_protectedInternalField";
+            if (accessibility.HasFlag(Accessibilities.Internal)) yield return "_internalField";
+            if (accessibility.HasFlag(Accessibilities.Protected)) yield return "_protectedField";
+            if (accessibility.HasFlag(Accessibilities.ProtectedPrivate)) yield return "_protectedPrivateField";
+            if (accessibility.HasFlag(Accessibilities.Private)) yield return "_privateField";
         }
 
         public static readonly object[] TestConfigs = 
         [
-            new object [] { typeof(ClassWithAccessibilityNone), AccessibilityRestriction.None },
-            new object [] { typeof(ClassWithDefaultAttribute), AccessibilityRestriction.Public },
-            new object [] { typeof(ClassWithAccessibilityPublic), AccessibilityRestriction.Public },
-            new object [] { typeof(ClassWithAccessibilityInternal), AccessibilityRestriction.Internal },
-            new object [] { typeof(ClassWithAccessibilityProtected), AccessibilityRestriction.Protected },
-            new object [] { typeof(ClassWithAccessibilityPrivate), AccessibilityRestriction.Private },
-            new object [] { typeof(ClassWithAccessibilityProtectedInternal), AccessibilityRestriction.ProtectedInternal },
-            new object [] { typeof(ClassWithAccessibilityProtectedPrivate), AccessibilityRestriction.ProtectedPrivate },
-            new object [] { typeof(ClassWithAccessibilityAll), AccessibilityRestriction.All },
+            new object [] { typeof(ClassWithAccessibilityNone), Accessibilities.None },
+            new object [] { typeof(ClassWithDefaultAttribute), Accessibilities.Public },
+            new object [] { typeof(ClassWithAccessibilityPublic), Accessibilities.Public },
+            new object [] { typeof(ClassWithAccessibilityInternal), Accessibilities.Internal },
+            new object [] { typeof(ClassWithAccessibilityProtected), Accessibilities.Protected },
+            new object [] { typeof(ClassWithAccessibilityPrivate), Accessibilities.Private },
+            new object [] { typeof(ClassWithAccessibilityProtectedInternal), Accessibilities.ProtectedInternal },
+            new object [] { typeof(ClassWithAccessibilityProtectedPrivate), Accessibilities.ProtectedPrivate },
+            new object [] { typeof(ClassWithAccessibilityAll), Accessibilities.All },
         ];
     }
 
@@ -45,49 +45,49 @@ namespace SourceInjection.Test.ToString.Accessibility
         private int _privateField;
     }
 
-    [AutoToString(accessibility: AccessibilityRestriction.Public)]
+    [AutoToString(accessibility: Accessibilities.Public)]
     internal partial class ClassWithAccessibilityPublic : ClassWithAllAccessibilitiesThatCanBeInherited
     {
         private int _privateField;
     }
 
-    [AutoToString(accessibility: AccessibilityRestriction.Internal)]
+    [AutoToString(accessibility: Accessibilities.Internal)]
     internal partial class ClassWithAccessibilityInternal : ClassWithAllAccessibilitiesThatCanBeInherited
     {
         private int _privateField;
     }
 
-    [AutoToString(accessibility: AccessibilityRestriction.Protected)]
+    [AutoToString(accessibility: Accessibilities.Protected)]
     internal partial class ClassWithAccessibilityProtected : ClassWithAllAccessibilitiesThatCanBeInherited
     {
         private int _privateField;
     }
 
-    [AutoToString(accessibility: AccessibilityRestriction.Private)]
+    [AutoToString(accessibility: Accessibilities.Private)]
     internal partial class ClassWithAccessibilityPrivate : ClassWithAllAccessibilitiesThatCanBeInherited
     {
         private int _privateField;
     }
 
-    [AutoToString(accessibility: AccessibilityRestriction.ProtectedInternal)]
+    [AutoToString(accessibility: Accessibilities.ProtectedInternal)]
     internal partial class ClassWithAccessibilityProtectedInternal : ClassWithAllAccessibilitiesThatCanBeInherited
     {
         private int _privateField;
     }
 
-    [AutoToString(accessibility: AccessibilityRestriction.ProtectedPrivate)]
+    [AutoToString(accessibility: Accessibilities.ProtectedPrivate)]
     internal partial class ClassWithAccessibilityProtectedPrivate : ClassWithAllAccessibilitiesThatCanBeInherited
     {
         private int _privateField;
     }
 
-    [AutoToString(accessibility: AccessibilityRestriction.None)]
+    [AutoToString(accessibility: Accessibilities.None)]
     internal partial class ClassWithAccessibilityNone : ClassWithAllAccessibilitiesThatCanBeInherited
     {
         private int _privateField;
     }
 
-    [AutoToString(accessibility: AccessibilityRestriction.All)]
+    [AutoToString(accessibility: Accessibilities.All)]
     internal partial class ClassWithAccessibilityAll: ClassWithAllAccessibilitiesThatCanBeInherited
     {
         private int _privateField;

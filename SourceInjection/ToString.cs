@@ -11,7 +11,7 @@ namespace SourceInjection
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, Inherited = false, AllowMultiple = false)]
     public class AutoToStringAttribute : Attribute, IAutoToStringAttribute
     {
-        public AutoToStringAttribute(DataMemberKind dataMemberKind = DataMemberKind.DataMember, AccessibilityRestriction accessibility = AccessibilityRestriction.Public)
+        public AutoToStringAttribute(DataMemberKind dataMemberKind = DataMemberKind.DataMember, Accessibilities accessibility = Accessibilities.Public)
         {
             DataMemberKind = dataMemberKind;
             Accessibility = accessibility;
@@ -19,7 +19,7 @@ namespace SourceInjection
 
         public DataMemberKind DataMemberKind { get; }
 
-        public AccessibilityRestriction Accessibility { get; }
+        public Accessibilities Accessibility { get; }
     }
 
     /// <summary>

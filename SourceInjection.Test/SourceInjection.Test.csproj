@@ -25,6 +25,10 @@
     <ProjectReference Include="..\SourceInjection.Test.Comparers\SourceInjection.Test.Comparers.csproj" />
     <ProjectReference Include="..\SourceInjection\SourceInjection.csproj" OutputItemType="Analyzer" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="PropertyEvents\" />
+  </ItemGroup>
   <Target Name="Cleanup" AfterTargets="Clean">
     <RemoveDir Directories="$(ProjectDir)$(BaseIntermediateOutputPath)$(Configuration)\net8.0\generated\SourceInjection" />
   </Target>

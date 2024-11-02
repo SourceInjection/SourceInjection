@@ -8,7 +8,7 @@ namespace SourceInjection.Test.ToString.Accessibility
     {
         [Test]
         [TestCaseSource(typeof(AccessibilityResources), nameof(AccessibilityResources.TestConfigs))]
-        public void TestAccessibility(Type type, AccessibilityRestriction accessibility)
+        public void TestAccessibility(Type type, Accessibilities accessibility)
         {
             var included = AccessibilityResources.GetTargetedFields(accessibility)
                 .Select(m => Test.ToString.ToString.Member(m))

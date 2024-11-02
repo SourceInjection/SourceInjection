@@ -69,14 +69,14 @@ namespace SourceInjection
             return Snippets.MemberToString(member, config);
         }
 
-        private static IEnumerable<Accessibility> GetAllowedAccessibilities(AccessibilityRestriction accessibility)
+        private static IEnumerable<Accessibility> GetAllowedAccessibilities(Accessibilities accessibility)
         {
-            if (accessibility.HasFlag(AccessibilityRestriction.Public))            yield return Accessibility.Public;
-            if (accessibility.HasFlag(AccessibilityRestriction.Internal))          yield return Accessibility.Internal;
-            if (accessibility.HasFlag(AccessibilityRestriction.Protected))         yield return Accessibility.Protected;
-            if (accessibility.HasFlag(AccessibilityRestriction.Private))           yield return Accessibility.Private;
-            if (accessibility.HasFlag(AccessibilityRestriction.ProtectedInternal)) yield return Accessibility.ProtectedOrInternal;
-            if (accessibility.HasFlag(AccessibilityRestriction.ProtectedPrivate))  yield return Accessibility.ProtectedAndInternal;
+            if (accessibility.HasFlag(Accessibilities.Public))            yield return Accessibility.Public;
+            if (accessibility.HasFlag(Accessibilities.Internal))          yield return Accessibility.Internal;
+            if (accessibility.HasFlag(Accessibilities.Protected))         yield return Accessibility.Protected;
+            if (accessibility.HasFlag(Accessibilities.Private))           yield return Accessibility.Private;
+            if (accessibility.HasFlag(Accessibilities.ProtectedInternal)) yield return Accessibility.ProtectedOrInternal;
+            if (accessibility.HasFlag(Accessibilities.ProtectedPrivate))  yield return Accessibility.ProtectedAndInternal;
         }
 
         private static bool SymbolIsAllowed(ISymbol symbol, Accessibility[] accessibilities)
