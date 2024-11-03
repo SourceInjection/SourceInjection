@@ -21,7 +21,8 @@ namespace SourceInjection.Test.Equals.Comparer.StructType.NullSafetyAuto
     {
         private class IntComparer : NullableComparerBase<int?> { }
 
-        [Equals(equalityComparer: typeof(IntComparer))]
+        [EqualityComparer(equalityComparer: typeof(IntComparer))]
+        [Equals]
         public int? Property { get; set; }
     }
 
@@ -29,7 +30,8 @@ namespace SourceInjection.Test.Equals.Comparer.StructType.NullSafetyAuto
     {
         private class IntComparer : ComparerBase<int> { }
 
-        [Equals(equalityComparer: typeof(IntComparer))]
+        [EqualityComparer(equalityComparer: typeof(IntComparer))]
+        [Equals]
         public int? Property { get; set; }
     }
 
@@ -37,7 +39,8 @@ namespace SourceInjection.Test.Equals.Comparer.StructType.NullSafetyAuto
     {
         private class IntComparer : NullableComparerBase<int?> { }
 
-        [Equals(equalityComparer: typeof(IntComparer))]
+        [EqualityComparer(equalityComparer: typeof(IntComparer))]
+        [Equals]
         public int Property { get; set; }
     }
 
@@ -45,7 +48,8 @@ namespace SourceInjection.Test.Equals.Comparer.StructType.NullSafetyAuto
     {
         private class IntComparer : ComparerBase<int> { }
 
-        [Equals(equalityComparer: typeof(IntComparer))]
+        [EqualityComparer(equalityComparer: typeof(IntComparer))]
+        [Equals]
         public int Property { get; set; }
     }
 }

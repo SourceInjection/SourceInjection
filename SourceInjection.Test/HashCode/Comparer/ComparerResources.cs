@@ -45,7 +45,8 @@ namespace SourceInjection.Test.HashCode.Comparer
     {
         private class IntComparer : ComparerBase<int> { }
 
-        [HashCode(equalityComparer: typeof(IntComparer))]
+        [EqualityComparer(equalityComparer: typeof(IntComparer))]
+        [HashCode]
         public int Property { get; }
     }
 
@@ -58,7 +59,8 @@ namespace SourceInjection.Test.HashCode.Comparer
 
     public partial class ClassWithExternComparer_WithHashCodeConfig
     {
-        [HashCode(equalityComparer: typeof(Comparers.IntEqualityComparer))]
+        [EqualityComparer(equalityComparer: typeof(Comparers.IntEqualityComparer))]
+        [HashCode]
         public int Property { get; }
     }
 
@@ -71,7 +73,8 @@ namespace SourceInjection.Test.HashCode.Comparer
 
     public partial class ClassWithGenericComparer_WithHashCodeConfig
     {
-        [HashCode(equalityComparer: typeof(ComparerBase<int>))]
+        [EqualityComparer(equalityComparer: typeof(ComparerBase<int>))]
+        [HashCode]
         public int Property { get; }
     }
 
@@ -84,7 +87,8 @@ namespace SourceInjection.Test.HashCode.Comparer
 
     public partial class ClassWithExternGenericComparer_WithHashCodeConfig
     {
-        [HashCode(equalityComparer: typeof(Comparers.GenericEqualityComparer<int>))]
+        [EqualityComparer(equalityComparer: typeof(Comparers.GenericEqualityComparer<int>))]
+        [HashCode]
         public int Property { get; }
     }
 

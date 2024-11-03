@@ -3,13 +3,13 @@ using System;
 
 namespace SourceInjection
 {
-    internal class EqualityComparerAttribute : Attribute, IEqualityComparerAttribute
+    public class EqualityComparerAttribute : Attribute, IEqualityComparerAttribute
     {
         public EqualityComparerAttribute(Type equalityComparer, NullSafety nullSafety = NullSafety.Auto)
             : this(equalityComparer?.FullName, nullSafety)
         { }
 
-        private EqualityComparerAttribute(string equalityComparer, NullSafety nullSafety)
+        protected EqualityComparerAttribute(string equalityComparer, NullSafety nullSafety = NullSafety.Auto)
         {
             EqualityComparer = equalityComparer;
             NullSafety = nullSafety;

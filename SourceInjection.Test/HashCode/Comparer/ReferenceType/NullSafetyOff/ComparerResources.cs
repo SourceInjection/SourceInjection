@@ -19,7 +19,8 @@ namespace SourceInjection.Test.HashCode.Comparer.ReferenceType.NullSafetyOff
     {
         private class IntComparer : NullableComparerBase<object?> { }
 
-        [HashCode(equalityComparer: typeof(IntComparer), nullSafety: NullSafety.Off)]
+        [EqualityComparer(equalityComparer: typeof(IntComparer), nullSafety: NullSafety.Off)]
+        [HashCode]
         public object? Property { get; set; }
     }
 
@@ -27,7 +28,8 @@ namespace SourceInjection.Test.HashCode.Comparer.ReferenceType.NullSafetyOff
     {
         private class IntComparer : ComparerBase<object> { }
 
-        [HashCode(equalityComparer: typeof(IntComparer), nullSafety: NullSafety.Off)]
+        [EqualityComparer(equalityComparer: typeof(IntComparer), nullSafety: NullSafety.Off)]
+        [HashCode]
         public object? Property { get; set; }
     }
 
@@ -35,7 +37,8 @@ namespace SourceInjection.Test.HashCode.Comparer.ReferenceType.NullSafetyOff
     {
         private class IntComparer : NullableComparerBase<object?> { }
 
-        [HashCode(equalityComparer: typeof(IntComparer), nullSafety: NullSafety.Off)]
+        [EqualityComparer(equalityComparer: typeof(IntComparer), nullSafety: NullSafety.Off)]
+        [HashCode]
         public object Property { get; set; }
     }
 
@@ -43,7 +46,8 @@ namespace SourceInjection.Test.HashCode.Comparer.ReferenceType.NullSafetyOff
     {
         private class IntComparer : ComparerBase<object> { }
 
-        [HashCode(equalityComparer: typeof(IntComparer), nullSafety: NullSafety.Off)]
+        [EqualityComparer(equalityComparer: typeof(IntComparer), nullSafety: NullSafety.Off)]
+        [HashCode]
         public object Property { get; set; }
     }
 }

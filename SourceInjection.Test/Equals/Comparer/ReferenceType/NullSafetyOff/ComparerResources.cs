@@ -19,7 +19,7 @@ namespace SourceInjection.Test.Equals.Comparer.ReferenceType.NullSafetyOff
     {
         private class IntComparer : NullableComparerBase<object?> { }
 
-        [EqualityComparer(equalityComparer: typeof(IntComparer), nullSafety: NullSafety.Off))]
+        [EqualityComparer(equalityComparer: typeof(IntComparer), nullSafety: NullSafety.Off)]
         [Equals]
         public object? Property { get; set; }
     }
