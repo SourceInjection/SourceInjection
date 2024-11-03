@@ -151,8 +151,8 @@ namespace SourceInjection
             if (member.HasMaybeNullAttribute())
                 return NullSafety.On;
 
-            if (comparerInfo != null)
-                return comparerInfo.HashCodeSupportsNullable ? NullSafety.Off : NullSafety.On;
+            if (comparerInfo != null && comparerInfo.EqualsSupportsNullable)
+                return NullSafety.Off;
 
             return NullSafety.Auto;
         }

@@ -144,8 +144,8 @@ namespace SourceInjection
             if(member.HasMaybeNullAttribute())
                 return NullSafety.On;
 
-            if (config.NullSafety == NullSafety.Auto && comparerInfo != null)
-                return comparerInfo.EqualsSupportsNullable ? NullSafety.Off : NullSafety.On;
+            if (config.NullSafety == NullSafety.Auto && comparerInfo != null && comparerInfo.EqualsSupportsNullable)
+                return NullSafety.Off;
 
             return config.NullSafety;
         }
