@@ -36,18 +36,12 @@ namespace SourceInjection
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, Inherited = true, AllowMultiple = false)]
     public class EqualsAttribute : Attribute, IEqualsAttribute
     {
-        public EqualsAttribute(Type equalityComparer = null, NullSafety nullSafety = NullSafety.Auto)
-            : this(equalityComparer?.FullName, nullSafety) { }
-
-        private EqualsAttribute(string equalityComparer = null, NullSafety nullSafety = NullSafety.Auto)
+        public EqualsAttribute(NullSafety nullSafety = NullSafety.Auto)
         {
             NullSafety = nullSafety;
-            EqualityComparer = equalityComparer;
         }
 
         public NullSafety NullSafety { get; }
-
-        public string EqualityComparer { get; }
     }
 
     /// <summary>

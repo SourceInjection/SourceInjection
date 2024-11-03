@@ -60,13 +60,13 @@ namespace SourceInjection.SourceGeneration.SnippetsHelper
                 : MayInversed(comparerCode, isInequality);
         }
 
-        public static string EqualityCheck(DataMemberSymbolInfo member, string otherName, bool nullSafe, ComparerInfo comparer, bool isInequality)
+        public static string EqualityCheck(DataMemberSymbolInfo member, string otherName, bool nullSafe, EqualityComparerInfo comparer, bool isInequality)
         {
             if (comparer != null)
             {
                 var comparerName = Reduce.ComparerName(member, comparer.Name);
 
-                if (!member.Type.IsReferenceType && member.Type.HasNullableAnnotation() && !comparer.IsNullSafe)
+                if (!member.Type.IsReferenceType && member.Type.HasNullableAnnotation() && !comparer.EqualsSupportsNullable)
                     return ComparerNullableNonReferenceTypeEquality(comparerName, member.Name, otherName, nullSafe, isInequality);
 
                 nullSafe = nullSafe && (member.Type.IsReferenceType || member.Type.HasNullableAnnotation());

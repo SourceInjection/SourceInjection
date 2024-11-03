@@ -18,7 +18,10 @@
         NullSafety NullSafety { get; }
     }
 
-    public interface IEqualsAttribute : IEqualityComparisonConfigAttribute { }
+    public interface IEqualsAttribute 
+    {
+        NullSafety NullSafety { get; }
+    }
 
     public interface IEqualsExcludeAttribute { }
 }

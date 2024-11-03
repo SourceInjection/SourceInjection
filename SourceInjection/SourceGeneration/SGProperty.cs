@@ -17,7 +17,7 @@ using SourceInjection.Util;
 namespace SourceInjection
 {
     [Generator(LanguageNames.CSharp)]
-    internal class SGPropertyEvents : TypeSourceGeneratorBase
+    internal class SGProperty : TypeSourceGeneratorBase
     {
         private const string PropertyChanged = nameof(INotifyPropertyChanged.PropertyChanged);
         private const string PropertyChangedArgs = nameof(PropertyChangedEventArgs);
@@ -39,7 +39,7 @@ $@"protected virtual void {PropertyChangingNotifyMethod}(string propertyName)
     {PropertyChanging}?.Invoke(this, new {PropertyChangingArgs}(propertyName));
 }}";
 
-        protected internal override string Name { get; } = "PropertyEvent";
+        protected internal override string Name { get; } = "Property";
 
         protected override IEnumerable<string> Dependencies(TypeInfo typeInfo)
         {
@@ -66,29 +66,38 @@ $@"protected virtual void {PropertyChangingNotifyMethod}(string propertyName)
             var sb = new StringBuilder();
             var fields = GetFields(typeInfo);
 
+            AddHandlers(sb, typeInfo);
+
+            AddPropertyCode(sb, fields.First(), typeInfo.HasNullableEnabled);
+            foreach (var field in fields.Skip(1))
+                AddPropertyCode(sb.AppendLines(2), field, typeInfo.HasNullableEnabled);
+
+            AddRaiseMethods(sb, typeInfo);
+
+            return sb.ToString();
+        }
+
+        private void AddHandlers(StringBuilder sb, TypeInfo typeInfo)
+        {
             if (MustAddHandler<INotifyPropertyChangingAttribute>(typeInfo, PropertyChanging))
                 sb.AppendLine($"public event {PropertyChangingHandler} {PropertyChanging};").AppendLine();
 
             if (MustAddHandler<INotifyPropertyChangedAttribute>(typeInfo, PropertyChanged))
                 sb.AppendLine($"public event {PropertyChangedHandler} {PropertyChanged};").AppendLine();
+        }
 
-            sb.Append(PropertyCode(fields.First(), typeInfo.HasNullableEnabled));
-            foreach (var field in fields.Skip(1))
-                sb.AppendLines(2).Append(PropertyCode(field, typeInfo.HasNullableEnabled));
-
+        private void AddRaiseMethods(StringBuilder sb, TypeInfo typeInfo)
+        {
             if (MustAddRaiseMethod<INotifyPropertyChangingAttribute>(typeInfo, PropertyChangingNotifyMethod))
                 sb.AppendLines(2).Append(ChangingRaiseMethod);
 
             if (MustAddRaiseMethod<INotifyPropertyChangedAttribute>(typeInfo, PropertyChangedNotifyMethod))
                 sb.AppendLines(2).Append(ChangedRaiseMethod);
-
-            return sb.ToString();
         }
 
-        private static string PropertyCode(IFieldSymbol field, bool nullableEnabled)
-        {
-            var sb = new StringBuilder();
 
+        private static void AddPropertyCode(StringBuilder sb, IFieldSymbol field, bool nullableEnabled)
+        {
             var changingAttribute = GetAttribute<INotifyPropertyChangingAttribute>(field);
             var changedAttribute = GetAttribute<INotifyPropertyChangedAttribute>(field);
 
@@ -96,6 +105,7 @@ $@"protected virtual void {PropertyChangingNotifyMethod}(string propertyName)
                 ?? changedAttribute?.PropertyName(field);
 
             var isNullableField = field.Type.NullableAnnotation == NullableAnnotation.Annotated;
+
             var fi = new PropertyEventFieldInfo(
                 propertyName, field,
                 changingAttribute, changedAttribute,
@@ -112,8 +122,6 @@ $@"protected virtual void {PropertyChangingNotifyMethod}(string propertyName)
 
             if (isNullableField)
                 sb.AppendLine().Append("#nullable restore");
-
-            return sb.ToString();
         }
 
         private static string GetterCode(IFieldSymbol field)
@@ -227,9 +235,31 @@ $@"protected virtual void {PropertyChangingNotifyMethod}(string propertyName)
 
         private static string InequalityConditionCode(IFieldSymbol symbol, bool nullSafe, string other = "value")
         {
+            var comparerInfo = GetComparerInfo(symbol);
+
             var member = FieldSymbolInfo.Create(symbol);
             return Text.Indent(
-                $"if ({Snippets.InequalityCheck(member, other, nullSafe, null)})", 2);
+                $"if ({Snippets.InequalityCheck(member, other, nullSafe, comparerInfo)})", 2);
+        }
+
+        private static EqualityComparerInfo GetComparerInfo(IFieldSymbol symbol)
+        {
+            var config = GetComparerConfig(symbol);
+            if (string.IsNullOrEmpty(config?.EqualityComparer))
+                return null;
+
+            return EqualityComparerInfo.Get(config.EqualityComparer, symbol.Type);
+        }
+
+        private static IEqualityComparerAttribute GetComparerConfig(IFieldSymbol symbol)
+        {
+            var attData = symbol.AttributesOfType<IEqualityComparerAttribute>()
+                .FirstOrDefault();
+
+            if(attData != null && AttributeFactory.TryCreate<IEqualityComparerAttribute>(attData, out var config))
+                return config;
+
+            return null;
         }
 
         private static T GetAttribute<T>(IFieldSymbol field) where T : class

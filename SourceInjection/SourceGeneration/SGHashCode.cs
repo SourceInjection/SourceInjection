@@ -4,13 +4,11 @@ using SourceInjection.SourceGeneration.DataMembers;
 using SourceInjection.SourceGeneration.Common;
 using Microsoft.CodeAnalysis;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using TypeInfo = SourceInjection.SourceGeneration.Common.TypeInfo;
 using SourceInjection.SourceGeneration;
 using SourceInjection.CodeAnalysis;
 using SourceInjection.Util;
-using System;
 
 #pragma warning disable IDE0130
 
@@ -132,9 +130,10 @@ namespace SourceInjection
 
         private string MemberHash(DataMemberSymbolInfo member, TypeInfo containingType)
         {
-            var memberConfig = GetEqualityConfigAttribute(member);
-            var comparerInfo = GetComparerInfo(member, memberConfig);
-            var nullSafety = GetNullSafety(member, memberConfig, comparerInfo);
+            var comparerConfig = GetComparerAttribute(member);
+            var comparerInfo = EqualityComparerInfo.Get(comparerConfig?.EqualityComparer, member.Type);
+
+            var nullSafety = GetNullSafety(member, comparerConfig, comparerInfo);
 
             var isNullSafe = nullSafety == NullSafety.On ||
                 nullSafety == NullSafety.Auto && (!containingType.HasNullableEnabled || member.Type.HasNullableAnnotation());
@@ -142,28 +141,20 @@ namespace SourceInjection
             return Snippets.GetHashCode(member, isNullSafe, comparerInfo);
         }
 
-        private NullSafety GetNullSafety(DataMemberSymbolInfo member, IEqualityComparisonConfigAttribute memberConfig, ComparerInfo comparerInfo)
+        private NullSafety GetNullSafety(DataMemberSymbolInfo member, IEqualityComparerAttribute comparerConfig, EqualityComparerInfo comparerInfo)
         {
-            if (memberConfig.NullSafety != NullSafety.Auto)
-                return memberConfig.NullSafety;
+            if (comparerConfig != null && comparerConfig.NullSafety != NullSafety.Auto)
+                return comparerConfig.NullSafety;
+            
             if (member.HasNotNullAttribute())
                 return NullSafety.Off;
             if (member.HasMaybeNullAttribute())
                 return NullSafety.On;
-            if (comparerInfo != null && comparerInfo.IsNullSafe)
-                return NullSafety.Off;
+
+            if (comparerInfo != null)
+                return comparerInfo.HashCodeSupportsNullable ? NullSafety.Off : NullSafety.On;
 
             return NullSafety.Auto;
-        }
-
-        private IEqualityComparisonConfigAttribute GetEqualityConfigAttribute(DataMemberSymbolInfo member)
-        {
-            var attribute = member.AttributesOfType<IEqualityComparerAttribute>()
-                .FirstOrDefault();
-
-            if (attribute != null && AttributeFactory.TryCreate<IEqualityComparerAttribute>(attribute, out var config))
-                return config;
-            return GetMemberConfigAttribute(member);
         }
 
         private static bool ShouldIncludeBase(TypeInfo typeInfo, IAutoHashCodeAttribute config)
@@ -171,37 +162,6 @@ namespace SourceInjection
             return typeInfo.Symbol.IsReferenceType && (
                 config.BaseCall == BaseCall.On
                 || config.BaseCall == BaseCall.Auto && typeInfo.Symbol.BaseType is ITypeSymbol syBase && syBase.OverridesGetHashCode());
-        }
-
-        private ComparerInfo GetComparerInfo(DataMemberSymbolInfo member, IEqualityComparisonConfigAttribute config)
-        {
-            if(string.IsNullOrEmpty(config.EqualityComparer))
-                return null;
-            return new ComparerInfo(config.EqualityComparer, ComparerSupportsNullable(config.EqualityComparer, member.Type));
-        }
-
-        private bool ComparerSupportsNullable(string comparerName, ITypeSymbol argType)
-        {
-            var types = GetTypes(comparerName);
-            if (types.Count > 0)
-            {
-                var equalsMethod = types.SelectMany(t => t.Symbol.GetAllMembers())
-                    .OfType<IMethodSymbol>()
-                    .FirstOrDefault(m => m.IsComparerGetHashCodeMethod(argType));
-
-                return equalsMethod != null
-                    && equalsMethod.Parameters[0].SupportsNullable();
-            }
-
-            var type = Type.GetType(comparerName);
-            if (type != null)
-            {
-                var equalsMethod = Array.Find(type.GetMethods(), m => m.IsComparerGetHashCodeMethod(argType));
-
-                return equalsMethod != null
-                    && equalsMethod.GetParameters()[0].SupportsNullable();
-            }
-            return false;
         }
     }
 }

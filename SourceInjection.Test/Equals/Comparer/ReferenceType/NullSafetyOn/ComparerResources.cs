@@ -19,7 +19,8 @@ namespace SourceInjection.Test.Equals.Comparer.ReferenceType.NullSafetyOn
     {
         private class IntComparer : NullableComparerBase<object?> { }
 
-        [Equals(equalityComparer: typeof(IntComparer), nullSafety: NullSafety.On)]
+        [EqualityComparer(equalityComparer: typeof(IntComparer), nullSafety: NullSafety.On)]
+        [Equals]
         public object? Property { get; set; }
     }
 
@@ -27,7 +28,8 @@ namespace SourceInjection.Test.Equals.Comparer.ReferenceType.NullSafetyOn
     {
         private class IntComparer : ComparerBase<object> { }
 
-        [Equals(equalityComparer: typeof(IntComparer), nullSafety: NullSafety.On)]
+        [EqualityComparer(equalityComparer: typeof(IntComparer), nullSafety: NullSafety.On)]
+        [Equals]
         public object? Property { get; set; }
     }
 
@@ -35,7 +37,8 @@ namespace SourceInjection.Test.Equals.Comparer.ReferenceType.NullSafetyOn
     {
         private class IntComparer : NullableComparerBase<object?> { }
 
-        [Equals(equalityComparer: typeof(IntComparer), nullSafety: NullSafety.On)]
+        [EqualityComparer(equalityComparer: typeof(IntComparer), nullSafety: NullSafety.On)]
+        [Equals]
         public object Property { get; set; }
     }
 
@@ -43,7 +46,8 @@ namespace SourceInjection.Test.Equals.Comparer.ReferenceType.NullSafetyOn
     {
         private class IntComparer : ComparerBase<object> { }
 
-        [Equals(equalityComparer: typeof(IntComparer), nullSafety: NullSafety.On)]
+        [EqualityComparer(equalityComparer: typeof(IntComparer), nullSafety: NullSafety.On)]
+        [Equals]
         public object Property { get; set; }
     }
 }

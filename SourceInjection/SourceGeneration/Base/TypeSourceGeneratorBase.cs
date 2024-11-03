@@ -6,13 +6,14 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using SourceInjection.SourceGeneration.Diagnostics;
+using SourceInjection.SourceGeneration.Common;
+using SourceInjection.Interfaces;
+using SourceInjection.CodeAnalysis;
 
 namespace SourceInjection.SourceGeneration.Base
 {
     internal abstract class TypeSourceGeneratorBase : IIncrementalGenerator
     {
-        private readonly Dictionary<string, List<TypeInfo>> _allTypes = new Dictionary<string, List<TypeInfo>>(1024);
-
         protected internal abstract string Name { get; }
 
         protected abstract bool IsTargeted(INamedTypeSymbol symbol);
@@ -29,21 +30,6 @@ namespace SourceInjection.SourceGeneration.Base
             return Enumerable.Empty<string>();
         }
 
-        protected IReadOnlyList<TypeInfo> GetTypes(string name)
-        {
-            if (_allTypes.TryGetValue(name, out var value))
-                return value;
-            return System.Array.Empty<TypeInfo>();
-        }
-
-        private void Consider(string name, TypeInfo type)
-        {
-            if (!_allTypes.TryGetValue(name, out var list))
-                _allTypes.Add(name, new List<TypeInfo> { type });
-            else if (!list.Contains(type))
-                list.Add(type);
-        }
-
         public void Initialize(IncrementalGeneratorInitializationContext context)
         {
             var collected = context.SyntaxProvider.CreateSyntaxProvider(
@@ -51,14 +37,19 @@ namespace SourceInjection.SourceGeneration.Base
                 (n, _) => new { Context = n, Symbol = (INamedTypeSymbol)n.SemanticModel.GetDeclaredSymbol(n.Node) })
                 .Collect();
 
-            context.RegisterSourceOutput(collected, (_, types) =>
+            if (!TypeCollector.IsRegistered)
             {
-                foreach(var type in types)
+                TypeCollector.IsRegistered = true;
+
+                context.RegisterSourceOutput(collected, (_, types) =>
                 {
-                    var typeInfo = new TypeInfo(type.Context, (TypeDeclarationSyntax)type.Context.Node, type.Symbol);
-                    Consider(type.Symbol.ToDisplayString(), typeInfo);
-                }
-            });
+                    foreach (var type in types)
+                    {
+                        var typeInfo = new TypeInfo(type.Context, (TypeDeclarationSyntax)type.Context.Node, type.Symbol);
+                        TypeCollector.Consider(type.Symbol.ToDisplayString(), typeInfo);
+                    }
+                });
+            }
 
             context.RegisterSourceOutput(collected, (sourceProductionContext, types) =>
             {
@@ -82,6 +73,16 @@ namespace SourceInjection.SourceGeneration.Base
                     }
                 }
             });
+        }
+
+        protected static IEqualityComparerAttribute GetComparerAttribute(ISymbol symbol)
+        {
+            var attribute = symbol.AttributesOfType<IEqualityComparerAttribute>()
+                .FirstOrDefault();
+
+            if (attribute != null && AttributeFactory.TryCreate<IEqualityComparerAttribute>(attribute, out var config))
+                return config;
+            return null;
         }
 
         private string GeneratePartialType(TypeInfo typeInfo)

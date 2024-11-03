@@ -104,6 +104,16 @@ namespace SourceInjection.SourceGeneration.Base
                 ?? DefaultConfigAttribute;
         }
 
+        protected static IEqualityComparerAttribute GetComparerAttribute(DataMemberSymbolInfo symbolInfo)
+        {
+            var attribute = symbolInfo.AttributesOfType<IEqualityComparerAttribute>()
+                .FirstOrDefault();
+
+            if (attribute != null && AttributeFactory.TryCreate<IEqualityComparerAttribute>(attribute, out var config))
+                return config;
+            return null;
+        }
+
         private static T GetFirstOrNull<T>(IEnumerable<AttributeData> attributes) where T : class
         {
             var attData = attributes.FirstOrDefault();

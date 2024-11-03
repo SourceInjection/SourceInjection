@@ -18,7 +18,7 @@ namespace SourceInjection.Interfaces
         Accessibility GetterAccessibility { get; }
     }
 
-    public interface IPropertyEventGenerationAttribute : IGeneratesDataMemberPropertyFromFieldAttribute, IEqualityComparerAttribute
+    public interface IPropertyEventGenerationAttribute : IGeneratesDataMemberPropertyFromFieldAttribute
     {
         /// <summary>
         /// Determines if a equality check is generated.

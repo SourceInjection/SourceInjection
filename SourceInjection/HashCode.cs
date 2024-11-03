@@ -32,25 +32,7 @@ namespace SourceInjection
     /// </summary>
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, Inherited = true, AllowMultiple = false)]
     public class HashCodeAttribute : Attribute, IHashCodeAttribute
-    {
-        public HashCodeAttribute()
-            : this(default(string), NullSafety.Auto)
-        { }
-
-        public HashCodeAttribute(Type equalityComparer, NullSafety nullSafety = NullSafety.Auto)
-            : this(equalityComparer?.FullName, nullSafety)
-        { }
-
-        private HashCodeAttribute(string equalityComparer, NullSafety nullSafety = NullSafety.Auto)
-        {
-            EqualityComparer = equalityComparer;
-            NullSafety = nullSafety;
-        }
-
-        public string EqualityComparer { get; }
-
-        public NullSafety NullSafety { get; }
-    }
+    { }
 
     /// <summary>
     /// Must be used in combination with <see cref="AutoHashCodeAttribute"/>.

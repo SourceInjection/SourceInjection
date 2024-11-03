@@ -36,17 +36,10 @@ namespace SourceInjection
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, Inherited = true, AllowMultiple = false)]
     public class EqualsAndHashCodeAttribute : Attribute, IEqualsAttribute, IHashCodeAttribute
     {
-        public EqualsAndHashCodeAttribute(NullSafety equalsNullSafety = NullSafety.Auto, Type equalsEqualityComparer = null)
-            : this(equalsNullSafety, equalsEqualityComparer?.FullName)
-        { }
-
-        private EqualsAndHashCodeAttribute(NullSafety nullSafety = NullSafety.Auto, string equalityComparer = null)
+        public EqualsAndHashCodeAttribute(NullSafety nullSafety = NullSafety.Auto)
         {
             NullSafety = nullSafety;
-            EqualityComparer = equalityComparer;
         }
-
-        public string EqualityComparer { get; }
 
         public NullSafety NullSafety { get; }
     }

@@ -8,13 +8,13 @@ namespace SourceInjection.SourceGeneration
 {
     internal static class Snippets
     {
-        public static string InequalityCheck(DataMemberSymbolInfo member, string otherName, bool nullSafe, ComparerInfo comparer)
+        public static string InequalityCheck(DataMemberSymbolInfo member, string otherName, bool nullSafe, EqualityComparerInfo comparer)
             => EqualizationSnippets.EqualityCheck(member, otherName, nullSafe, comparer, true);
 
-        public static string EqualityCheck(DataMemberSymbolInfo member, string otherName, bool nullSafe, ComparerInfo comparer)
+        public static string EqualityCheck(DataMemberSymbolInfo member, string otherName, bool nullSafe, EqualityComparerInfo comparer)
             => EqualizationSnippets.EqualityCheck(member, otherName, nullSafe, comparer, false);
 
-        public static string GetHashCode(DataMemberSymbolInfo member, bool nullSafe, ComparerInfo comparer)
+        public static string GetHashCode(DataMemberSymbolInfo member, bool nullSafe, EqualityComparerInfo comparer)
             => HashCodeSnippets.GetHashCode(member, nullSafe, comparer);
 
         public static string MemberToString(DataMemberSymbolInfo member, IToStringAttribute config)

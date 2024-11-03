@@ -1,10 +1,6 @@
-﻿using System.Collections;
-
-namespace SourceInjection.Interfaces
+﻿namespace SourceInjection.Interfaces
 {
-    public interface IEqualityComparerAttribute : IEqualityComparisonConfigAttribute { }
-
-    public interface IEqualityComparisonConfigAttribute
+    public interface IEqualityComparerAttribute
     {
         /// <summary>
         /// The <see cref="IEqualityComparer"/> which is used to compare or evaluating the hash code.

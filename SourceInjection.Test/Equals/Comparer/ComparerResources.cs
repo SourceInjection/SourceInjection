@@ -2,6 +2,7 @@
 
 namespace SourceInjection.Test.Equals.Comparer
 {
+    using SourceInjection.Test.Comparers;
     using NullSafety = SourceInjection.NullSafety;
 
     internal static class ComparerResources
@@ -45,7 +46,8 @@ namespace SourceInjection.Test.Equals.Comparer
     {
         private class IntComparer : ComparerBase<int> { }
 
-        [Equals(equalityComparer: typeof(IntComparer))]
+        [EqualityComparer(typeof(IntComparer))]
+        [Equals]
         public int Property { get; }
     }
 
@@ -58,20 +60,23 @@ namespace SourceInjection.Test.Equals.Comparer
 
     public partial class ClassWithExternComparer_WithEqualsConfig
     {
-        [Equals(equalityComparer: typeof(Comparers.IntEqualityComparer))]
+        [EqualityComparer(typeof(IntEqualityComparer))]
+        [Equals]
         public int Property { get; }
     }
 
     [AutoEquals]
     public partial class ClassWithExternComparer_WithComparerAttribute
     {
-        [EqualityComparer(equalityComparer: typeof(Comparers.IntEqualityComparer))]
+        [EqualityComparer(typeof(IntEqualityComparer))]
+        [Equals]
         public int Property { get; }
     }
 
     public partial class ClassWithGenericComparer_WithEqualsConfig
     {
-        [Equals(equalityComparer: typeof(ComparerBase<int>))]
+        [EqualityComparer(typeof(ComparerBase<int>))]
+        [Equals]
         public int Property { get; }
     }
 
@@ -84,7 +89,8 @@ namespace SourceInjection.Test.Equals.Comparer
 
     public partial class ClassWithExternGenericComparer_WithEqualsConfig
     {
-        [Equals(equalityComparer: typeof(Comparers.GenericEqualityComparer<int>))]
+        [EqualityComparer(equalityComparer: typeof(Comparers.GenericEqualityComparer<int>))]
+        [Equals]
         public int Property { get; }
     }
 
