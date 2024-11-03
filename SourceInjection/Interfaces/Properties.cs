@@ -1,6 +1,5 @@
 ﻿using Microsoft.CodeAnalysis;
 using System.Collections.Generic;
-using System;
 
 namespace SourceInjection.Interfaces
 {
@@ -21,14 +20,11 @@ namespace SourceInjection.Interfaces
     public interface IPropertyEventGenerationAttribute : IGeneratesDataMemberPropertyFromFieldAttribute
     {
         /// <summary>
-        /// Determines if a equality check is generated.
+        /// Determines if a inequality check is generated.
         /// </summary>
-        bool EqualityCheck { get; }
+        bool InEqualityCheck { get; }
 
-        /// <summary>
-        /// Determines if a <see cref="ArgumentNullException"/> is thrown when <see langword="value"/> is <see langword="null"/>.
-        /// </summary>
-        bool ThrowIfValueIsNull { get; }
+        NullSafety NullSafety { get; }
 
         Accessibility SetterAccessibility { get; }
 

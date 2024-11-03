@@ -143,7 +143,7 @@ $@"protected virtual void {PropertyChangingNotifyMethod}(string propertyName)
 
             if (fieldInfo.ChangingAttribute is null)
                 sb.AppendLine(SetterCodeWithoutChangingEvent(fieldInfo));
-            else if (!fieldInfo.ChangingAttribute.EqualityCheck)
+            else if (!fieldInfo.ChangingAttribute.InEqualityCheck)
                 sb.AppendLine(SetterCodeWithoutChangingEqualityCheck(fieldInfo));
             else
                 sb.AppendLine(SetterCodeWithChangingEqualityCheck(fieldInfo));
@@ -156,7 +156,7 @@ $@"protected virtual void {PropertyChangingNotifyMethod}(string propertyName)
         {
             var sb = new StringBuilder();
 
-            if (fieldInfo.ChangedAttribute?.EqualityCheck is true)
+            if (fieldInfo.ChangedAttribute?.InEqualityCheck is true)
             {
                 const int tab = 3;
                 sb.AppendLine(InequalityConditionCode(fieldInfo.Field, fieldInfo.NullSafe));
@@ -185,7 +185,7 @@ $@"protected virtual void {PropertyChangingNotifyMethod}(string propertyName)
             AppendRaiseChangingEvent(sb, fieldInfo.ChangingAttribute, fieldInfo.PropertyName, tab);
             sb.AppendLine();
 
-            if (fieldInfo.ChangedAttribute?.EqualityCheck is true)
+            if (fieldInfo.ChangedAttribute?.InEqualityCheck is true)
             {
                 tempVar = Snippets.UnconflictingVariable(fieldInfo.Field.ContainingType);
                 sb.AppendLine(Text.Indent($"var {tempVar} = {fieldInfo.Field.Name};", tab));
@@ -196,7 +196,7 @@ $@"protected virtual void {PropertyChangingNotifyMethod}(string propertyName)
             if (fieldInfo.ChangedAttribute != null)
             {
                 sb.AppendLine();
-                if (!fieldInfo.ChangedAttribute.EqualityCheck)
+                if (!fieldInfo.ChangedAttribute.InEqualityCheck)
                     AppendRaiseChangedEvent(sb, fieldInfo.ChangedAttribute, fieldInfo.PropertyName, tab);
                 else
                 {
@@ -218,14 +218,14 @@ $@"protected virtual void {PropertyChangingNotifyMethod}(string propertyName)
             sb.AppendLine(Text.Indent("{", tab - 1));
             AppendRaiseChangingEvent(sb, fieldInfo.ChangingAttribute, fieldInfo.PropertyName, tab);
 
-            if (!(fieldInfo.ChangedAttribute?.EqualityCheck is false))
+            if (!(fieldInfo.ChangedAttribute?.InEqualityCheck is false))
                 sb.AppendLine(SetField(fieldInfo.Field.Name, tab));
 
-            if (fieldInfo.ChangedAttribute?.EqualityCheck is true)
+            if (fieldInfo.ChangedAttribute?.InEqualityCheck is true)
                 AppendRaiseChangedEvent(sb, fieldInfo.ChangedAttribute, fieldInfo.PropertyName, tab);
 
             sb.AppendLine(Text.Indent("}", tab - 1));
-            if (fieldInfo.ChangedAttribute?.EqualityCheck is false)
+            if (fieldInfo.ChangedAttribute?.InEqualityCheck is false)
             {
                 sb.AppendLine(SetField(fieldInfo.Field.Name, tab - 1));
                 AppendRaiseChangedEvent(sb, fieldInfo.ChangedAttribute, fieldInfo.PropertyName, tab - 1);

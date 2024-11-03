@@ -12,36 +12,28 @@ namespace SourceInjection
     public abstract class PropertyEventGenerationAttribute : Attribute, IPropertyEventGenerationAttribute
     {
         protected PropertyEventGenerationAttribute(
-            bool equalityCheck,
+            bool inEqualityCheck,
             NullSafety inEqualityNullSafety,
-            string equalityComparer, 
-            bool throwIfValueIsNull,
             Accessibility setterAccessibility,
             params string[] relatedProperties)
         {
-            EqualityCheck = equalityCheck;
+            InEqualityCheck = inEqualityCheck;
             NullSafety = inEqualityNullSafety;
-            EqualityComparer = equalityComparer;
-            ThrowIfValueIsNull = throwIfValueIsNull;
             SetterAccessibility = setterAccessibility;
             RelatedProperties = relatedProperties;
         }
 
-        public bool EqualityCheck { get; }
-
-        public string EqualityComparer { get; }
+        public bool InEqualityCheck { get; }
 
         public NullSafety NullSafety { get; }
 
-        public bool ThrowIfValueIsNull { get; }
-
         public IEnumerable<string> RelatedProperties { get; }
+
+        public Accessibility SetterAccessibility {  get; }
 
         public Accessibility Accessibility => Accessibility.Public;
 
         public Accessibility GetterAccessibility => Accessibility.NotApplicable;
-
-        public Accessibility SetterAccessibility {  get; }
 
         public string PropertyName(IFieldSymbol field)
         {
@@ -68,33 +60,12 @@ namespace SourceInjection
         public NotifyPropertyChangedAttribute(
                 bool equalityCheck = true,
                 NullSafety inEqualityNullSafety = NullSafety.Auto,
-                Type equalityComparer = null,
-                bool throwIfValueIsNull = false,
-                Accessibility setterAccessibility = Accessibility.NotApplicable,
-                params string[] relatedProperties)
-
-            : this(
-                  equalityCheck,
-                  inEqualityNullSafety,
-                  equalityComparer?.FullName,
-                  throwIfValueIsNull,
-                  setterAccessibility,
-                  relatedProperties)
-        { }
-
-        protected NotifyPropertyChangedAttribute(
-                bool equalityCheck = true,
-                NullSafety inEqualityNullSafety = NullSafety.Auto,
-                string equalityComparer = null,
-                bool throwIfValueIsNull = false,
                 Accessibility setterAccessibility = Accessibility.NotApplicable,
                 params string[] relatedProperties)
 
             : base(
                   equalityCheck,
                   inEqualityNullSafety,
-                  equalityComparer,
-                  throwIfValueIsNull,
                   setterAccessibility,
                   relatedProperties)
         { }
@@ -111,32 +82,12 @@ namespace SourceInjection
         public NotifyPropertyChangingAttribute(
                 bool equalityCheck = true,
                 NullSafety inEqualityNullSafety = NullSafety.Auto,
-                Type equalityComparer = null,
-                bool throwIfValueIsNull = false,
                 Accessibility setterAccessibility = Accessibility.NotApplicable,
                 params string[] relatedProperties)
 
-            : this(
-                  equalityCheck,
-                  inEqualityNullSafety,
-                  equalityComparer?.FullName,
-                  throwIfValueIsNull,
-                  setterAccessibility,
-                  relatedProperties)
-        { }
-
-        protected NotifyPropertyChangingAttribute(
-                bool equalityCheck = true,
-                NullSafety inEqualityNullSafety = NullSafety.Auto,
-                string equalityComparer = null,
-                bool throwIfValueIsNull = false,
-                Accessibility setterAccessibility = Accessibility.NotApplicable,
-                params string[] relatedProperties)
             : base(
                   equalityCheck,
                   inEqualityNullSafety,
-                  equalityComparer,
-                  throwIfValueIsNull,
                   setterAccessibility,
                   relatedProperties)
         { }
@@ -153,32 +104,12 @@ namespace SourceInjection
         public NotifyPropertyEventsAttribute(
                 bool equalityCheck = true,
                 NullSafety inEqualityNullSafety = NullSafety.Auto,
-                Type equalityComparer = null,
-                bool throwIfValueIsNull = false,
                 Accessibility setterAccessibility = Accessibility.NotApplicable,
                 params string[] relatedProperties)
 
-            : this(
-                  equalityCheck,
-                  inEqualityNullSafety,
-                  equalityComparer?.FullName,
-                  throwIfValueIsNull,
-                  setterAccessibility,
-                  relatedProperties)
-        { }
-
-        protected NotifyPropertyEventsAttribute(
-                bool equalityCheck = true,
-                NullSafety inEqualityNullSafety = NullSafety.Auto,
-                string equalityComparer = null,
-                bool throwIfValueIsNull = false,
-                Accessibility setterAccessibility = Accessibility.NotApplicable,
-                params string[] relatedProperties)
             : base(
                   equalityCheck,
                   inEqualityNullSafety,
-                  equalityComparer,
-                  throwIfValueIsNull,
                   setterAccessibility,
                   relatedProperties)
         { }
