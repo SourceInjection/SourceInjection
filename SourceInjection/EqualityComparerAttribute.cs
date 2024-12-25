@@ -1,15 +1,14 @@
-﻿using SourceInjection.Interfaces;
-using System;
+﻿using System;
 
 namespace SourceInjection
 {
-    public class EqualityComparerAttribute : Attribute, IEqualityComparerAttribute
+    public sealed class EqualityComparerAttribute : Attribute
     {
         public EqualityComparerAttribute(Type equalityComparer, NullSafety nullSafety = NullSafety.Auto)
             : this(equalityComparer?.FullName, nullSafety)
         { }
 
-        protected EqualityComparerAttribute(string equalityComparer, NullSafety nullSafety = NullSafety.Auto)
+        private EqualityComparerAttribute(string equalityComparer, NullSafety nullSafety = NullSafety.Auto)
         {
             EqualityComparer = equalityComparer;
             NullSafety = nullSafety;

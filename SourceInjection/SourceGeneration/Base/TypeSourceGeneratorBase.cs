@@ -7,7 +7,6 @@ using System.Linq;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using SourceInjection.SourceGeneration.Diagnostics;
 using SourceInjection.SourceGeneration.Common;
-using SourceInjection.Interfaces;
 using SourceInjection.CodeAnalysis;
 
 namespace SourceInjection.SourceGeneration.Base
@@ -75,12 +74,12 @@ namespace SourceInjection.SourceGeneration.Base
             });
         }
 
-        protected static IEqualityComparerAttribute GetComparerAttribute(ISymbol symbol)
+        protected static EqualityComparerAttribute GetComparerAttribute(ISymbol symbol)
         {
-            var attribute = symbol.AttributesOfType<IEqualityComparerAttribute>()
+            var attribute = symbol.AttributesOfType<EqualityComparerAttribute>()
                 .FirstOrDefault();
 
-            if (attribute != null && AttributeFactory.TryCreate<IEqualityComparerAttribute>(attribute, out var config))
+            if (attribute != null && AttributeFactory.TryCreate<EqualityComparerAttribute>(attribute, out var config))
                 return config;
             return null;
         }

@@ -130,7 +130,7 @@ namespace SourceInjection
                 : snippet;
         }
 
-        private NullSafety GetNullSafety(DataMemberSymbolInfo member, IAutoEqualsAttribute config, IEqualityComparerAttribute comparerConfig, EqualityComparerInfo comparerInfo)
+        private NullSafety GetNullSafety(DataMemberSymbolInfo member, IAutoEqualsAttribute config, EqualityComparerAttribute comparerConfig, EqualityComparerInfo comparerInfo)
         {
             if (comparerConfig != null && comparerConfig.NullSafety != NullSafety.Auto)
                 return comparerConfig.NullSafety;

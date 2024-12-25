@@ -1,7 +1,5 @@
 ﻿using Microsoft.CodeAnalysis;
 using SourceInjection.CodeAnalysis;
-using SourceInjection.Interfaces;
-using SourceInjection.SourceGeneration.DataMembers;
 using SourceInjection.Util;
 using System;
 using System.Collections.Generic;

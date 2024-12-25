@@ -251,12 +251,12 @@ $@"protected virtual void {PropertyChangingNotifyMethod}(string propertyName)
             return EqualityComparerInfo.Get(config.EqualityComparer, symbol.Type);
         }
 
-        private static IEqualityComparerAttribute GetComparerConfig(IFieldSymbol symbol)
+        private static EqualityComparerAttribute GetComparerConfig(IFieldSymbol symbol)
         {
-            var attData = symbol.AttributesOfType<IEqualityComparerAttribute>()
+            var attData = symbol.AttributesOfType<EqualityComparerAttribute>()
                 .FirstOrDefault();
 
-            if(attData != null && AttributeFactory.TryCreate<IEqualityComparerAttribute>(attData, out var config))
+            if(attData != null && AttributeFactory.TryCreate<EqualityComparerAttribute>(attData, out var config))
                 return config;
 
             return null;
@@ -267,10 +267,7 @@ $@"protected virtual void {PropertyChangingNotifyMethod}(string propertyName)
             var attData = field.AttributesOfType<T>()
                 .FirstOrDefault();
 
-            if (attData == null)
-                return null;
-
-            if (AttributeFactory.TryCreate<T>(attData, out var att))
+            if (attData != null && AttributeFactory.TryCreate<T>(attData, out var att))
                 return att;
             return null;
         }

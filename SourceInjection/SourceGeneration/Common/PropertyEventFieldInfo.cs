@@ -1,4 +1,5 @@
 ﻿using Microsoft.CodeAnalysis;
+using SourceInjection.CodeAnalysis;
 using SourceInjection.Interfaces;
 
 namespace SourceInjection.SourceGeneration.Common
@@ -16,8 +17,7 @@ namespace SourceInjection.SourceGeneration.Common
             ChangingAttribute = changingAttribute;
             ChangedAttribute = changedAttribute;
             NullSafe = nullSafe;
-            ThrowIfNull = field.Type.IsReferenceType
-                && (changingAttribute?.ThrowIfValueIsNull is true || changedAttribute?.ThrowIfValueIsNull is true);
+            ThrowIfNull = field.HasAttributeOfType<ThrowIfNullAttribute>();
         }
 
         public string PropertyName { get; }

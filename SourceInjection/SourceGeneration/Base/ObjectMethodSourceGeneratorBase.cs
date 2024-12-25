@@ -104,12 +104,12 @@ namespace SourceInjection.SourceGeneration.Base
                 ?? DefaultConfigAttribute;
         }
 
-        protected static IEqualityComparerAttribute GetComparerAttribute(DataMemberSymbolInfo symbolInfo)
+        protected static EqualityComparerAttribute GetComparerAttribute(DataMemberSymbolInfo symbolInfo)
         {
-            var attribute = symbolInfo.AttributesOfType<IEqualityComparerAttribute>()
+            var attribute = symbolInfo.AttributesOfType<EqualityComparerAttribute>()
                 .FirstOrDefault();
 
-            if (attribute != null && AttributeFactory.TryCreate<IEqualityComparerAttribute>(attribute, out var config))
+            if (attribute != null && AttributeFactory.TryCreate<EqualityComparerAttribute>(attribute, out var config))
                 return config;
             return null;
         }

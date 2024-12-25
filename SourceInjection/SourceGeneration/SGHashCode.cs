@@ -141,7 +141,7 @@ namespace SourceInjection
             return Snippets.GetHashCode(member, isNullSafe, comparerInfo);
         }
 
-        private NullSafety GetNullSafety(DataMemberSymbolInfo member, IEqualityComparerAttribute comparerConfig, EqualityComparerInfo comparerInfo)
+        private NullSafety GetNullSafety(DataMemberSymbolInfo member, EqualityComparerAttribute comparerConfig, EqualityComparerInfo comparerInfo)
         {
             if (comparerConfig != null && comparerConfig.NullSafety != NullSafety.Auto)
                 return comparerConfig.NullSafety;

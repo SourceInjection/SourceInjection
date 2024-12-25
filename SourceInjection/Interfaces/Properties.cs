@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace SourceInjection.Interfaces
 {
-    public interface IGeneratesDataMemberPropertyFromFieldAttribute 
+    public interface IGeneratesDataMemberPropertyFromFieldAttribute
     {
         /// <summary>
         /// Evaluates the generated property name from the field name.
