@@ -1,4 +1,4 @@
-﻿using SourceInjection.FormatProviders;
+﻿using SourceInjection.Test.FormatProviders;
 
 namespace SourceInjection.Test.ToString.FormatProvider
 {
@@ -10,34 +10,39 @@ namespace SourceInjection.Test.ToString.FormatProvider
             typeof(ClassWithObjectAndFormatProvider)
         ];
     }
-
+    
+    [AutoToString]
     internal partial class ClassWithFormatProvider
     {
-        [ToString(formatProvider: typeof(CurrentCultureFormatProvider))]
+        [FormatProvider(formatProvider: typeof(CurrentCultureFormatProvider))]
         public DateTime Property { get; }
     }
 
     internal partial class ClassWithFormatAndFormatProvider
     {
-        [ToString(format: "HH:mm", formatProvider: typeof(CurrentCultureFormatProvider))]
+        [ToString(format: "HH:mm")]
+        [FormatProvider(formatProvider: typeof(CurrentCultureFormatProvider))]
         public DateTime Property { get; }
     }
 
     internal partial class ClassWithFormatAndFormatProviderWhereFormatIsStringEmpty
     {
-        [ToString(format: "", formatProvider: typeof(CurrentCultureFormatProvider))]
+        [ToString(format: "")]
+        [FormatProvider(formatProvider: typeof(CurrentCultureFormatProvider))]
         public DateTime Property { get; }
     }
 
+    [AutoToString]
     internal partial class ClassWithNullableStructAndFormatProvider
     {
-        [ToString(formatProvider: typeof(CurrentCultureFormatProvider))]
+        [FormatProvider(formatProvider: typeof(CurrentCultureFormatProvider))]
         public DateTime? Property { get; }
     }
 
+    [AutoToString]
     internal partial class ClassWithObjectAndFormatProvider
     {
-        [ToString(formatProvider: typeof(CurrentCultureFormatProvider))]
+        [FormatProvider(formatProvider: typeof(CurrentCultureFormatProvider))]
         public IFormattable Property { get; } = null!;
     }
 }

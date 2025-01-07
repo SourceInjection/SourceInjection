@@ -66,7 +66,17 @@ namespace SourceInjection
         private string MemberToString(DataMemberSymbolInfo member)
         {
             var config = GetMemberConfigAttribute(member);
-            return Snippets.MemberToString(member, config);
+            var formatProviderConfig = GetFormatProviderAttribute(member);
+
+            return Snippets.MemberToString(member, config, formatProviderConfig);
+        }
+
+        private static FormatProviderAttribute GetFormatProviderAttribute(DataMemberSymbolInfo member)
+        {
+            var attData = member.AttributesOfType<FormatProviderAttribute>().FirstOrDefault();
+            if (attData == null || !AttributeFactory.TryCreate<FormatProviderAttribute>(attData, out var fpc))
+                return null;
+            return fpc;
         }
 
         private static IEnumerable<Accessibility> GetAllowedAccessibilities(Accessibilities accessibility)

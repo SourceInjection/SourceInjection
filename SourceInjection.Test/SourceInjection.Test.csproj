@@ -23,11 +23,17 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SourceInjection.Test.Comparers\SourceInjection.Test.Comparers.csproj" />
+    <ProjectReference Include="..\SourceInjection.Test.FormatProviders\SourceInjection.Test.FormatProviders.csproj" />
     <ProjectReference Include="..\SourceInjection\SourceInjection.csproj" OutputItemType="Analyzer" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="PropertyEvents\" />
+    <Folder Include="PropertyEvents\Combined\" />
+    <Folder Include="PropertyEvents\PropertyChanged\EqualityChecks\Comparer\" />
+    <Folder Include="PropertyEvents\PropertyChanged\EqualityChecks\Nullsafety\" />
+    <Folder Include="PropertyEvents\PropertyChanged\Inheritance\" />
+    <Folder Include="PropertyEvents\PropertyChanged\Accessibility\" />
+    <Folder Include="PropertyEvents\PropertyChanging\" />
   </ItemGroup>
   <Target Name="Cleanup" AfterTargets="Clean">
     <RemoveDir Directories="$(ProjectDir)$(BaseIntermediateOutputPath)$(Configuration)\net8.0\generated\SourceInjection" />

@@ -1,6 +1,6 @@
 ﻿using CompileUnits.CSharp;
 using NUnit.Framework;
-using SourceInjection.FormatProviders;
+using SourceInjection.Test.FormatProviders;
 
 namespace SourceInjection.Test.ToString.FormatProvider
 {

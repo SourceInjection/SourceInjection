@@ -17,8 +17,8 @@ namespace SourceInjection.SourceGeneration
         public static string GetHashCode(DataMemberSymbolInfo member, bool nullSafe, EqualityComparerInfo comparer)
             => HashCodeSnippets.GetHashCode(member, nullSafe, comparer);
 
-        public static string MemberToString(DataMemberSymbolInfo member, IToStringAttribute config)
-            => ToStringSnippets.MemberToString(member, config);
+        public static string MemberToString(DataMemberSymbolInfo member, IToStringAttribute config, FormatProviderAttribute formatProviderConfig)
+            => ToStringSnippets.MemberToString(member, config, formatProviderConfig);
 
         public static string UnconflictingVariable(INamedTypeSymbol type, string name = "temp")
         {

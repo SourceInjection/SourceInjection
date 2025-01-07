@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Globalization;
 
-namespace SourceInjection.FormatProviders
+namespace SourceInjection.Test.FormatProviders
 {
     public class CurrentCultureFormatProvider : IFormatProvider
     {

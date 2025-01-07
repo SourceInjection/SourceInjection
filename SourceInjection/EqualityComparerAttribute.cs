@@ -2,6 +2,7 @@
 
 namespace SourceInjection
 {
+    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
     public sealed class EqualityComparerAttribute : Attribute
     {
         public EqualityComparerAttribute(Type equalityComparer, NullSafety nullSafety = NullSafety.Auto)

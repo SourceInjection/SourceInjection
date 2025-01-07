@@ -24,9 +24,6 @@
 	<ProjectReference Include="..\SourceInjection.Collections\SourceInjection.Collections.csproj">
       <PrivateAssets>analyzers;build</PrivateAssets>
 	</ProjectReference>
-	<ProjectReference Include="..\SourceInjection.FormatProviders\SourceInjection.FormatProviders.csproj">
-      <PrivateAssets>analyzers;build</PrivateAssets>
-	</ProjectReference>
   </ItemGroup>
 
   <ItemGroup>

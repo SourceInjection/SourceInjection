@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace SourceInjection.Interfaces
+﻿namespace SourceInjection.Interfaces
 {
     public interface IAutoToStringAttribute 
     {
@@ -26,11 +24,6 @@ namespace SourceInjection.Interfaces
         /// Defines the format which will be handover to the string representation of the targeted object.
         /// </summary>
         string Format { get; }
-
-        /// <summary>
-        /// Defines the type name of the <see cref="IFormatProvider"/> which is linked to the members <see cref="IFormattable.ToString(string, IFormatProvider)"/> method.
-        /// </summary>
-        string FormatProvider { get; }
     }
 
     public interface IToStringExcludeAttribute { }
