@@ -27,7 +27,7 @@ namespace SourceInjection.SourceGeneration.Common
                 throw new ArgumentNullException(nameof(data));
 
             var name = data.AttributeClass.ToDisplayString();
-            var type = Type.GetType(name);
+            var type = TypeLoader.GetType(name);
 
 
             var args = data.ConstructorArguments
@@ -38,11 +38,18 @@ namespace SourceInjection.SourceGeneration.Common
             {
                 return (T)Activator.CreateInstance(type, args);
             }
-            catch
+            catch (Exception ex)
             {
+                try
+                {
 #pragma warning disable S3011
-                return (T)Activator.CreateInstance(type, BindingFlags.Instance | BindingFlags.NonPublic, null, args, null);
+                    return (T)Activator.CreateInstance(type, BindingFlags.Instance | BindingFlags.NonPublic, null, args, null);
 #pragma warning restore S3011
+                }
+                catch
+                {
+                    throw ex;
+                }
             }
         }
 
@@ -75,7 +82,7 @@ namespace SourceInjection.SourceGeneration.Common
 
         private static Type GetType(string name)
         {
-            var type = Type.GetType(name);
+            var type = TypeLoader.GetType(name);
             if (type != null)
                 return type;
 

@@ -1,16 +1,40 @@
-﻿using System.Text;
+﻿using System.Reflection;
+using System.Text;
 
 namespace SourceInjection.Test.ToString
 {
     internal static class ToString
     {
-        public static string Member(string memberName, string? label = null, string? format = null, string? formatProvider = null, bool coalesce = false)
+        public static string Member(Type containingType, string memberName, string? label = null, string? format = null, bool coalesce = false)
         {
             label = string.IsNullOrEmpty(label)
                 ? memberName
                 : label;
 
+            var member = containingType.GetMember(memberName)[0];
+
+            var attribute = member.GetCustomAttribute<FormatProviderAttribute>();
+            var formatProvider = GetFormatProvider(attribute);
+
             return $"{label}: {MemberValue(memberName, format, formatProvider, coalesce)}";
+        }
+
+        private static string? GetFormatProvider(FormatProviderAttribute? formatProviderAttribute)
+        {
+            if (formatProviderAttribute == null)
+                return null;
+            if (string.IsNullOrEmpty(formatProviderAttribute.Member))
+                return $"new {formatProviderAttribute.Class}()";
+
+            var type = Type.GetType(formatProviderAttribute.Class)!;
+            var member = type.GetMember(formatProviderAttribute.Member)[0];
+
+            var result = $"{formatProviderAttribute.Class}.{formatProviderAttribute.Member}";
+
+            if (member.MemberType != MemberTypes.Property)
+                result += "()";
+
+            return result;
         }
 
         private static string MemberValue(string memberName, string? format = null, string? formatProvider = null, bool coalesce = false)
@@ -20,7 +44,7 @@ namespace SourceInjection.Test.ToString
                 format = format == null ? "null" : $"\"{format}\"";
                 var op = coalesce ? "?" : string.Empty;
 
-                return $"{{{memberName}{op}.ToString({format}, new {formatProvider}())}}";
+                return $"{{{memberName}{op}.ToString({format}, {formatProvider})}}";
             }
             if (!string.IsNullOrEmpty(format))
                 return $"{{{memberName}:{format}}}";

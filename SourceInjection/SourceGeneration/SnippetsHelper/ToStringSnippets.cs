@@ -47,12 +47,12 @@ namespace SourceInjection.SourceGeneration.SnippetsHelper
                 .Where(m => m.Name == formatProviderAttribute.Member && m.IsStatic)
                 .ToArray();
 
-            if(members.Length > 0)
+            if (members.Length > 0)
             {
                 if (!Array.Exists(members, m => m.Kind == SymbolKind.Property) && Array.Exists(members, m => m.Kind == SymbolKind.Method))
                     return $"{formatProviderAttribute.Class}.{formatProviderAttribute.Member}()";
             }
-            else if(Type.GetType(formatProviderAttribute.Class) is Type type)
+            else if(TypeLoader.GetType(formatProviderAttribute.Class, true) is Type type)
             {
                 var flags = BindingFlags.Static | BindingFlags.Public;
                 var allMembers = type.GetMembers(flags);

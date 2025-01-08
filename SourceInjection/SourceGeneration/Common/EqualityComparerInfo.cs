@@ -58,7 +58,7 @@ namespace SourceInjection.SourceGeneration.Common
                     && equalsMethod.Parameters.All(p => p.SupportsNullable());
             }
 
-            var type = System.Type.GetType(comparerName);
+            var type = TypeLoader.GetType(comparerName);
             if (type != null)
             {
                 var equalsMethod = Array.Find(type.GetMethods(), m => m.IsComparerEqualsMethod(argType));
@@ -82,7 +82,7 @@ namespace SourceInjection.SourceGeneration.Common
                     && equalsMethod.Parameters[0].SupportsNullable();
             }
 
-            var type = System.Type.GetType(comparerName);
+            var type = TypeLoader.GetType(comparerName);
             if (type != null)
             {
                 var equalsMethod = Array.Find(type.GetMethods(), m => m.IsComparerGetHashCodeMethod(argType));

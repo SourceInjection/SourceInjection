@@ -11,7 +11,7 @@ namespace SourceInjection.Test.ToString.Label
 
         private static void TestLabel(Type type)
         {
-            var memberCode = Test.ToString.ToString.Member(propertyName, label);
+            var memberCode = Test.ToString.ToString.Member(type, propertyName, label);
             var expectedCode = Test.ToString.ToString.Body(type, memberCode);
 
             var sut = ToStringMethod.FromType(type);

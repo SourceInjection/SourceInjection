@@ -1,4 +1,5 @@
 ﻿using SourceInjection.Test.FormatProviders;
+using System.Globalization;
 
 namespace SourceInjection.Test.ToString.FormatProvider
 {
@@ -44,5 +45,19 @@ namespace SourceInjection.Test.ToString.FormatProvider
     {
         [FormatProvider(formatProvider: typeof(CurrentCultureFormatProvider))]
         public IFormattable Property { get; } = null!;
+    }
+
+    [AutoToString]
+    internal partial class ClassWithFactoryPropertyFormatProvider
+    {
+        [FormatProvider(staticClass: typeof(CultureInfo), factoryMember: nameof(CultureInfo.CurrentCulture))]
+        public DateTime? Property { get; }
+    }
+
+    [AutoToString]
+    internal partial class ClassWithFactoryMethodFormatProvider
+    {
+        [FormatProvider(staticClass: typeof(FormatProviderFactory), factoryMember: nameof(FormatProviderFactory.Method))]
+        public DateTime? Property { get; }
     }
 }

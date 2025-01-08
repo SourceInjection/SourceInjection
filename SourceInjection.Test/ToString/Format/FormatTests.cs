@@ -11,7 +11,7 @@ namespace SourceInjection.Test.ToString.Format
 
         private static void TestFormat(Type type)
         {
-            var memberCode = Test.ToString.ToString.Member(propertyName, null, format);
+            var memberCode = Test.ToString.ToString.Member(type, propertyName, null, format);
             var expectedCode = Test.ToString.ToString.Body(type, memberCode);
 
             var sut = ToStringMethod.FromType(type);

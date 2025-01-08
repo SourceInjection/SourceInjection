@@ -11,7 +11,7 @@ namespace SourceInjection.Test.ToString.Accessibility
         public void TestAccessibility(Type type, Accessibilities accessibility)
         {
             var included = AccessibilityResources.GetTargetedFields(accessibility)
-                .Select(m => Test.ToString.ToString.Member(m))
+                .Select(m => Test.ToString.ToString.Member(type, m))
                 .ToArray();
 
             var expectedBody = Test.ToString.ToString.Body(type, included);
