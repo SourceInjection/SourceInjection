@@ -64,10 +64,7 @@ namespace SourceInjection.SourceGeneration.Common
             if (constant.Kind == TypedConstantKind.Enum)
                 return EnumFromConstant(constant);
             if (constant.Kind == TypedConstantKind.Type)
-            {
-                // TODO maybe return type if possible
                 return (constant.Value as INamedTypeSymbol)?.ToDisplayString();
-            }
             if (constant.Kind == TypedConstantKind.Array)
             {
                 var objects = constant.Values.Select(v => SelectValue(v)).ToArray();
@@ -76,10 +73,7 @@ namespace SourceInjection.SourceGeneration.Common
 
                 var elem = Array.Find(objects, o => o != null);
                 if (elem is string)
-                {
-
                     return Cast<string>(objects);
-                }
 
                 return null;
             }
