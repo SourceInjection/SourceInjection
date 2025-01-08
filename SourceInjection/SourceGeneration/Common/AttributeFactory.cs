@@ -64,7 +64,10 @@ namespace SourceInjection.SourceGeneration.Common
             if (constant.Kind == TypedConstantKind.Enum)
                 return EnumFromConstant(constant);
             if (constant.Kind == TypedConstantKind.Type)
+            {
+                // TODO maybe return type if possible
                 return (constant.Value as INamedTypeSymbol)?.ToDisplayString();
+            }
             if (constant.Kind == TypedConstantKind.Array)
             {
                 var objects = constant.Values.Select(v => SelectValue(v)).ToArray();
@@ -72,21 +75,11 @@ namespace SourceInjection.SourceGeneration.Common
                     return null;
 
                 var elem = Array.Find(objects, o => o != null);
+                if (elem is string)
+                {
 
-                if (elem is string) return Cast<string>(objects);
-                if (elem is decimal) return Cast<decimal>(objects);
-                if (elem is double) return Cast<double>(objects);
-                if (elem is float) return Cast<float>(objects);
-                if (elem is long) return Cast<long>(objects);
-                if (elem is int) return Cast<int>(objects);
-                if (elem is short) return Cast<short>(objects);
-                if (elem is sbyte) return Cast<sbyte>(objects);
-                if (elem is ulong) return Cast<ulong>(objects);
-                if (elem is uint) return Cast<uint>(objects);
-                if (elem is ushort) return Cast<ushort>(objects);
-                if (elem is byte) return Cast<byte>(objects);
-                if (elem is char) return Cast<char>(objects);
-                if (elem is bool) return Cast<bool>(objects);
+                    return Cast<string>(objects);
+                }
 
                 return null;
             }
