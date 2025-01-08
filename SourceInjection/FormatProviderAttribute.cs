@@ -5,27 +5,27 @@ namespace SourceInjection
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
     public sealed class FormatProviderAttribute : Attribute
     {
-        public FormatProviderAttribute(Type formatProvider)
-            : this (formatProvider?.FullName) 
+        public FormatProviderAttribute(Type type)
+            : this (type?.FullName) 
         { }
 
-        public FormatProviderAttribute(Type staticClass, string factoryMember)
-            : this(staticClass?.FullName, factoryMember) 
+        public FormatProviderAttribute(Type type, string property)
+            : this(type?.FullName, property) 
         { }
 
-        private FormatProviderAttribute(string formatProvider)
+        private FormatProviderAttribute(string type)
         {
-            Class = formatProvider;
+            Type = type;
         }
 
-        private FormatProviderAttribute(string staticClass, string factoryMember)
+        private FormatProviderAttribute(string type, string property)
         {
-            Class = staticClass;
-            Member = factoryMember;
+            Type = type;
+            Property = property;
         }
 
-        public string Class { get; }
+        public string Type { get; }
 
-        public string Member { get; }
+        public string Property { get; }
     }
 }

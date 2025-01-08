@@ -1,31 +1,44 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 
 namespace SourceInjection.SourceGeneration.Common
 {
     internal static class TypeLoader
     {
-        public static Type GetType(string name, bool throwIfNotFond = false)
+        private static Assembly[] _assemblies = null;
+        private static readonly Dictionary<string, Type> _loadedTypes = new Dictionary<string, Type>(1024);
+
+        private static Assembly[] Assemblies
+        {
+            get
+            {
+                if (_assemblies == null)
+                    _assemblies = AppDomain.CurrentDomain.GetAssemblies();
+                return _assemblies;
+            }
+        }
+
+        public static Type GetType(string name)
         {
             if (string.IsNullOrEmpty(name))
                 return null;
 
-            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
-            foreach (var assembly in assemblies)
+            if (_loadedTypes.TryGetValue(name, out Type type))
+                return type;
+
+            type = null;
+            foreach (var assembly in Assemblies)
             {
                 if (assembly.GetType(name) is Type t)
-                    return t;
+                {
+                    type = t;
+                    break;
+                }
             }
 
-            if (throwIfNotFond)
-            {
-                var assembliesString = string.Join(", ", assemblies.Select(a => a.GetName().Name)); 
-                throw new TypeLoadException($"Type '{name}' not found in assemblies {assembliesString}");
-            }
-            return null;
+            _loadedTypes[name] = type;
+            return type;
         }
     }
 }

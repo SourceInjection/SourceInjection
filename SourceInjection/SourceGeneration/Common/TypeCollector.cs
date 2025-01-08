@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace SourceInjection.SourceGeneration.Common
 {
@@ -18,7 +19,7 @@ namespace SourceInjection.SourceGeneration.Common
         {
             if (_allTypes.TryGetValue(name, out var value))
                 return value;
-            return System.Array.Empty<TypeInfo>();
+            return Array.Empty<TypeInfo>();
         }
 
         public static bool IsRegistered { get; set; }

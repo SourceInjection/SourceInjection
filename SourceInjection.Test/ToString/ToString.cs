@@ -23,18 +23,11 @@ namespace SourceInjection.Test.ToString
         {
             if (formatProviderAttribute == null)
                 return null;
-            if (string.IsNullOrEmpty(formatProviderAttribute.Member))
-                return $"new {formatProviderAttribute.Class}()";
 
-            var type = Type.GetType(formatProviderAttribute.Class)!;
-            var member = type.GetMember(formatProviderAttribute.Member)[0];
+            if (string.IsNullOrEmpty(formatProviderAttribute.Property))
+                return $"new {formatProviderAttribute.Type}()";
 
-            var result = $"{formatProviderAttribute.Class}.{formatProviderAttribute.Member}";
-
-            if (member.MemberType != MemberTypes.Property)
-                result += "()";
-
-            return result;
+            return $"{formatProviderAttribute.Type}.{formatProviderAttribute.Property}";
         }
 
         private static string MemberValue(string memberName, string? format = null, string? formatProvider = null, bool coalesce = false)

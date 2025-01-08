@@ -1,11 +1,6 @@
-﻿using Microsoft.CodeAnalysis;
-using SourceInjection.CodeAnalysis;
+﻿using SourceInjection.CodeAnalysis;
 using SourceInjection.Interfaces;
-using SourceInjection.SourceGeneration.Common;
 using SourceInjection.SourceGeneration.DataMembers;
-using System;
-using System.Linq;
-using System.Reflection;
 
 namespace SourceInjection.SourceGeneration.SnippetsHelper
 {
@@ -22,7 +17,7 @@ namespace SourceInjection.SourceGeneration.SnippetsHelper
 
         private static string MemberValue(DataMemberSymbolInfo member, IToStringAttribute config, FormatProviderAttribute formatProviderConfig)
         {
-            if (!string.IsNullOrEmpty(formatProviderConfig?.Class))
+            if (!string.IsNullOrEmpty(formatProviderConfig?.Type))
             {
                 var format = config.Format == null ? "null" : $"\"{config.Format}\"";
                 var op = member.Type.IsReferenceType || member.Type.HasNullableAnnotation()
@@ -39,29 +34,10 @@ namespace SourceInjection.SourceGeneration.SnippetsHelper
 
         private static string FormatProvider(FormatProviderAttribute formatProviderAttribute)
         {
-            if (string.IsNullOrEmpty(formatProviderAttribute.Member))
-                return $"new {formatProviderAttribute.Class}()";
+            if (string.IsNullOrEmpty(formatProviderAttribute.Property))
+                return $"new {formatProviderAttribute.Type}()";
 
-            var members = TypeCollector.GetTypes(formatProviderAttribute.Class)
-                .SelectMany(cl => cl.Members())
-                .Where(m => m.Name == formatProviderAttribute.Member && m.IsStatic)
-                .ToArray();
-
-            if (members.Length > 0)
-            {
-                if (!Array.Exists(members, m => m.Kind == SymbolKind.Property) && Array.Exists(members, m => m.Kind == SymbolKind.Method))
-                    return $"{formatProviderAttribute.Class}.{formatProviderAttribute.Member}()";
-            }
-            else if(TypeLoader.GetType(formatProviderAttribute.Class, true) is Type type)
-            {
-                var flags = BindingFlags.Static | BindingFlags.Public;
-                var allMembers = type.GetMembers(flags);
-
-                if (!Array.Exists(allMembers, m => m.MemberType == MemberTypes.Property) && Array.Exists(allMembers, m => m.MemberType == MemberTypes.Method))
-                    return $"{formatProviderAttribute.Class}.{formatProviderAttribute.Member}()";
-            }
-
-            return $"{formatProviderAttribute.Class}.{formatProviderAttribute.Member}";
+            return $"{formatProviderAttribute.Type}.{formatProviderAttribute.Property}";
         }
     }
 }

@@ -34,6 +34,9 @@ namespace SourceInjection.SourceGeneration.Common
                     .Select(arg => SelectValue(arg))
                     .ToArray();
 
+            if(args.Length > 0 && data.ConstructorArguments[args.Length - 1].Kind == TypedConstantKind.Array && args[args.Length - 1] == null)
+                Array.Resize(ref args, args.Length - 1);
+
             try
             {
                 return (T)Activator.CreateInstance(type, args);
@@ -64,34 +67,43 @@ namespace SourceInjection.SourceGeneration.Common
                 return (constant.Value as INamedTypeSymbol)?.ToDisplayString();
             if (constant.Kind == TypedConstantKind.Array)
             {
-                // TODO: implement type casting for param arrays other than string
-                return constant.Values.Select(v => (string)SelectValue(v)).ToArray();
+                var objects = constant.Values.Select(v => SelectValue(v)).ToArray();
+                if(objects.Length == 0 || Array.TrueForAll(objects, o => o == null))
+                    return null;
+
+                var elem = Array.Find(objects, o => o != null);
+
+                if (elem is string) return Cast<string>(objects);
+                if (elem is decimal) return Cast<decimal>(objects);
+                if (elem is double) return Cast<double>(objects);
+                if (elem is float) return Cast<float>(objects);
+                if (elem is long) return Cast<long>(objects);
+                if (elem is int) return Cast<int>(objects);
+                if (elem is short) return Cast<short>(objects);
+                if (elem is sbyte) return Cast<sbyte>(objects);
+                if (elem is ulong) return Cast<ulong>(objects);
+                if (elem is uint) return Cast<uint>(objects);
+                if (elem is ushort) return Cast<ushort>(objects);
+                if (elem is byte) return Cast<byte>(objects);
+                if (elem is char) return Cast<char>(objects);
+                if (elem is bool) return Cast<bool>(objects);
+
+                return null;
             }
             return constant.Value;
         }
+
+        private static T[] Cast<T>(object[] values)
+            => values.Select(v => (T)v).ToArray();
 
         private static object EnumFromConstant(TypedConstant constant)
         {
             if (constant.Value is null)
                 return null;
 
-            var type = GetType(constant.Type.ToDisplayString());
+            var type = TypeLoader.GetType(constant.Type.ToDisplayString());
 
             return Enum.Parse(type, constant.Value.ToString());
-        }
-
-        private static Type GetType(string name)
-        {
-            var type = TypeLoader.GetType(name);
-            if (type != null)
-                return type;
-
-            if (name == typeof(Accessibility).FullName)
-                return typeof(Accessibility);
-
-            // TODO: find a way to load all types of Microsoft.CodeAnalysis
-
-            throw new TypeLoadException($"Could not find type '{name}'");
         }
     }
 }
