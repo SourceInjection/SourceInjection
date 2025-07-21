@@ -1,4 +1,4 @@
-﻿using SourceInjection.Test.FormatProviders;
+﻿using SourceInjection.Test.Util.FormatProviders;
 using System.Globalization;
 
 namespace SourceInjection.Test.ToString.FormatProvider

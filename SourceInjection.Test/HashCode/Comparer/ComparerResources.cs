@@ -2,6 +2,7 @@
 
 namespace SourceInjection.Test.HashCode.Comparer
 {
+    using SourceInjection.Test.Util.EqualityComparers;
     using NullSafety = SourceInjection.NullSafety;
 
     internal static class ComparerResources
@@ -53,13 +54,13 @@ namespace SourceInjection.Test.HashCode.Comparer
     [AutoHashCode]
     public partial class ClassWithComparerAsMember_WithComparerAttribute
     {
-        [EqualityComparer(equalityComparer: typeof(Comparers.IntEqualityComparer))]
+        [EqualityComparer(equalityComparer: typeof(IntEqualityComparer))]
         public int Property { get; }
     }
 
     public partial class ClassWithExternComparer_WithHashCodeConfig
     {
-        [EqualityComparer(equalityComparer: typeof(Comparers.IntEqualityComparer))]
+        [EqualityComparer(equalityComparer: typeof(IntEqualityComparer))]
         [HashCode]
         public int Property { get; }
     }
@@ -67,7 +68,7 @@ namespace SourceInjection.Test.HashCode.Comparer
     [AutoHashCode]
     public partial class ClassWithExternComparer_WithComparerAttribute
     {
-        [EqualityComparer(equalityComparer: typeof(Comparers.IntEqualityComparer))]
+        [EqualityComparer(equalityComparer: typeof(IntEqualityComparer))]
         public int Property { get; }
     }
 
@@ -87,7 +88,7 @@ namespace SourceInjection.Test.HashCode.Comparer
 
     public partial class ClassWithExternGenericComparer_WithHashCodeConfig
     {
-        [EqualityComparer(equalityComparer: typeof(Comparers.GenericEqualityComparer<int>))]
+        [EqualityComparer(equalityComparer: typeof(GenericEqualityComparer<int>))]
         [HashCode]
         public int Property { get; }
     }
@@ -95,7 +96,7 @@ namespace SourceInjection.Test.HashCode.Comparer
     [AutoHashCode]
     public partial class ClassWithExternGenericComparer_WithComparerAttribute
     {
-        [EqualityComparer(equalityComparer: typeof(Comparers.GenericEqualityComparer<int>))]
+        [EqualityComparer(equalityComparer: typeof(GenericEqualityComparer<int>))]
         public int Property { get; }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using CompileUnits.CSharp;
 using NUnit.Framework;
-using SourceInjection.Test.FormatProviders;
+using SourceInjection.Test.Util.FormatProviders;
+using System.Reflection;
 
 namespace SourceInjection.Test.ToString.FormatProvider
 {
@@ -33,6 +34,16 @@ namespace SourceInjection.Test.ToString.FormatProvider
         {
             var sut = ToStringMethod.FromType<ClassWithFormatAndFormatProviderWhereFormatIsStringEmpty>();
             var expectedCode = $"{propertyName}.ToString(\"\", new {formatProvider}())";
+
+            Assert.That(sut.Body.Contains(expectedCode));
+        }
+
+        [Test]
+        public void ToString_WithFormatProviderFactory_UsesFormatProviderFactory()
+        {
+            var sut = ToStringMethod.FromType<ClassWithFactoryPropertyFormatProvider>();
+            var attribute = typeof(ClassWithFactoryPropertyFormatProvider).GetProperties()[0].GetCustomAttribute<FormatProviderAttribute>()!;
+            var expectedCode = $"{propertyName}?.ToString(null, {attribute.Type}.{attribute.Property})";
 
             Assert.That(sut.Body.Contains(expectedCode));
         }

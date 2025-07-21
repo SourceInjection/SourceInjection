@@ -11,7 +11,7 @@ namespace SourceInjection.Test.ToString
                 ? memberName
                 : label;
 
-            var member = containingType.GetMember(memberName)[0];
+            var member = containingType.GetMember(memberName, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance)[0];
 
             var attribute = member.GetCustomAttribute<FormatProviderAttribute>();
             var formatProvider = GetFormatProvider(attribute);

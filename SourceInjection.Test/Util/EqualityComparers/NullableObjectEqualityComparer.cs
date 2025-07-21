@@ -1,4 +1,4 @@
-﻿namespace SourceInjection.Test.Comparers
+﻿namespace SourceInjection.Test.Util.EqualityComparers
 {
     public class NullableObjectEqualityComparer : IEqualityComparer<object?>
     {
