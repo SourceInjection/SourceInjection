@@ -14,5 +14,14 @@ namespace SourceInjection.Test.PropertyEvents.PropertyChanged.Accessibility
 
             Assert.That(sut.Setter.AccessModifier, Is.EqualTo(accessibility));
         }
+
+        public int Test
+        {
+            get => 3;
+            protected private set
+            {
+
+            }
+        }
     }
 }

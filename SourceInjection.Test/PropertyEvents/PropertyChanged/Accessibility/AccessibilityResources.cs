@@ -7,7 +7,7 @@
     {
         public static readonly object[] ExpectedAccessibilities =
         [
-            new object[] { typeof(ClassWithPropertyWithDefaultAttribute), AccessModifier.Public },
+            new object[] { typeof(ClassWithPropertyWithDefaultAttribute), AccessModifier.None },
             new object[] { typeof(ClassWithPropertyWithAccessibilityInternal), AccessModifier.Internal },
             new object[] { typeof(ClassWithPropertyWithAccessibilityProtected), AccessModifier.Protected },
             new object[] { typeof(ClassWithPropertyWithAccessibilityPrivate), AccessModifier.Private },

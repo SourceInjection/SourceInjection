@@ -132,7 +132,7 @@ $@"protected virtual void {PropertyChangingNotifyMethod}(string propertyName)
         private static string SetterCode(PropertyEventFieldInfo fieldInfo)
         {
             var sb = new StringBuilder();
-            sb.AppendLine(Text.Indent("set"));
+            sb.AppendLine(Text.Indent($"{SetterAccessibilityText(fieldInfo)}set"));
             sb.AppendLine(Text.Indent("{"));
 
             if(fieldInfo.ThrowIfNull)
@@ -151,6 +151,61 @@ $@"protected virtual void {PropertyChangingNotifyMethod}(string propertyName)
             sb.Append(Text.Indent("}"));
             return sb.ToString();
         }
+
+        private static string SetterAccessibilityText(PropertyEventFieldInfo fieldInfo)
+        {
+            var setterAccessibility = MergeAccessibilities(fieldInfo.ChangingAttribute?.SetterAccessibility, fieldInfo.ChangedAttribute?.SetterAccessibility);
+            if (setterAccessibility == Accessibility.Public)
+                setterAccessibility = Accessibility.NotApplicable;
+            return AccessibilityText(setterAccessibility);
+        }
+
+        private static string AccessibilityText(Accessibility accessibility)
+        {
+            switch (accessibility)
+            {
+                case Accessibility.Public: return "public ";
+                case Accessibility.Internal: return "internal ";
+                case Accessibility.Protected: return "protected ";
+                case Accessibility.ProtectedOrInternal: return "protected internal ";
+                case Accessibility.ProtectedAndInternal: return "protected private ";
+                case Accessibility.Private: return "private ";
+                default: return string.Empty;
+            }
+        }
+
+        private static Accessibility MergeAccessibilities(Accessibility? a, Accessibility? b)
+        {
+            if (a == null && b == null)
+                return Accessibility.NotApplicable;
+
+            if (a != null && b == null)
+                return a.Value;
+
+            if (a == null)
+                return b.Value;
+
+            if (a.Value == Accessibility.Public || b.Value == Accessibility.Public)
+                return Accessibility.Public;
+
+            if (a.Value == Accessibility.ProtectedOrInternal || b.Value == Accessibility.ProtectedOrInternal || a.Value == Accessibility.Internal && b.Value == Accessibility.Protected || b.Value == Accessibility.Internal && a.Value == Accessibility.Protected)
+                return Accessibility.ProtectedOrInternal;
+
+            if (a.Value == Accessibility.Internal || b.Value == Accessibility.Internal)
+                return Accessibility.Internal;
+
+            if (a.Value == Accessibility.Protected || b.Value == Accessibility.Protected)
+                return Accessibility.Protected;
+
+            if(a.Value == Accessibility.ProtectedAndInternal || b.Value == Accessibility.ProtectedAndInternal)
+                return Accessibility.ProtectedAndInternal;
+
+            if(a.Value == Accessibility.Private || b.Value == Accessibility.Private)
+                return Accessibility.Private;
+
+            return Accessibility.NotApplicable;
+        }
+        
 
         private static string SetterCodeWithoutChangingEvent(PropertyEventFieldInfo fieldInfo)
         {
