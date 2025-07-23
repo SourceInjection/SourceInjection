@@ -28,7 +28,7 @@ namespace SourceInjection.Test.Equals
             => EqualizationSnippets.ComparerNullableNonReferenceTypeEquality(
                 EqualityComparer.FromMember(containingType, memberName), memberName, $"#i.{memberName}", nullSafe, false);
 
-        public static Action Build(Type type, string propertyName)
+        public static Func<bool> Build(Type type, string propertyName, object? lhsValue = null, object? rhsValue = null)
         {
             return () =>
             {
@@ -40,10 +40,10 @@ namespace SourceInjection.Test.Equals
                 if (lhs is null || rhs is null || prop is null)
                     throw new TypeLoadException($"could not get necessary information.");
 
-                prop.SetValue(lhs, null);
-                prop.SetValue(rhs, null);
+                prop.SetValue(lhs, lhsValue);
+                prop.SetValue(rhs, rhsValue);
 
-                lhs.Equals(rhs);
+                return lhs.Equals(rhs);
             };
         }
 

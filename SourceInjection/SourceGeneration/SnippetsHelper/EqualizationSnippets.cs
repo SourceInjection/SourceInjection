@@ -27,7 +27,7 @@ namespace SourceInjection.SourceGeneration.SnippetsHelper
             var methodCode = $"{nameA}.{nameof(Equals)}({nameB})";
             return nullSafe
                 ? Equality(methodCode, nameA, nameB, isInequality)
-                : MayInversed(methodCode, isInequality);
+                : MayNegated(methodCode, isInequality);
         }
 
         public static string SourceInjectionArrayEquality(string nameA, string nameB, bool nullSafe, bool isInequality)
@@ -49,7 +49,7 @@ namespace SourceInjection.SourceGeneration.SnippetsHelper
             var comparerCode = $"new {comparer}().Equals({nameA}, {nameB})";
             return nullSafe
                 ? Equality(comparerCode, nameA, nameB, isInequality)
-                : MayInversed(comparerCode, isInequality);
+                : MayNegated(comparerCode, isInequality);
         }
 
         public static string ComparerNullableNonReferenceTypeEquality(string comparer, string nameA, string nameB, bool nullSafe, bool isInequality)
@@ -57,7 +57,7 @@ namespace SourceInjection.SourceGeneration.SnippetsHelper
             var comparerCode = $"new {comparer}().Equals({nameA}.Value, {nameB}.Value)";
             return nullSafe
                 ? Equality(comparerCode, nameA, nameB, isInequality)
-                : MayInversed(comparerCode, isInequality);
+                : MayNegated(comparerCode, isInequality);
         }
 
         public static string EqualityCheck(DataMemberSymbolInfo member, string otherName, bool nullSafe, EqualityComparerInfo comparer, bool isInequality)
@@ -93,15 +93,15 @@ namespace SourceInjection.SourceGeneration.SnippetsHelper
             return MethodEquality(member.Name, otherName, nullSafe, isInequality);
         }
 
-        private static string MayInversed(string s, bool isInequality) => isInequality ? '!' + s : s;
+        private static string MayNegated(string s, bool isInequality) => isInequality ? '!' + s : s;
 
         private static string SequenceEquality(string method, string nameA, string nameB, bool isInequality)
-            => MayInversed($"{method}({nameA}, {nameB})", isInequality);
+            => MayNegated($"{method}({nameA}, {nameB})", isInequality);
 
-        private static string NullSafeSequenceEquality(string method, string nameA, string nameB, bool _isInequality)
+        private static string NullSafeSequenceEquality(string method, string nameA, string nameB, bool isInequality)
         {
             var methodCode = $"{method}({nameA}, {nameB})";
-            return _isInequality
+            return isInequality
                 ? $"{nameA} == null ^ {nameB} == null || {nameA} != null && {nameA} != {nameB} && !{methodCode}"
                 : $"{nameA} == {nameB} || {nameA} != null && {nameB} != null && {methodCode}";
         }

@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CompileUnits.CSharp" Version="1.0.1" />
+    <PackageReference Include="CompileUnits.CSharp" Version="1.0.3" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
     <PackageReference Include="NUnit" Version="4.2.2" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.6.0" />
@@ -27,9 +27,9 @@
 
   <ItemGroup>
     <Folder Include="PropertyEvents\PropertyChanged\EqualityChecks\Comparer\" />
+    <Folder Include="PropertyEvents\PropertyChanged\EqualityChecks\Comparisons\" />
+    <Folder Include="PropertyEvents\PropertyChanged\EqualityChecks\TypeHandling\" />
     <Folder Include="PropertyEvents\PropertyChanged\EqualityChecks\Nullsafety\" />
-    <Folder Include="PropertyEvents\PropertyChanged\Inheritance\" />
-    <Folder Include="PropertyEvents\PropertyChanging\" />
   </ItemGroup>
   <Target Name="Cleanup" AfterTargets="Clean">
     <RemoveDir Directories="$(ProjectDir)$(BaseIntermediateOutputPath)$(Configuration)\net8.0\generated\SourceInjection" />
