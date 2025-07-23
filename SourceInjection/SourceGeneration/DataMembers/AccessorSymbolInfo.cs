@@ -5,12 +5,12 @@ namespace SourceInjection.SourceGeneration.DataMembers
 {
     internal class AccessorSymbolInfo
     {
-        private AccessorSymbolInfo(AccessModifier declaredAccessibility)
+        private AccessorSymbolInfo(AccessModifier declaredModifier)
         {
-            DeclaredAccessibility = declaredAccessibility;
+            DeclaredModifier = declaredModifier;
         }
 
-        public AccessModifier DeclaredAccessibility { get; }
+        public AccessModifier DeclaredModifier { get; }
 
         public static AccessorSymbolInfo Create(IMethodSymbol accessor)
         {
@@ -19,9 +19,9 @@ namespace SourceInjection.SourceGeneration.DataMembers
                 : new AccessorSymbolInfo(accessor.DeclaredAccessibility.ToAccessModifier());
         }
 
-        public static AccessorSymbolInfo Create(AccessModifier accessibility)
+        public static AccessorSymbolInfo Create(AccessModifier modifier)
         {
-            return new AccessorSymbolInfo(accessibility);
+            return new AccessorSymbolInfo(modifier);
         }
     }
 }

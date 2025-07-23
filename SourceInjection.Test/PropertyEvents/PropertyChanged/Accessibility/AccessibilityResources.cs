@@ -21,37 +21,37 @@
 
     internal partial class ClassWithPropertyWithAccessibilityPublic
     {
-        [NotifyPropertyChanged(setterAccessibility: AccessModifier.Public)]
+        [NotifyPropertyChanged(setterModifier: AccessModifier.Public)]
         private int _property;
     }
 
     internal partial class ClassWithPropertyWithAccessibilityInternal
     {
-        [NotifyPropertyChanged(setterAccessibility: AccessModifier.Internal)]
+        [NotifyPropertyChanged(setterModifier: AccessModifier.Internal)]
         private int _property;
     }
 
     internal partial class ClassWithPropertyWithAccessibilityProtected
     {
-        [NotifyPropertyChanged(setterAccessibility: AccessModifier.Protected)]
+        [NotifyPropertyChanged(setterModifier: AccessModifier.Protected)]
         private int _property;
     }
 
     internal partial class ClassWithPropertyWithAccessibilityPrivate
     {
-        [NotifyPropertyChanged(setterAccessibility: AccessModifier.Private)]
+        [NotifyPropertyChanged(setterModifier: AccessModifier.Private)]
         private int _property;
     }
 
     internal partial class ClassWithPropertyWithAccessibilityProtectedInternal
     {
-        [NotifyPropertyChanged(setterAccessibility: AccessModifier.ProtectedInternal)]
+        [NotifyPropertyChanged(setterModifier: AccessModifier.ProtectedInternal)]
         private int _property;
     }
 
     internal partial class ClassWithPropertyWithAccessibilityProtectedPrivate
     {
-        [NotifyPropertyChanged(setterAccessibility: AccessModifier.ProtectedPrivate)]
+        [NotifyPropertyChanged(setterModifier: AccessModifier.ProtectedPrivate)]
         private int _property;
     }
 }

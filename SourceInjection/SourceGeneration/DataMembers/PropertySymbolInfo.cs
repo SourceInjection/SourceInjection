@@ -8,7 +8,7 @@ namespace SourceInjection.SourceGeneration.DataMembers
     {
         protected PropertySymbolInfo(
             string name,
-            AccessModifier declaredAccessibility,
+            AccessModifier declaredModifier,
             ITypeSymbol containingType,
             ImmutableArray<AttributeData> attributes,
             ITypeSymbol type,
@@ -18,7 +18,7 @@ namespace SourceInjection.SourceGeneration.DataMembers
             ) : base(
 
             name: name,
-            declaredAccessibility: declaredAccessibility,
+            declaredModifier: declaredModifier,
             containingType: containingType,
             attributes: attributes,
             type: type)
@@ -35,7 +35,7 @@ namespace SourceInjection.SourceGeneration.DataMembers
         {
             return new PropertySymbolInfo(
                 name: property.Name,
-                declaredAccessibility: property.DeclaredAccessibility.ToAccessModifier(),
+                declaredModifier: property.DeclaredAccessibility.ToAccessModifier(),
                 containingType: property.ContainingType,
                 attributes: property.GetAttributes(),
                 type: property.Type,

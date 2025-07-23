@@ -11,7 +11,7 @@ namespace SourceInjection.SourceGeneration.DataMembers
     {
         protected GeneratedPropertySymbolInfo(
             string name,
-            AccessModifier declaredAccessibility,
+            AccessModifier declaredModifier,
             ITypeSymbol containingType,
             ImmutableArray<AttributeData> attributes,
             ITypeSymbol type,
@@ -22,7 +22,7 @@ namespace SourceInjection.SourceGeneration.DataMembers
             ) : base(
 
             name: name,
-            declaredAccessibility: declaredAccessibility,
+            declaredModifier: declaredModifier,
             containingType: containingType,
             attributes: attributes,
             type: type,
@@ -47,12 +47,12 @@ namespace SourceInjection.SourceGeneration.DataMembers
 
             return new GeneratedPropertySymbolInfo(
                 name: attribute.PropertyName(field),
-                declaredAccessibility: attribute.Accessibility,
+                declaredModifier: attribute.Modifier,
                 containingType: field.ContainingType,
                 attributes: field.GetAttributes(),
                 type: field.Type,
                 generationSource: field,
-                getAccessor: AccessorSymbolInfo.Create(attribute.GetterAccessibility),
+                getAccessor: AccessorSymbolInfo.Create(attribute.GetterModifier),
                 setAccessor: null);
         }
     }

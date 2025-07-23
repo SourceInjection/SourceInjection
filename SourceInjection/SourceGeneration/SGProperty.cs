@@ -154,7 +154,7 @@ $@"protected virtual void {PropertyChangingNotifyMethod}(string propertyName)
 
         private static string SetterAccessibilityText(PropertyEventFieldInfo fieldInfo)
         {
-            var setterAccessibility = MergeAccessibilities(fieldInfo.ChangingAttribute?.SetterAccessibility, fieldInfo.ChangedAttribute?.SetterAccessibility);
+            var setterAccessibility = MergeAccessibilities(fieldInfo.ChangingAttribute?.SetterModifier, fieldInfo.ChangedAttribute?.SetterModifier);
             if (setterAccessibility == AccessModifier.Public)
                 setterAccessibility = AccessModifier.None;
             return AccessibilityText(setterAccessibility);

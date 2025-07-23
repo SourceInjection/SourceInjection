@@ -14,12 +14,12 @@ namespace SourceInjection
         protected PropertyEventGenerationAttribute(
             bool inEqualityCheck,
             NullSafety inEqualityNullSafety,
-            AccessModifier setterAccessibility,
+            AccessModifier setterModifier,
             params string[] relatedProperties)
         {
             InEqualityCheck = inEqualityCheck;
             NullSafety = inEqualityNullSafety;
-            SetterAccessibility = setterAccessibility;
+            SetterModifier = setterModifier;
             RelatedProperties = relatedProperties;
         }
 
@@ -29,11 +29,11 @@ namespace SourceInjection
 
         public IEnumerable<string> RelatedProperties { get; }
 
-        public AccessModifier SetterAccessibility {  get; }
+        public AccessModifier SetterModifier {  get; }
 
-        public AccessModifier Accessibility => AccessModifier.Public;
+        public AccessModifier Modifier => AccessModifier.Public;
 
-        public AccessModifier GetterAccessibility => AccessModifier.None;
+        public AccessModifier GetterModifier => AccessModifier.None;
 
         public string PropertyName(IFieldSymbol field)
         {
@@ -60,13 +60,13 @@ namespace SourceInjection
         public NotifyPropertyChangedAttribute(
                 bool equalityCheck = true,
                 NullSafety inEqualityNullSafety = NullSafety.Auto,
-                AccessModifier setterAccessibility = AccessModifier.None,
+                AccessModifier setterModifier = AccessModifier.None,
                 params string[] relatedProperties)
 
             : base(
                   equalityCheck,
                   inEqualityNullSafety,
-                  setterAccessibility,
+                  setterModifier,
                   relatedProperties)
         { }
     }
@@ -82,13 +82,13 @@ namespace SourceInjection
         public NotifyPropertyChangingAttribute(
                 bool equalityCheck = true,
                 NullSafety inEqualityNullSafety = NullSafety.Auto,
-                AccessModifier setterAccessibility = AccessModifier.None,
+                AccessModifier setterModifier = AccessModifier.None,
                 params string[] relatedProperties)
 
             : base(
                   equalityCheck,
                   inEqualityNullSafety,
-                  setterAccessibility,
+                  setterModifier,
                   relatedProperties)
         { }
     }
@@ -104,13 +104,13 @@ namespace SourceInjection
         public NotifyPropertyEventsAttribute(
                 bool equalityCheck = true,
                 NullSafety inEqualityNullSafety = NullSafety.Auto,
-                AccessModifier setterAccessibility = AccessModifier.None,
+                AccessModifier setterModifier = AccessModifier.None,
                 params string[] relatedProperties)
 
             : base(
                   equalityCheck,
                   inEqualityNullSafety,
-                  setterAccessibility,
+                  setterModifier,
                   relatedProperties)
         { }
     }

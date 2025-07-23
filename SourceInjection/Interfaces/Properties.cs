@@ -12,9 +12,9 @@ namespace SourceInjection.Interfaces
         /// <returns>The name of the generated property.</returns>
         string PropertyName(IFieldSymbol field);
 
-        AccessModifier Accessibility { get; }
+        AccessModifier Modifier { get; }
 
-        AccessModifier GetterAccessibility { get; }
+        AccessModifier GetterModifier { get; }
     }
 
     public interface IPropertyEventGenerationAttribute : IGeneratesDataMemberPropertyFromFieldAttribute
@@ -26,7 +26,7 @@ namespace SourceInjection.Interfaces
 
         NullSafety NullSafety { get; }
 
-        AccessModifier SetterAccessibility { get; }
+        AccessModifier SetterModifier { get; }
 
         /// <summary>
         /// Also raises a event for the defined properties.

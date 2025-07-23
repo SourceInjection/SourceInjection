@@ -8,7 +8,7 @@ namespace SourceInjection.SourceGeneration.DataMembers
     {
         protected FieldSymbolInfo(
             string name,
-            AccessModifier declaredAccessibility,
+            AccessModifier declaredModifier,
             ITypeSymbol containingType,
             ImmutableArray<AttributeData> attributes,
             ITypeSymbol type
@@ -16,7 +16,7 @@ namespace SourceInjection.SourceGeneration.DataMembers
             ) : base(
 
             name: name,
-            declaredAccessibility: declaredAccessibility,
+            declaredModifier: declaredModifier,
             containingType: containingType,
             attributes: attributes,
             type: type)
@@ -26,7 +26,7 @@ namespace SourceInjection.SourceGeneration.DataMembers
         {
             return new FieldSymbolInfo(
                 name: field.Name,
-                declaredAccessibility: field.DeclaredAccessibility.ToAccessModifier(),
+                declaredModifier: field.DeclaredAccessibility.ToAccessModifier(),
                 containingType: field.ContainingType,
                 attributes: field.GetAttributes(),
                 type: field.Type);

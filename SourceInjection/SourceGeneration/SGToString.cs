@@ -120,7 +120,7 @@ namespace SourceInjection
             {
                 var attribute = AttributeFactory.Create<IGeneratesDataMemberPropertyFromFieldAttribute>(
                     field.AttributesOfType<IGeneratesDataMemberPropertyFromFieldAttribute>().First());
-                accessibility = MergePropertyAccessibility(attribute.Accessibility, attribute.GetterAccessibility);
+                accessibility = MergePropertyAccessibility(attribute.Modifier, attribute.GetterModifier);
             }
 
             if (accessibility == AccessModifier.None)
