@@ -79,17 +79,17 @@ namespace SourceInjection
             return fpc;
         }
 
-        private static IEnumerable<Accessibility> GetAllowedAccessibilities(Accessibilities accessibility)
+        private static IEnumerable<AccessModifier> GetAllowedAccessibilities(Accessibilities accessibility)
         {
-            if (accessibility.HasFlag(Accessibilities.Public))            yield return Accessibility.Public;
-            if (accessibility.HasFlag(Accessibilities.Internal))          yield return Accessibility.Internal;
-            if (accessibility.HasFlag(Accessibilities.Protected))         yield return Accessibility.Protected;
-            if (accessibility.HasFlag(Accessibilities.Private))           yield return Accessibility.Private;
-            if (accessibility.HasFlag(Accessibilities.ProtectedInternal)) yield return Accessibility.ProtectedOrInternal;
-            if (accessibility.HasFlag(Accessibilities.ProtectedPrivate))  yield return Accessibility.ProtectedAndInternal;
+            if (accessibility.HasFlag(Accessibilities.Public))            yield return AccessModifier.Public;
+            if (accessibility.HasFlag(Accessibilities.Internal))          yield return AccessModifier.Internal;
+            if (accessibility.HasFlag(Accessibilities.Protected))         yield return AccessModifier.Protected;
+            if (accessibility.HasFlag(Accessibilities.Private))           yield return AccessModifier.Private;
+            if (accessibility.HasFlag(Accessibilities.ProtectedInternal)) yield return AccessModifier.ProtectedInternal;
+            if (accessibility.HasFlag(Accessibilities.ProtectedPrivate))  yield return AccessModifier.ProtectedPrivate;
         }
 
-        private static bool SymbolIsAllowed(ISymbol symbol, Accessibility[] accessibilities)
+        private static bool SymbolIsAllowed(ISymbol symbol, AccessModifier[] accessibilities)
         {
             ITypeSymbol type;
             if (symbol is IFieldSymbol field)
@@ -103,18 +103,18 @@ namespace SourceInjection
                     HasRequiredAccessibility(symbol, accessibilities) && (!type.IsEnumerable() || type.OverridesToString())));
         }
 
-        private static bool HasRequiredAccessibility(ISymbol symbol, Accessibility[] accessibilities)
+        private static bool HasRequiredAccessibility(ISymbol symbol, AccessModifier[] accessibilities)
         {
-            Accessibility accessibility;
+            AccessModifier accessibility;
             if(symbol is IPropertySymbol property)
             {
                 if (property.GetMethod == null)
                     return false;
-                accessibility = MergePropertyAccessibility(property.DeclaredAccessibility, property.GetMethod.DeclaredAccessibility);
+                accessibility = MergePropertyAccessibility(property.DeclaredAccessibility.ToAccessModifier(), property.GetMethod.DeclaredAccessibility.ToAccessModifier());
             }
             else if (!(symbol is IFieldSymbol field && field.HasAttributeOfType<IGeneratesDataMemberPropertyFromFieldAttribute>()))
             {
-                accessibility = symbol.DeclaredAccessibility;
+                accessibility = symbol.DeclaredAccessibility.ToAccessModifier();
             }
             else
             {
@@ -123,15 +123,15 @@ namespace SourceInjection
                 accessibility = MergePropertyAccessibility(attribute.Accessibility, attribute.GetterAccessibility);
             }
 
-            if (accessibility == Accessibility.NotApplicable)
-                accessibility = Accessibility.Private;
+            if (accessibility == AccessModifier.None)
+                accessibility = AccessModifier.Private;
 
             return accessibilities.Contains(accessibility);
         }
 
-        private static Accessibility MergePropertyAccessibility(Accessibility declaredAccessibility, Accessibility getterAccessibility)
+        private static AccessModifier MergePropertyAccessibility(AccessModifier declaredAccessibility, AccessModifier getterAccessibility)
         {
-            if (getterAccessibility == Accessibility.NotApplicable)
+            if (getterAccessibility == AccessModifier.None)
                 return declaredAccessibility;
             return getterAccessibility;
         }

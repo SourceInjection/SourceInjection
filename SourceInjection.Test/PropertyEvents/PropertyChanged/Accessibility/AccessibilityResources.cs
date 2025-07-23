@@ -1,8 +1,5 @@
 ﻿namespace SourceInjection.Test.PropertyEvents.PropertyChanged.Accessibility
 {
-    using CompileUnits.CSharp;
-    using Accessibility = Microsoft.CodeAnalysis.Accessibility;
-
     internal static class AccessibilityResources
     {
         public static readonly object[] ExpectedAccessibilities =
@@ -12,7 +9,7 @@
             new object[] { typeof(ClassWithPropertyWithAccessibilityProtected), AccessModifier.Protected },
             new object[] { typeof(ClassWithPropertyWithAccessibilityPrivate), AccessModifier.Private },
             new object[] { typeof(ClassWithPropertyWithAccessibilityProtectedInternal), AccessModifier.ProtectedInternal },
-            new object[] { typeof(ClassWithPropertyWithAccessibilityProtectedPrivate), AccessModifier.PrivateProtected },
+            new object[] { typeof(ClassWithPropertyWithAccessibilityProtectedPrivate), AccessModifier.ProtectedPrivate },
         ];
     }
 
@@ -24,37 +21,37 @@
 
     internal partial class ClassWithPropertyWithAccessibilityPublic
     {
-        [NotifyPropertyChanged(setterAccessibility: Accessibility.Public)]
+        [NotifyPropertyChanged(setterAccessibility: AccessModifier.Public)]
         private int _property;
     }
 
     internal partial class ClassWithPropertyWithAccessibilityInternal
     {
-        [NotifyPropertyChanged(setterAccessibility: Accessibility.Internal)]
+        [NotifyPropertyChanged(setterAccessibility: AccessModifier.Internal)]
         private int _property;
     }
 
     internal partial class ClassWithPropertyWithAccessibilityProtected
     {
-        [NotifyPropertyChanged(setterAccessibility: Accessibility.Protected)]
+        [NotifyPropertyChanged(setterAccessibility: AccessModifier.Protected)]
         private int _property;
     }
 
     internal partial class ClassWithPropertyWithAccessibilityPrivate
     {
-        [NotifyPropertyChanged(setterAccessibility: Accessibility.Private)]
+        [NotifyPropertyChanged(setterAccessibility: AccessModifier.Private)]
         private int _property;
     }
 
     internal partial class ClassWithPropertyWithAccessibilityProtectedInternal
     {
-        [NotifyPropertyChanged(setterAccessibility: Accessibility.ProtectedOrInternal)]
+        [NotifyPropertyChanged(setterAccessibility: AccessModifier.ProtectedInternal)]
         private int _property;
     }
 
     internal partial class ClassWithPropertyWithAccessibilityProtectedPrivate
     {
-        [NotifyPropertyChanged(setterAccessibility: Accessibility.ProtectedAndInternal)]
+        [NotifyPropertyChanged(setterAccessibility: AccessModifier.ProtectedPrivate)]
         private int _property;
     }
 }

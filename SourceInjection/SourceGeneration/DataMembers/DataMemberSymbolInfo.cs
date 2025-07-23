@@ -10,8 +10,7 @@ namespace SourceInjection.SourceGeneration.DataMembers
     {
         protected DataMemberSymbolInfo(
             string name,
-            Accessibility
-            declaredAccessibility,
+            AccessModifier declaredAccessibility,
             ITypeSymbol containingType,
             ImmutableArray<AttributeData> attributes,
             ITypeSymbol type)
@@ -25,7 +24,7 @@ namespace SourceInjection.SourceGeneration.DataMembers
 
         public string Name { get; }
 
-        public Accessibility DeclaredAccessibility { get; }
+        public AccessModifier DeclaredAccessibility { get; }
 
         public ITypeSymbol ContainingType { get; }
 

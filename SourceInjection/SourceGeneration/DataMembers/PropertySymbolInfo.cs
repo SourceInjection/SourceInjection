@@ -1,4 +1,5 @@
 ﻿using Microsoft.CodeAnalysis;
+using SourceInjection.Util;
 using System.Collections.Immutable;
 
 namespace SourceInjection.SourceGeneration.DataMembers
@@ -7,7 +8,7 @@ namespace SourceInjection.SourceGeneration.DataMembers
     {
         protected PropertySymbolInfo(
             string name,
-            Accessibility declaredAccessibility,
+            AccessModifier declaredAccessibility,
             ITypeSymbol containingType,
             ImmutableArray<AttributeData> attributes,
             ITypeSymbol type,
@@ -34,7 +35,7 @@ namespace SourceInjection.SourceGeneration.DataMembers
         {
             return new PropertySymbolInfo(
                 name: property.Name,
-                declaredAccessibility: property.DeclaredAccessibility,
+                declaredAccessibility: property.DeclaredAccessibility.ToAccessModifier(),
                 containingType: property.ContainingType,
                 attributes: property.GetAttributes(),
                 type: property.Type,

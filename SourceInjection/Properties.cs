@@ -14,7 +14,7 @@ namespace SourceInjection
         protected PropertyEventGenerationAttribute(
             bool inEqualityCheck,
             NullSafety inEqualityNullSafety,
-            Accessibility setterAccessibility,
+            AccessModifier setterAccessibility,
             params string[] relatedProperties)
         {
             InEqualityCheck = inEqualityCheck;
@@ -29,11 +29,11 @@ namespace SourceInjection
 
         public IEnumerable<string> RelatedProperties { get; }
 
-        public Accessibility SetterAccessibility {  get; }
+        public AccessModifier SetterAccessibility {  get; }
 
-        public Accessibility Accessibility => Accessibility.Public;
+        public AccessModifier Accessibility => AccessModifier.Public;
 
-        public Accessibility GetterAccessibility => Accessibility.NotApplicable;
+        public AccessModifier GetterAccessibility => AccessModifier.None;
 
         public string PropertyName(IFieldSymbol field)
         {
@@ -60,7 +60,7 @@ namespace SourceInjection
         public NotifyPropertyChangedAttribute(
                 bool equalityCheck = true,
                 NullSafety inEqualityNullSafety = NullSafety.Auto,
-                Accessibility setterAccessibility = Accessibility.NotApplicable,
+                AccessModifier setterAccessibility = AccessModifier.None,
                 params string[] relatedProperties)
 
             : base(
@@ -82,7 +82,7 @@ namespace SourceInjection
         public NotifyPropertyChangingAttribute(
                 bool equalityCheck = true,
                 NullSafety inEqualityNullSafety = NullSafety.Auto,
-                Accessibility setterAccessibility = Accessibility.NotApplicable,
+                AccessModifier setterAccessibility = AccessModifier.None,
                 params string[] relatedProperties)
 
             : base(
@@ -104,7 +104,7 @@ namespace SourceInjection
         public NotifyPropertyEventsAttribute(
                 bool equalityCheck = true,
                 NullSafety inEqualityNullSafety = NullSafety.Auto,
-                Accessibility setterAccessibility = Accessibility.NotApplicable,
+                AccessModifier setterAccessibility = AccessModifier.None,
                 params string[] relatedProperties)
 
             : base(

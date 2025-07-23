@@ -155,29 +155,29 @@ $@"protected virtual void {PropertyChangingNotifyMethod}(string propertyName)
         private static string SetterAccessibilityText(PropertyEventFieldInfo fieldInfo)
         {
             var setterAccessibility = MergeAccessibilities(fieldInfo.ChangingAttribute?.SetterAccessibility, fieldInfo.ChangedAttribute?.SetterAccessibility);
-            if (setterAccessibility == Accessibility.Public)
-                setterAccessibility = Accessibility.NotApplicable;
+            if (setterAccessibility == AccessModifier.Public)
+                setterAccessibility = AccessModifier.None;
             return AccessibilityText(setterAccessibility);
         }
 
-        private static string AccessibilityText(Accessibility accessibility)
+        private static string AccessibilityText(AccessModifier accessibility)
         {
             switch (accessibility)
             {
-                case Accessibility.Public: return "public ";
-                case Accessibility.Internal: return "internal ";
-                case Accessibility.Protected: return "protected ";
-                case Accessibility.ProtectedOrInternal: return "protected internal ";
-                case Accessibility.ProtectedAndInternal: return "protected private ";
-                case Accessibility.Private: return "private ";
+                case AccessModifier.Public: return "public ";
+                case AccessModifier.Internal: return "internal ";
+                case AccessModifier.Protected: return "protected ";
+                case AccessModifier.ProtectedInternal: return "protected internal ";
+                case AccessModifier.ProtectedPrivate: return "protected private ";
+                case AccessModifier.Private: return "private ";
                 default: return string.Empty;
             }
         }
 
-        private static Accessibility MergeAccessibilities(Accessibility? a, Accessibility? b)
+        private static AccessModifier MergeAccessibilities(AccessModifier? a, AccessModifier? b)
         {
             if (a == null && b == null)
-                return Accessibility.NotApplicable;
+                return AccessModifier.None;
 
             if (a != null && b == null)
                 return a.Value;
@@ -185,25 +185,25 @@ $@"protected virtual void {PropertyChangingNotifyMethod}(string propertyName)
             if (a == null)
                 return b.Value;
 
-            if (a.Value == Accessibility.Public || b.Value == Accessibility.Public)
-                return Accessibility.Public;
+            if (a.Value == AccessModifier.Public || b.Value == AccessModifier.Public)
+                return AccessModifier.Public;
 
-            if (a.Value == Accessibility.ProtectedOrInternal || b.Value == Accessibility.ProtectedOrInternal || a.Value == Accessibility.Internal && b.Value == Accessibility.Protected || b.Value == Accessibility.Internal && a.Value == Accessibility.Protected)
-                return Accessibility.ProtectedOrInternal;
+            if (a.Value == AccessModifier.ProtectedInternal || b.Value == AccessModifier.ProtectedInternal || a.Value == AccessModifier.Internal && b.Value == AccessModifier.Protected || b.Value == AccessModifier.Internal && a.Value == AccessModifier.Protected)
+                return AccessModifier.ProtectedInternal;
 
-            if (a.Value == Accessibility.Internal || b.Value == Accessibility.Internal)
-                return Accessibility.Internal;
+            if (a.Value == AccessModifier.Internal || b.Value == AccessModifier.Internal)
+                return AccessModifier.Internal;
 
-            if (a.Value == Accessibility.Protected || b.Value == Accessibility.Protected)
-                return Accessibility.Protected;
+            if (a.Value == AccessModifier.Protected || b.Value == AccessModifier.Protected)
+                return AccessModifier.Protected;
 
-            if(a.Value == Accessibility.ProtectedAndInternal || b.Value == Accessibility.ProtectedAndInternal)
-                return Accessibility.ProtectedAndInternal;
+            if(a.Value == AccessModifier.ProtectedPrivate || b.Value == AccessModifier.ProtectedPrivate)
+                return AccessModifier.ProtectedPrivate;
 
-            if(a.Value == Accessibility.Private || b.Value == Accessibility.Private)
-                return Accessibility.Private;
+            if(a.Value == AccessModifier.Private || b.Value == AccessModifier.Private)
+                return AccessModifier.Private;
 
-            return Accessibility.NotApplicable;
+            return AccessModifier.None;
         }
         
 

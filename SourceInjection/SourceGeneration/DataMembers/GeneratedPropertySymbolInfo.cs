@@ -11,7 +11,7 @@ namespace SourceInjection.SourceGeneration.DataMembers
     {
         protected GeneratedPropertySymbolInfo(
             string name,
-            Accessibility declaredAccessibility,
+            AccessModifier declaredAccessibility,
             ITypeSymbol containingType,
             ImmutableArray<AttributeData> attributes,
             ITypeSymbol type,
